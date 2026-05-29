@@ -1,238 +1,513 @@
-# ─────────────────────────────────────────────────────────────
-# Planificación temporal — Complexe Balear
-# Fuente de verdad para el cálculo de duraciones y cronograma
-# Actualizado con estructura de hitos revisada
-# ─────────────────────────────────────────────────────────────
-
 proyecto:
-  nombre: "Adecuación del sistema de climatización del Complexe Balear de Recerca — UIB"
-  fecha_inicio: "2025-09-01"      # H1 — inicio real de obra
+  nombre: Adecuación del sistema de climatización del Complexe Balear de Recerca — UIB
+  fecha_inicio: '2025-09-01'
   horas_dia: 8
-  dias_semana: 5                  # días hábiles
-  plazo_contractual_dias: 80      # 4 meses de plazo de obra hasta H11A
+  dias_semana: 5
+  plazo_contractual_dias: 80
 
-# Operarios disponibles por perfil de recurso MO
 escenarios:
   base:
-    MO-INGPRO:       1
-    MO-CONT-SENIOR:  1
-    MO-CONT-JR:      1
-    MO-CLIM-O1:      1
-    MO-CLIM-AY:      1
-    MO-mo003:        1
-    MO-mo102:        1
-    MO-ELEC-O1:      1
-    MO-ELEC-AY:      1
-    MO-MONT-TECHO:   1
-    MO-mo041:        1
-    MO-mo087:        1
-    MO-AUX-GEN:      1
-    MO-DELINEANTE:   1
+    MO-INGPRO: 1
+    MO-CONT-SENIOR: 1
+    MO-CONT-JR: 1
+    MO-CLIM-O1: 1
+    MO-CLIM-AY: 1
+    MO-mo003: 1
+    MO-mo102: 1
+    MO-ELEC-O1: 1
+    MO-ELEC-AY: 1
+    MO-MONT-TECHO: 1
+    MO-mo041: 1
+    MO-mo087: 1
+    MO-AUX-GEN: 1
+    MO-DELINEANTE: 1
 
   optimizado:
-    MO-INGPRO:       1
-    MO-CONT-SENIOR:  1
-    MO-CONT-JR:      3
-    MO-CLIM-O1:      3
-    MO-CLIM-AY:      1
-    MO-mo003:        1
-    MO-mo102:        1
-    MO-ELEC-O1:      1
-    MO-ELEC-AY:      1
-    MO-MONT-TECHO:   1
-    MO-mo041:        1
-    MO-mo087:        1
-    MO-AUX-GEN:      1
-    MO-DELINEANTE:   1
+    MO-INGPRO: 1
+    MO-CONT-SENIOR: 1
+    MO-CONT-JR: 3
+    MO-CLIM-O1: 3
+    MO-CLIM-AY: 1
+    MO-mo003: 1
+    MO-mo102: 1
+    MO-ELEC-O1: 1
+    MO-ELEC-AY: 1
+    MO-MONT-TECHO: 1
+    MO-mo041: 1
+    MO-mo087: 1
+    MO-AUX-GEN: 1
+    MO-DELINEANTE: 1
 
 tareas:
-
   ADJ:
-    nombre: "Adjudicación del contrato"
+    nombre: Adjudicación del contrato
     tipo: hito
     capitulos_bc3: []
     duracion_dias_fija: 0
     dependencias: []
+    grupo_visual: Inicio / documentación contractual
+    nombre_corto: Adjudicación
+    entregables: []
+    orden_visual: 10
 
   DOC:
-    nombre: "Documentación previa al inicio de obras"
+    nombre: Documentación previa al inicio de obras
     tipo: tarea
-    capitulos_bc3: ["10#"]
+    capitulos_bc3:
+      - 10#
     duracion_dias_fija: 10
-    dependencias: [ADJ]
+    dependencias:
+      - ADJ
+    grupo_visual: Inicio / documentación contractual
+    nombre_corto: Doc. previa
+    entregables:
+      - Doc. inicio
+    orden_visual: 20
 
   PLANES:
-    nombre: "Elaboración, entrega y aprobación del PEO, PGR, PSS"
+    nombre: Elaboración, entrega y aprobación del PEO, PGR, PSS
     tipo: tarea
     capitulos_bc3: []
     duracion_dias_fija: 15
-    dependencias: [ADJ]
+    dependencias:
+      - ADJ
+    grupo_visual: Inicio / documentación contractual
+    nombre_corto: PEO/PGR/PSS
+    entregables:
+      - PEO
+      - PSS
+      - PGR
+    orden_visual: 30
 
   H1:
-    nombre: "H1 — Acta de replanteo e inicio de obra"
+    nombre: H1 — Acta de replanteo e inicio de obra
     tipo: hito
     capitulos_bc3: []
-    duracion_dias_fija: 1
-    dependencias: [DOC, PLANES]
+    duracion_dias_fija: 0
+    dependencias:
+      - DOC
+      - PLANES
+    grupo_visual: Inicio / documentación contractual
+    nombre_corto: Inicio obra
+    entregables: []
+    orden_visual: 40
 
   A_aud:
-    nombre: "Bloque A — Auditoría comunicaciones y control"
+    nombre: Bloque A — Auditoría comunicaciones y control
     tipo: tarea
-    capitulos_bc3: ["A.0"]
-    dependencias: [H1]
+    capitulos_bc3:
+      - A.0
+    dependencias:
+      - H1
+    grupo_visual: Auditorías técnicas
+    nombre_corto: Aud. control
+    entregables:
+      - PL01
+    orden_visual: 10
 
   A_inv:
-    nombre: "Validación inventario técnico Bloque A"
+    nombre: Validación inventario técnico Bloque A
     tipo: tarea
     capitulos_bc3: []
     duracion_dias_fija: 7
-    dependencias: [A_aud]
+    dependencias:
+      - A_aud
+    grupo_visual: Validación de inventarios y tipologías
+    nombre_corto: Valid. PL01
+    entregables:
+      - PL01 valid.
+    orden_visual: 10
 
   A_ejec:
-    nombre: "Bloque A — Ejecución SCADA y reparaciones UTs"
+    nombre: Bloque A — Ejecución SCADA y reparaciones UTs
     tipo: tarea
-    capitulos_bc3: ["A.1#", "A.2#"]
-    dependencias: [A_inv]
+    capitulos_bc3:
+      - A.1#
+      - A.2#
+    dependencias:
+      - A_inv
+    grupo_visual: Ejecución correctiva por bloques
+    nombre_corto: Ejec. control
+    entregables: []
+    orden_visual: 10
 
-  B:
-    nombre: "Bloque B — Purgadores automáticos y sectorización"
+  A_val:
+    nombre: Validación funcional Bloque A — Control centralizado y comunicaciones
     tipo: tarea
-    capitulos_bc3: ["B#"]
-    dependencias: [H1]
+    capitulos_bc3: []
+    duracion_dias_fija: 2
+    dependencias:
+      - A_ejec
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. control
+    entregables:
+      - Acta valid. A
+    orden_visual: 10
 
-  H2:
-    nombre: "H2 — Registros en lamas F4.1"
+  B_ejec:
+    nombre: Bloque B — Ejecución purgadores automáticos y sectorización
     tipo: tarea
-    capitulos_bc3: ["F4.1"]
-    dependencias: [H1]
+    capitulos_bc3:
+      - B#
+    dependencias:
+      - H1
+    grupo_visual: Actuaciones habilitadoras sistémicas
+    nombre_corto: Purgado/sector.
+    entregables: []
+    orden_visual: 10
+
+  B_val:
+    nombre: Validación funcional Bloque B — Purgado y sectorización
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 2
+    dependencias:
+      - B_ejec
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. hidr. base
+    entregables:
+      - Acta valid. B
+    orden_visual: 20
+
+  C_ejec:
+    nombre: Bloque C — Ejecución reforma integral sala de máquinas
+    tipo: tarea
+    capitulos_bc3:
+      - C#
+    dependencias:
+      - H1
+    grupo_visual: Actuaciones habilitadoras sistémicas
+    nombre_corto: Sala máquinas
+    entregables: []
+    orden_visual: 20
+
+  C_val:
+    nombre: Validación funcional Bloque C — Sala de máquinas
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 2
+    dependencias:
+      - C_ejec
+      - A_val
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. sala maq.
+    entregables:
+      - Acta valid. C
+    orden_visual: 30
 
   D_aud:
-    nombre: "Bloque D — Auditoría ventiladores y control de velocidad"
+    nombre: Bloque D — Auditoría ventiladores y control de velocidad
     tipo: tarea
-    capitulos_bc3: ["D.0"]
-    dependencias: [H1]
+    capitulos_bc3:
+      - D.0
+    dependencias:
+      - H1
+    grupo_visual: Auditorías técnicas
+    nombre_corto: Aud. ventilación
+    entregables:
+      - PL02
+    orden_visual: 20
 
   D_inv:
-    nombre: "Validación inventario funcional Bloque D"
+    nombre: Validación inventario funcional Bloque D
     tipo: tarea
     capitulos_bc3: []
     duracion_dias_fija: 7
-    dependencias: [D_aud]
-
-  E_aud:
-    nombre: "Bloque E — Auditoría equilibrio hidráulico y válvulas"
-    tipo: tarea
-    capitulos_bc3: ["E.0"]
-    dependencias: [H1]
-
-  E_inv:
-    nombre: "Validación inventario funcional Bloque E"
-    tipo: tarea
-    capitulos_bc3: []
-    duracion_dias_fija: 7
-    dependencias: [E_aud]
-
-  F_aud:
-    nombre: "Bloque F — Auditoría fugas, desagües, aislamiento y accesibilidad"
-    tipo: tarea
-    capitulos_bc3: ["F.0"]
-    dependencias: [H1]
-
-  F_inv:
-    nombre: "Validación inventario funcional Bloque F"
-    tipo: tarea
-    capitulos_bc3: []
-    duracion_dias_fija: 7
-    dependencias: [F_aud]
-
-  C:
-    nombre: "Bloque C — Reforma integral sala de máquinas"
-    tipo: tarea
-    capitulos_bc3: ["C#"]
-    dependencias: [B, A_ejec]
+    dependencias:
+      - D_aud
+    grupo_visual: Validación de inventarios y tipologías
+    nombre_corto: Valid. PL02
+    entregables:
+      - PL02 valid.
+    orden_visual: 20
 
   D_ejec:
-    nombre: "Bloque D — Ejecución recuperación ventiladores y control local"
+    nombre: Bloque D — Ejecución recuperación ventiladores y control local
     tipo: tarea
-    capitulos_bc3: ["D1.1", "D1.2", "D1.3", "D1.4", "D1.5",
-                    "D1.6", "D1.7", "D1.8", "D1.9", "D1.10",
-                    "D1.11", "D1.12", "D1.13"]
-    dependencias: [A_ejec, D_inv]
+    capitulos_bc3:
+      - D1.1
+      - D1.2
+      - D1.3
+      - D1.4
+      - D1.5
+      - D1.6
+      - D1.7
+      - D1.8
+      - D1.9
+      - D1.10
+      - D1.11
+      - D1.12
+      - D1.13
+    dependencias:
+      - D_inv
+    grupo_visual: Ejecución correctiva por bloques
+    nombre_corto: Ejec. ventilación
+    entregables: []
+    orden_visual: 20
+
+  D_val:
+    nombre: Validación funcional Bloque D — Ventilación y control local
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 2
+    dependencias:
+      - D_ejec
+      - A_val
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. ventilación
+    entregables:
+      - Acta valid. D
+    orden_visual: 40
+
+  E_aud:
+    nombre: Bloque E — Auditoría equilibrio hidráulico y válvulas
+    tipo: tarea
+    capitulos_bc3:
+      - E.0
+    dependencias:
+      - H1
+    grupo_visual: Auditorías técnicas
+    nombre_corto: Aud. hidráulica
+    entregables:
+      - PL03
+    orden_visual: 30
+
+  E_inv:
+    nombre: Validación inventario funcional Bloque E
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 7
+    dependencias:
+      - E_aud
+    grupo_visual: Validación de inventarios y tipologías
+    nombre_corto: Valid. PL03
+    entregables:
+      - PL03 valid.
+    orden_visual: 30
 
   E_ejec:
-    nombre: "Bloque E — Ejecución equilibrio hidráulico, actuadores y válvulas"
+    nombre: Bloque E — Ejecución equilibrio hidráulico, actuadores y válvulas
     tipo: tarea
-    capitulos_bc3: ["E1.1.1", "E1.1.2", "E1.1.3", "E1.1.4", "E1.1.5",
-                    "E1.1.6", "E1.1.7", "E1.1.8", "E1.1.9",
-                    "E1.2.1.1", "E1.2.1.2", "E1.2.1.3", "E1.2.1.4", "E1.2.1.5",
-                    "E1.2.3", "E1.2.4", "E1.3", "E1.4",
-                    "E1.5.1", "E1.5.2", "E1.5.3", "E1.5.4", "E1.5.5",
-                    "E3.1", "E3.2", "E3.3", "E3.4", "E3.5", "E3.6"]
-    dependencias: [A_ejec, E_inv]
+    capitulos_bc3:
+      - E1.1.1
+      - E1.1.2
+      - E1.1.3
+      - E1.1.4
+      - E1.1.5
+      - E1.1.6
+      - E1.1.7
+      - E1.1.8
+      - E1.1.9
+      - E1.2.1.1
+      - E1.2.1.2
+      - E1.2.1.3
+      - E1.2.1.4
+      - E1.2.1.5
+      - E1.2.3
+      - E1.2.4
+      - E1.3
+      - E1.4
+      - E1.5.1
+      - E1.5.2
+      - E1.5.3
+      - E1.5.4
+      - E1.5.5
+      - E3.1
+      - E3.2
+      - E3.3
+      - E3.4
+      - E3.5
+      - E3.6
+    dependencias:
+      - E_inv
+    grupo_visual: Ejecución correctiva por bloques
+    nombre_corto: Ejec. hidráulica
+    entregables: []
+    orden_visual: 30
+
+  E_val:
+    nombre: Validación funcional Bloque E — Hidráulica, actuadores y válvulas
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 2
+    dependencias:
+      - E_ejec
+      - A_val
+      - B_val
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. hidráulica
+    entregables:
+      - Acta valid. E
+    orden_visual: 50
+
+  F_aud:
+    nombre: Bloque F — Auditoría fugas, desagües, aislamiento y accesibilidad
+    tipo: tarea
+    capitulos_bc3:
+      - F.0
+    dependencias:
+      - H1
+    grupo_visual: Auditorías técnicas
+    nombre_corto: Aud. fugas/accesos
+    entregables:
+      - PL04
+    orden_visual: 40
+
+  F_inv:
+    nombre: Validación inventario funcional Bloque F
+    tipo: tarea
+    capitulos_bc3: []
+    duracion_dias_fija: 7
+    dependencias:
+      - F_aud
+    grupo_visual: Validación de inventarios y tipologías
+    nombre_corto: Valid. PL04
+    entregables:
+      - PL04 valid.
+    orden_visual: 40
+
+  LAMAS:
+    nombre: Bloque F — Registros en lamas F4.1
+    tipo: tarea
+    capitulos_bc3:
+      - F4.1
+    dependencias:
+      - H1
+    grupo_visual: Actuaciones habilitadoras sistémicas
+    nombre_corto: Registros lamas
+    entregables: []
+    orden_visual: 30
 
   F_ejec:
-    nombre: "Bloque F — Ejecución fugas, desagües, aislamiento y accesos"
+    nombre: Bloque F — Ejecución fugas, desagües, aislamiento y accesos
     tipo: tarea
-    capitulos_bc3: ["F1.1", "F1.2.1.1", "F1.2.1.2", "F1.2.1.3",
-                    "F1.2.1.4", "F1.2.1.5", "F1.2.4", "F1.2.5", "F1.2.6",
-                    "F1.3", "F1.4",
-                    "F2.1", "F2.2", "F2.3", "F2.4",
-                    "F3.1", "F3.2", "F3.3"]
-    dependencias: [F_inv, H2]
+    capitulos_bc3:
+      - F1.1
+      - F1.2.1.1
+      - F1.2.1.2
+      - F1.2.1.3
+      - F1.2.1.4
+      - F1.2.1.5
+      - F1.2.4
+      - F1.2.5
+      - F1.2.6
+      - F1.3
+      - F1.4
+      - F2.1
+      - F2.2
+      - F2.3
+      - F2.4
+      - F3.1
+      - F3.2
+      - F3.3
+    dependencias:
+      - F_inv
+      - LAMAS
+    grupo_visual: Ejecución correctiva por bloques
+    nombre_corto: Ejec. fugas/accesos
+    entregables: []
+    orden_visual: 40
 
-  H3:
-    nombre: "H3 — Bloques A, B, C, D, E y F ejecutados y validados"
-    tipo: hito
+  F_val:
+    nombre: Validación funcional Bloque F — Fugas, desagües, aislamiento y accesos
+    tipo: tarea
     capitulos_bc3: []
-    duracion_dias_fija: 0
-    dependencias: [B, C, D_ejec, E_ejec, F_ejec]
+    duracion_dias_fija: 2
+    dependencias:
+      - F_ejec
+    grupo_visual: Validación funcional por bloques
+    nombre_corto: Valid. fugas/accesos
+    entregables:
+      - Acta valid. F
+    orden_visual: 60
 
   PFS:
-    nombre: "07 — Puesta en servicio funcional"
+    nombre: 07 — Puesta en servicio funcional
     tipo: tarea
-    capitulos_bc3: ["07#"]
+    capitulos_bc3:
+      - 07#
     duracion_dias_fija: 5
-    dependencias: [H3]
+    dependencias:
+      - A_val
+      - B_val
+      - C_val
+      - D_val
+      - E_val
+      - F_val
+    grupo_visual: Puesta en servicio funcional
+    nombre_corto: Puesta servicio
+    entregables:
+      - Acta PFS
+    orden_visual: 10
 
   H4:
-    nombre: "H4 — Cierre técnico / recepción operativa"
+    nombre: H4 — Cierre técnico / recepción operativa
     tipo: hito
     capitulos_bc3: []
     duracion_dias_fija: 0
-    dependencias: [PFS]
+    dependencias:
+      - PFS
     es_fin_plazo: true
+    grupo_visual: Cierre contractual
+    nombre_corto: Cierre técnico
+    entregables:
+      - Recepción operativa
+    orden_visual: 10
 
   VLC:
-    nombre: "Campaña validación térmica — modo calefacción"
+    nombre: Campaña validación térmica — modo calefacción
     tipo: tarea
     capitulos_bc3: []
     duracion_dias_fija: 4
-    dependencias: [H4]
+    dependencias:
+      - H4
     estacional: true
+    grupo_visual: Validaciones estacionales diferidas
+    nombre_corto: Camp. calor
+    entregables:
+      - Ensayo calor
+    orden_visual: 10
 
   VLR:
-    nombre: "Campaña validación térmica — modo refrigeración"
+    nombre: Campaña validación térmica — modo refrigeración
     tipo: tarea
     capitulos_bc3: []
     duracion_dias_fija: 4
-    dependencias: [H4]
+    dependencias:
+      - H4
     estacional: true
+    grupo_visual: Validaciones estacionales diferidas
+    nombre_corto: Camp. frío
+    entregables:
+      - Ensayo frío
+    orden_visual: 20
 
   ASB:
-    nombre: "Proyecto As Build"
+    nombre: Proyecto As Built
     tipo: tarea
-    capitulos_bc3: ["11#"]
+    capitulos_bc3:
+      - 11#
     duracion_dias_fija: 5
-    dependencias: [H4, VLC, VLR]
+    dependencias:
+      - H4
+      - VLC
+      - VLR
+    grupo_visual: Proyecto As Built
+    nombre_corto: As Built
+    entregables:
+      - Proyecto As Built
+    orden_visual: 10
 
   H5:
-    nombre: "H5 — Cierre total documental y estacional"
+    nombre: H5 — Cierre total documental y estacional
     tipo: hito
     capitulos_bc3: []
     duracion_dias_fija: 0
-    dependencias: [ASB, VLC, VLR]
-
-# Capítulos excluidos del cronograma calculado:
-# 12 — Seguridad y Salud: obligación continua.
-# 13 — Gestión de Residuos: obligación continua.
-# 00 — Trabajos generales: partidas transversales sin secuencia fija.
+    dependencias:
+      - ASB
+      - VLC
+      - VLR
+    grupo_visual: Proyecto As Built
+    nombre_corto: Cierre total
+    entregables: []
+    orden_visual: 20

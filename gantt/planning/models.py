@@ -58,6 +58,12 @@ class TareaGantt(BaseModel):
     estacional: bool = False
     es_fin_plazo: bool = False          # True en el hito que marca el fin del plazo contractual
 
+    # Campos opcionales de representación gráfica
+    grupo_visual: str | None = None     # banda funcional del diagrama de red
+    nombre_corto: str | None = None     # etiqueta compacta para el nodo
+    entregables: list[str] = Field(default_factory=list)
+    orden_visual: int | None = None     # ajuste manual dentro de la banda
+
     # Campos calculados — None hasta que calculator los rellena
     duracion_dias: float | None = None
     fecha_inicio: date | None = None
@@ -149,6 +155,10 @@ def cargar_planificacion_yaml(
             dependencias=[str(d) for d in tarea_data.get('dependencias', [])],
             estacional=tarea_data.get('estacional', False),
             es_fin_plazo=tarea_data.get('es_fin_plazo', False),
+            grupo_visual=tarea_data.get('grupo_visual'),
+            nombre_corto=tarea_data.get('nombre_corto'),
+            entregables=tarea_data.get('entregables', []),
+            orden_visual=tarea_data.get('orden_visual'),
         )
         for tarea_id, tarea_data in tareas_raw.items()
     ]
@@ -180,3 +190,4 @@ if __name__ == '__main__':
         bc3_str = ', '.join(tarea.capitulos_bc3) if tarea.capitulos_bc3 else 'duración fija'
         print(f'  {tarea.id:<12} [{tarea.tipo:<5}] {tarea.nombre[:40]:<40} '
               f'dep: {dep_str:<20} bc3: {bc3_str}')
+        

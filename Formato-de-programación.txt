@@ -1,0 +1,214 @@
+Norma de programación Python del proyecto
+
+Este proyecto debe desarrollarse siguiendo un estilo de programación estricto, sobrio y orientado a mantenibilidad a largo plazo. El objetivo no es generar código sofisticado ni maximizar abstracciones, sino construir una base de software clara, revisable y ampliable de forma controlada.
+
+1. Objetivo general del estilo de programación
+
+Todo el código generado debe priorizar, por este orden:
+
+claridad de lectura
+simplicidad estructural
+coherencia con la arquitectura del proyecto
+mantenibilidad a medio y largo plazo
+reutilización real, no forzada
+extensión controlada del software
+
+No se debe introducir complejidad técnica si no existe una necesidad funcional o arquitectónica clara.
+
+2. Principio general de sobriedad
+
+El código debe ser explícito, técnico y fácil de revisar. Se debe evitar cualquier forma de “magia”, automatismo innecesario o patrón avanzado que dificulte entender qué está ocurriendo.
+
+Se debe evitar especialmente:
+
+abstracción prematura
+patrones de diseño innecesarios
+decoradores no imprescindibles
+staticmethod y classmethod salvo justificación expresa
+helpers pequeños sin valor arquitectónico real
+métodos privados introducidos por costumbre
+lógica repartida en demasiadas capas
+estructuras de datos excesivamente anidadas
+nombres genéricos como manager, processor, handler, builder, factory si no describen bien el rol del objeto
+3. Diseño orientado a objetos
+
+La programación debe ser orientada a objetos cuando realmente aporte claridad al modelo del problema.
+
+Se deben crear clases cuando:
+
+representan una entidad clara del dominio
+encapsulan una responsabilidad bien definida
+tiene sentido instanciarlas
+agrupan estado y comportamiento coherentes
+permiten extender el sistema con orden
+
+No se deben crear clases artificiales para envolver unas pocas funciones sin necesidad real.
+
+La herencia está permitida únicamente cuando existe una relación conceptual real entre clases. Debe utilizarse para expresar correctamente el dominio, no como mecanismo de reutilización de código.
+
+La composición está permitida cuando sea la forma más clara de construir comportamiento, evitando capas innecesarias.
+
+4. Uso de abstracción y polimorfismo
+
+Las clases abstractas y el polimorfismo deben utilizarse únicamente cuando haya una familia clara de comportamientos con contrato común.
+
+Ejemplo válido: adapters de ingesta de diferentes orígenes de datos con una interfaz común.
+
+No se deben crear abstracciones “por si acaso” ni anticipar múltiples implementaciones sin necesidad real.
+
+5. Modelado de datos
+
+Cuando se modele un objeto del sistema, se utilizarán modelos Pydantic como norma general.
+
+Debe existir un bloque claro de modelos de datos dentro del proyecto.
+
+Los modelos deben:
+
+representar estructuras reales del dominio o de intercambio de datos
+ser claros, sobrios y explícitos
+evitar lógica innecesaria
+centrarse en validación y estructura
+
+No se debe introducir dataclass de forma dispersa salvo decisión expresa.
+
+6. Funciones y métodos
+
+Las funciones y métodos deben tener una única responsabilidad clara.
+
+Deben ser:
+
+relativamente cortos
+fáciles de revisar
+con lógica directa y comprensible
+
+Los helpers solo se aceptan cuando:
+
+encapsulan una transformación relevante
+evitan duplicación real
+aíslan lógica reutilizable
+separan una operación compleja
+pertenecen a un bloque común bien definido
+
+No se deben crear helpers triviales que fragmenten innecesariamente la lectura.
+
+7. Métodos privados y utilidades auxiliares
+
+No crear métodos privados
+
+No se debe fragmentar una clase en múltiples métodos pequeños salvo que exista una razón clara.
+
+Las utilidades comunes deben organizarse de forma controlada en módulos específicos, evitando dispersión.
+
+No se deben crear archivos genéricos sin delimitación clara de responsabilidad.
+
+8. Constructores
+
+Los constructores deben ser simples y fáciles de revisar.
+
+Un __init__ no debe contener:
+
+lógica pesada
+parsing complejo
+acceso a disco
+validaciones extensas
+
+Debe limitarse a inicializar estado y dependencias.
+
+9. Inputs y outputs
+
+Las firmas deben ser claras y contenidas.
+
+Se debe evitar:
+
+exceso de parámetros
+outputs innecesarios
+tuplas largas
+diccionarios ambiguos
+estructuras anidadas complejas
+
+Solo se devuelve lo necesario para el flujo.
+
+10. Manejo de errores
+
+Queda prohibido el uso de try/except profiláctico.
+
+Solo se permite cuando:
+
+existe un fallo esperable
+hay estrategia de recuperación
+se añade contexto útil al error
+se traduce una excepción técnica a dominio
+
+No se deben ocultar errores ni usar bloques vacíos.
+
+11. Logs, prints y trazabilidad
+
+Se deben evitar logs excesivos.
+
+Los print son válidos en desarrollo local, pero deben ser:
+
+claros
+concretos
+temporales
+
+Para trazabilidad formal se debe priorizar:
+
+serialización de modelos Pydantic
+manifests estructurados
+registros explícitos de pipeline
+12. Comentarios y documentación
+
+Cada clase debe incluir una docstring inicial clara en castellano que explique su responsabilidad.
+
+No se deben añadir comentarios triviales dentro del código.
+
+Solo se permiten comentarios internos en lógica compleja o no evidente.
+
+Código en inglés, comentarios en castellano salvo indicación contraria.
+
+13. Organización modular
+
+Se debe respetar el árbol de módulos definido en el proyecto.
+
+No se deben crear nuevas estructuras sin indicarlo previamente.
+
+Si se detecta necesidad de ampliación, debe proponerse antes de implementar.
+
+Se deben evitar archivos excesivamente grandes.
+
+14. Flujo de generación de código
+
+Antes de escribir código, se debe seguir este proceso:
+
+análisis del problema
+propuesta de arquitectura
+definición de módulos y clases
+definición de modelos de datos
+descripción del flujo
+generación de código
+explicación técnica breve
+
+No se debe generar código directamente sin diseño previo.
+
+15. Evolución del sistema
+
+El sistema debe crecer por ampliación controlada.
+
+El código nuevo debe adaptarse a la arquitectura existente.
+
+Si se propone modificarla, debe indicarse previamente.
+
+No se deben hacer refactorizaciones masivas sin necesidad real.
+
+16. Criterio final de calidad
+
+El código debe poder responder afirmativamente a:
+
+¿se entiende rápido?
+¿cada clase tiene sentido real?
+¿la estructura responde al dominio?
+¿hay complejidad innecesaria?
+¿es mantenible?
+¿es ampliable sin romper lo existente?
+
+Si no, debe simplificarse.

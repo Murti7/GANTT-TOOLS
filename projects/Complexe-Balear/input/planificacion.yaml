@@ -39,57 +39,17 @@ escenarios:
     MO-DELINEANTE: 1
 
 tareas:
-  ADJ:
-    nombre: Adjudicación del contrato
-    tipo: hito
-    capitulos_bc3: []
-    duracion_dias_fija: 0
-    dependencias: []
-    grupo_visual: Inicio / documentación contractual
-    nombre_corto: Adjudicación
-    entregables: []
-    orden_visual: 10
-
-  DOC:
-    nombre: Documentación previa al inicio de obras
-    tipo: tarea
-    capitulos_bc3:
-      - 10#
-    duracion_dias_fija: 10
-    dependencias:
-      - ADJ
-    grupo_visual: Inicio / documentación contractual
-    nombre_corto: Doc. previa
-    entregables:
-      - Doc. inicio
-    orden_visual: 20
-
-  PLANES:
-    nombre: Elaboración, entrega y aprobación del PEO, PGR, PSS
-    tipo: tarea
-    capitulos_bc3: []
-    duracion_dias_fija: 15
-    dependencias:
-      - ADJ
-    grupo_visual: Inicio / documentación contractual
-    nombre_corto: PEO/PGR/PSS
-    entregables:
-      - PEO
-      - PSS
-      - PGR
-    orden_visual: 30
 
   H1:
     nombre: H1 — Acta de replanteo e inicio de obra
     tipo: hito
     capitulos_bc3: []
     duracion_dias_fija: 0
-    dependencias:
-      - DOC
-      - PLANES
+    dependencias: []
     grupo_visual: Inicio / documentación contractual
     nombre_corto: Inicio obra
-    entregables: []
+    entregables: 
+    - Acta Replanteo
     orden_visual: 40
 
   A_aud:
@@ -100,7 +60,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. control
+    nombre_corto: A_aud
     entregables:
       - PL01
     orden_visual: 10
@@ -113,7 +73,7 @@ tareas:
     dependencias:
       - A_aud
     grupo_visual: Validación de inventarios y tipologías
-    nombre_corto: Valid. PL01
+    nombre_corto: Rev. STI PL01
     entregables:
       - PL01 valid.
     orden_visual: 10
@@ -127,7 +87,7 @@ tareas:
     dependencias:
       - A_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. control
+    nombre_corto: A_ejec
     entregables: []
     orden_visual: 10
 
@@ -139,7 +99,7 @@ tareas:
     dependencias:
       - A_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. control
+    nombre_corto: A_val
     entregables:
       - Acta valid. A
     orden_visual: 10
@@ -152,7 +112,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Actuaciones habilitadoras sistémicas
-    nombre_corto: Purgado/sector.
+    nombre_corto: B_ejec
     entregables: []
     orden_visual: 10
 
@@ -164,7 +124,7 @@ tareas:
     dependencias:
       - B_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. hidr. base
+    nombre_corto: B_val
     entregables:
       - Acta valid. B
     orden_visual: 20
@@ -177,7 +137,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Actuaciones habilitadoras sistémicas
-    nombre_corto: Sala máquinas
+    nombre_corto: C_ejec
     entregables: []
     orden_visual: 20
 
@@ -190,7 +150,7 @@ tareas:
       - C_ejec
       - A_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. sala maq.
+    nombre_corto: C_val
     entregables:
       - Acta valid. C
     orden_visual: 30
@@ -203,7 +163,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. ventilación
+    nombre_corto: D_aud
     entregables:
       - PL02
     orden_visual: 20
@@ -216,7 +176,7 @@ tareas:
     dependencias:
       - D_aud
     grupo_visual: Validación de inventarios y tipologías
-    nombre_corto: Valid. PL02
+    nombre_corto: Rev. STI PL02
     entregables:
       - PL02 valid.
     orden_visual: 20
@@ -241,7 +201,7 @@ tareas:
     dependencias:
       - D_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. ventilación
+    nombre_corto: D_ejec
     entregables: []
     orden_visual: 20
 
@@ -254,7 +214,7 @@ tareas:
       - D_ejec
       - A_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. ventilación
+    nombre_corto: D_val
     entregables:
       - Acta valid. D
     orden_visual: 40
@@ -267,7 +227,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. hidráulica
+    nombre_corto: E_aud
     entregables:
       - PL03
     orden_visual: 30
@@ -280,7 +240,7 @@ tareas:
     dependencias:
       - E_aud
     grupo_visual: Validación de inventarios y tipologías
-    nombre_corto: Valid. PL03
+    nombre_corto: Rev. STI PL03
     entregables:
       - PL03 valid.
     orden_visual: 30
@@ -321,7 +281,7 @@ tareas:
     dependencias:
       - E_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. hidráulica
+    nombre_corto: E_ejec
     entregables: []
     orden_visual: 30
 
@@ -335,7 +295,7 @@ tareas:
       - A_val
       - B_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. hidráulica
+    nombre_corto: E_val
     entregables:
       - Acta valid. E
     orden_visual: 50
@@ -348,7 +308,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. fugas/accesos
+    nombre_corto: F_aud
     entregables:
       - PL04
     orden_visual: 40
@@ -361,7 +321,7 @@ tareas:
     dependencias:
       - F_aud
     grupo_visual: Validación de inventarios y tipologías
-    nombre_corto: Valid. PL04
+    nombre_corto: Rev. STI PL04
     entregables:
       - PL04 valid.
     orden_visual: 40
@@ -374,7 +334,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Actuaciones habilitadoras sistémicas
-    nombre_corto: Registros lamas
+    nombre_corto: F4.1 Registros
     entregables: []
     orden_visual: 30
 
@@ -404,7 +364,7 @@ tareas:
       - F_inv
       - LAMAS
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. fugas/accesos
+    nombre_corto: F_ejec
     entregables: []
     orden_visual: 40
 
@@ -416,7 +376,7 @@ tareas:
     dependencias:
       - F_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. fugas/accesos
+    nombre_corto: F_val
     entregables:
       - Acta valid. F
     orden_visual: 60
@@ -508,6 +468,6 @@ tareas:
       - VLC
       - VLR
     grupo_visual: Proyecto As Built
-    nombre_corto: Cierre total
+    nombre_corto: Acta Rececpión obra
     entregables: []
     orden_visual: 20

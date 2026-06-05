@@ -18,24 +18,27 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from openpyxl import load_workbook
 
+from gantt.reporting.styles import CHART_DPI, CHART_PALETA, CHART_PALETA_APILADA
+from gantt.reporting.palette import (
+    CHART_AZUL, CHART_AZUL_MEDIO, CHART_VERDE,
+    CHART_GRIS_CLARO, CHART_BORDE, CHART_GRID,
+    CHART_TEXTO, CHART_MUTED, FONT_CHART,
+)
 
-# ---------------------------------------------------------------------------
-# Configuración visual
-# ---------------------------------------------------------------------------
+# Alias locales para compatibilidad con el código existente del módulo
+COLOR_BLUE       = CHART_AZUL
+from gantt.reporting.palette import CHART_AZUL_CLARO
+COLOR_BLUE_LIGHT = CHART_AZUL_CLARO
+COLOR_GREEN      = CHART_VERDE
+COLOR_GRID       = CHART_GRID
+COLOR_TEXT       = CHART_TEXTO
+COLOR_MUTED      = CHART_MUTED
 
-CHART_DPI = 300
-COLOR_BLUE = '#2F5D8C'
-COLOR_BLUE_LIGHT = '#5B9BD5'
-COLOR_GREEN = '#6FA843'
-COLOR_GRID = '#D0D0D0'
-COLOR_TEXT = '#222222'
-COLOR_MUTED = '#666666'
-
-plt.rcParams['font.family'] = 'DejaVu Sans'
-plt.rcParams['axes.edgecolor'] = '#222222'
-plt.rcParams['axes.labelcolor'] = COLOR_TEXT
-plt.rcParams['xtick.color'] = COLOR_TEXT
-plt.rcParams['ytick.color'] = COLOR_TEXT
+plt.rcParams['font.family']     = FONT_CHART
+plt.rcParams['axes.edgecolor']  = CHART_TEXTO
+plt.rcParams['axes.labelcolor'] = CHART_TEXTO
+plt.rcParams['xtick.color']     = CHART_TEXTO
+plt.rcParams['ytick.color']     = CHART_TEXTO
 
 
 # ---------------------------------------------------------------------------
@@ -335,17 +338,7 @@ def save_stacked_mo_chart(
     y_pos = list(range(n_caps))
     left = [0.0] * n_caps
 
-    palette = [
-        '#2F5D8C',
-        '#5B9BD5',
-        '#70AD47',
-        '#A9D18E',
-        '#C55A11',
-        '#F4B183',
-        '#7F6000',
-        '#A64D79',
-        '#999999',
-    ]
+    palette = CHART_PALETA_APILADA
 
     fig, ax = plt.subplots(figsize=(13.5, max(4.5, n_caps * 0.58 + 1.5)))
     fig.patch.set_facecolor('white')
@@ -373,7 +366,7 @@ def save_stacked_mo_chart(
             vals,
             left=left,
             label='Otros perfiles (<50 h)',
-            color='#BFBFBF',
+            color=CHART_GRIS_CLARO,
             height=0.58,
             edgecolor='white',
         )
@@ -395,7 +388,7 @@ def save_stacked_mo_chart(
         ncol=2,
         framealpha=0.95,
         facecolor='white',
-        edgecolor='#DDDDDD',
+        edgecolor=CHART_BORDE,
     )
 
     fig.tight_layout(pad=1.8)
@@ -637,7 +630,7 @@ class AnalysisChartsReport:
                 title='Horas de mano de obra por capítulo',
                 xlabel='Horas MO',
                 value_fmt='{:,.1f}',
-                color='#4472C4',
+                color=CHART_AZUL_MEDIO,
                 filter_zero=True,
             )
             print('      OK 01_horas_mo_por_capitulo.png')

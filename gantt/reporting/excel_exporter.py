@@ -28,8 +28,8 @@ from gantt.planning.analyser import (
 )
 from gantt.planning.models import PlanificacionProyecto
 from gantt.reporting.styles import (
-    FILL_ALT, FILL_CAP, FILL_GREEN, FILL_HEADER, FILL_RED, FILL_WHITE, FILL_YELLOW,
-    FONT_BOLD, FONT_HEADER, FONT_ITALIC,
+    GANTT_FILL_ALT, GANTT_FILL_CAP, GANTT_FILL_GREEN, GANTT_FILL_HEADER, GANTT_FILL_RED, GANTT_FILL_WHITE, GANTT_FILL_YELLOW,
+    GANTT_FONT_BOLD, GANTT_FONT_HEADER, GANTT_FONT_ITALIC,
 )
 
 
@@ -86,8 +86,8 @@ def write_resumen(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> No
 
     ws.append(headers)
     for cell in ws[1]:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     tot_importe = 0.0
@@ -104,8 +104,8 @@ def write_resumen(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> No
                   + [horas[c] for c in codigos] + [pct])
         row = ws[ws.max_row]
         for cell in row:
-            cell.fill = FILL_CAP
-            cell.font = FONT_BOLD
+            cell.fill = GANTT_FILL_CAP
+            cell.font = GANTT_FONT_BOLD
         row[2].number_format = '#,##0.00'
         for cell in row[3:]:
             cell.number_format = '#,##0.0'
@@ -135,8 +135,8 @@ def write_resumen(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> No
     ws.append(['', 'TOTAL', tot_importe, tot_hmo] + tot_h + [tot_pct])
     tot_row = ws[ws.max_row]
     for cell in tot_row:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
     tot_row[2].number_format = '#,##0.00'
     for cell in tot_row[3:]:
         cell.number_format = '#,##0.0'
@@ -148,22 +148,22 @@ def write_resumen(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> No
     mo_title = ws.max_row
     # Fusionado en el mismo ancho que la tabla principal
     ws.merge_cells(start_row=mo_title, start_column=1, end_row=mo_title, end_column=n_main_cols)
-    ws.cell(mo_title, 1).fill = FILL_HEADER
-    ws.cell(mo_title, 1).font = FONT_HEADER
+    ws.cell(mo_title, 1).fill = GANTT_FILL_HEADER
+    ws.cell(mo_title, 1).font = GANTT_FONT_HEADER
     ws.cell(mo_title, 1).alignment = Alignment(horizontal='center')
 
     ws.append(['Código', 'Descripción', '€/hora', 'Horas totales', 'Coste total (€)', '% coste MO'])
     mo_hdr = ws[ws.max_row]
     for cell in mo_hdr:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     for i, recurso in enumerate(recursos):
         horas_r = tot_h[i]
         coste_r = horas_r * recurso.precio_hora
         pct_r   = round(coste_r / tot_coste * 100, 1) if tot_coste else 0.0
-        fill    = FILL_ALT if i % 2 == 0 else FILL_WHITE
+        fill    = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
         ws.append([recurso.codigo, recurso.descripcion, recurso.precio_hora, horas_r, coste_r, pct_r])
         mo_row = ws[ws.max_row]
         for cell in mo_row:
@@ -176,8 +176,8 @@ def write_resumen(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> No
     ws.append(['', 'TOTAL', '', sum(tot_h), tot_coste, 100.0])
     mo_tot = ws[ws.max_row]
     for cell in mo_tot:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
     mo_tot[3].number_format = '#,##0.00'
     mo_tot[4].number_format = '#,##0.00'
     mo_tot[5].number_format = '0.0'
@@ -198,8 +198,8 @@ def write_partidas(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> N
     )
     ws.append(headers)
     for cell in ws[1]:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
     ws.freeze_panes = 'A2'
 
@@ -219,7 +219,7 @@ def write_partidas(ws, presupuesto: Presupuesto, recursos: list[RecursoMO]) -> N
                       + [horas_por_cod[c] for c in codigos])
 
             row  = ws[row_idx]
-            fill = FILL_ALT if row_idx % 2 == 0 else FILL_WHITE
+            fill = GANTT_FILL_ALT if row_idx % 2 == 0 else GANTT_FILL_WHITE
             for cell in row:
                 cell.fill = fill
             for cell in row[5:]:
@@ -245,8 +245,8 @@ def write_simulador(
     ws.append(['PARÁMETROS DE CUADRILLA POR ESCENARIO'])
     title_a = ws.max_row
     ws.merge_cells(start_row=title_a, start_column=1, end_row=title_a, end_column=n_cols_b)
-    ws.cell(title_a, 1).fill = FILL_HEADER
-    ws.cell(title_a, 1).font = FONT_HEADER
+    ws.cell(title_a, 1).fill = GANTT_FILL_HEADER
+    ws.cell(title_a, 1).font = GANTT_FONT_HEADER
     ws.cell(title_a, 1).alignment = Alignment(horizontal='center')
 
     for plan_idx, plan in enumerate(planificaciones):
@@ -257,27 +257,27 @@ def write_simulador(
         ws.append([plan.escenario.nombre])
         scen_row = ws.max_row
         ws.merge_cells(start_row=scen_row, start_column=1, end_row=scen_row, end_column=5)
-        ws.cell(scen_row, 1).fill = FILL_CAP
-        ws.cell(scen_row, 1).font = FONT_BOLD
+        ws.cell(scen_row, 1).fill = GANTT_FILL_CAP
+        ws.cell(scen_row, 1).font = GANTT_FONT_BOLD
 
         # Cabecera
         ws.append(['Código recurso', 'Descripción', '€/hora', 'Operarios asignados', 'Horas/día'])
         for cell in ws[ws.max_row]:
-            cell.fill = FILL_HEADER
-            cell.font = FONT_HEADER
+            cell.fill = GANTT_FILL_HEADER
+            cell.font = GANTT_FONT_HEADER
             cell.alignment = Alignment(horizontal='center')
 
         # Filas de recursos
         for i, recurso in enumerate(recursos):
             ops  = plan.escenario.operarios_por_recurso.get(recurso.codigo, 1)
-            fill = FILL_ALT if i % 2 == 0 else FILL_WHITE
+            fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
             ws.append([recurso.codigo, recurso.descripcion, recurso.precio_hora,
                        ops, plan.parametros.horas_dia])
             row = ws[ws.max_row]
             for cell in row:
                 cell.fill = fill
             row[2].number_format = '#,##0.00'
-            row[3].fill = FILL_YELLOW  # Operarios: editable en el yaml
+            row[3].fill = GANTT_FILL_YELLOW  # Operarios: editable en el yaml
 
     # ── SECCIÓN B: DURACIONES POR ESCENARIO ──────────────────────────────────
     ws.append([])
@@ -285,8 +285,8 @@ def write_simulador(
     ws.append(['DURACIONES CALCULADAS POR ESCENARIO'])
     title_b = ws.max_row
     ws.merge_cells(start_row=title_b, start_column=1, end_row=title_b, end_column=n_cols_b)
-    ws.cell(title_b, 1).fill = FILL_HEADER
-    ws.cell(title_b, 1).font = FONT_HEADER
+    ws.cell(title_b, 1).fill = GANTT_FILL_HEADER
+    ws.cell(title_b, 1).font = GANTT_FONT_HEADER
     ws.cell(title_b, 1).alignment = Alignment(horizontal='center')
 
     # Fila de cabecera 1: nombres de escenarios (merged 3 cols cada uno)
@@ -301,14 +301,14 @@ def write_simulador(
         ws.merge_cells(start_row=hdr1_row, start_column=col, end_row=hdr1_row, end_column=col + 2)
         ws.cell(hdr1_row, col).alignment = Alignment(horizontal='center')
     for cell in ws[hdr1_row]:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
 
     # Fila de cabecera 2: Días / Inicio / Fin por escenario
     ws.append(['', ''] + ['Días', 'Inicio', 'Fin'] * n_escenarios + [''])
     for cell in ws[ws.max_row]:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     # Lookup por ID para cada planificación
@@ -330,12 +330,12 @@ def write_simulador(
 
         if tarea_base.tipo == 'hito':
             for cell in row:
-                cell.fill = FILL_YELLOW
+                cell.fill = GANTT_FILL_YELLOW
         else:
             for cell in row:
-                cell.fill = FILL_CAP
-            row[0].font = FONT_BOLD
-            row[1].font = FONT_BOLD
+                cell.fill = GANTT_FILL_CAP
+            row[0].font = GANTT_FONT_BOLD
+            row[1].font = GANTT_FONT_BOLD
 
         # Formato numérico en columnas Días
         for i in range(n_escenarios):
@@ -350,21 +350,21 @@ def write_simulador(
             dias_tot = dias_habiles_entre(plan.parametros.fecha_inicio, hito_fin.fecha_fin)
             cumple = dias_tot <= plan.parametros.plazo_contractual_dias
             label  = f'{"CUMPLE" if cumple else "NO CUMPLE"} ({dias_tot}d)'
-            tot_fills.append(FILL_GREEN if cumple else FILL_RED)
+            tot_fills.append(GANTT_FILL_GREEN if cumple else GANTT_FILL_RED)
         else:
             label = '—'
-            tot_fills.append(FILL_WHITE)
+            tot_fills.append(GANTT_FILL_WHITE)
         tot_data += [label, '', '']
     tot_data += ['']
 
     ws.append(tot_data)
     tot_row = ws[ws.max_row]
-    tot_row[0].font = FONT_BOLD
-    tot_row[1].font = FONT_BOLD
+    tot_row[0].font = GANTT_FONT_BOLD
+    tot_row[1].font = GANTT_FONT_BOLD
     for i, fill in enumerate(tot_fills):
         for j in range(3):
             tot_row[2 + i * 3 + j].fill = fill
-            tot_row[2 + i * 3 + j].font = FONT_BOLD
+            tot_row[2 + i * 3 + j].font = GANTT_FONT_BOLD
 
     adjust_col_widths(ws)
 
@@ -381,8 +381,8 @@ def write_ms_project_sheet(
                'Resource Names', 'Outline Level', 'Milestone', 'Notes']
     ws.append(headers)
     for cell in ws[1]:
-        cell.fill = FILL_HEADER
-        cell.font = FONT_HEADER
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
     ws.freeze_panes = 'A2'
 
@@ -428,10 +428,10 @@ def write_ms_project_sheet(
         row = ws[ws.max_row]
         if es_hito:
             for cell in row:
-                cell.fill = FILL_YELLOW
-                cell.font = FONT_ITALIC
+                cell.fill = GANTT_FILL_YELLOW
+                cell.font = GANTT_FONT_ITALIC
         else:
-            fill = FILL_ALT if i % 2 == 0 else FILL_WHITE
+            fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
             for cell in row:
                 cell.fill = fill
 
@@ -460,8 +460,8 @@ def write_dashboard(
     ws.append(['RESUMEN EJECUTIVO DEL PROYECTO'])
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
-    ws.cell(r, 1).fill      = FILL_HEADER
-    ws.cell(r, 1).font      = FONT_HEADER
+    ws.cell(r, 1).fill      = GANTT_FILL_HEADER
+    ws.cell(r, 1).font      = GANTT_FONT_HEADER
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     for label, value in [
@@ -472,7 +472,7 @@ def write_dashboard(
         ('', ''),
     ]:
         ws.append([label, value])
-        ws[ws.max_row][0].font = FONT_BOLD
+        ws[ws.max_row][0].font = GANTT_FONT_BOLD
 
     for plan in planificaciones:
         hito_fin = next((t for t in plan.tareas if t.es_fin_plazo), None)
@@ -484,16 +484,16 @@ def write_dashboard(
                 f'{dias}d habiles - {"CUMPLE" if cumple else "NO CUMPLE"}',
             ])
             row = ws[ws.max_row]
-            row[0].font = FONT_BOLD
-            row[1].fill = FILL_GREEN if cumple else FILL_RED
+            row[0].font = GANTT_FONT_BOLD
+            row[1].fill = GANTT_FILL_GREEN if cumple else GANTT_FILL_RED
 
     # ── SECCIÓN B: DIAGRAMA DE RED ────────────────────────────────────────────
     ws.append([])
     ws.append(['DIAGRAMA DE RED - DEPENDENCIAS Y CAMINO CRITICO'])
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=6)
-    ws.cell(r, 1).fill      = FILL_HEADER
-    ws.cell(r, 1).font      = FONT_HEADER
+    ws.cell(r, 1).fill      = GANTT_FILL_HEADER
+    ws.cell(r, 1).font      = GANTT_FONT_HEADER
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     image_row  = ws.max_row + 1
@@ -551,14 +551,14 @@ def write_dashboard(
     ws.append(['CAMINO CRITICO - TAREAS CON HOLGURA CERO'])
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
-    ws.cell(r, 1).fill      = FILL_HEADER
-    ws.cell(r, 1).font      = FONT_HEADER
+    ws.cell(r, 1).fill      = GANTT_FILL_HEADER
+    ws.cell(r, 1).font      = GANTT_FONT_HEADER
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     ws.append(['ID', 'Nombre', 'Dias', 'Recurso limitante', 'H limitante', 'Op', 'Holgura'])
     for cell in ws[ws.max_row]:
-        cell.fill      = FILL_HEADER
-        cell.font      = FONT_HEADER
+        cell.fill      = GANTT_FILL_HEADER
+        cell.font      = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     for i, tarea in enumerate(tareas_camino_critico):
@@ -585,8 +585,8 @@ def write_dashboard(
         ])
         row = ws[ws.max_row]
         for cell in row:
-            cell.fill = FILL_ALT if i % 2 == 0 else FILL_WHITE
-        row[6].fill = FILL_RED
+            cell.fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
+        row[6].fill = GANTT_FILL_RED
 
     # ── TABLA 2: ANÁLISIS DE SENSIBILIDAD ─────────────────────────────────────
     ws.append([])
@@ -594,8 +594,8 @@ def write_dashboard(
     ws.append(['ANALISIS DE SENSIBILIDAD - IMPACTO DE +1 OPERARIO POR TAREA'])
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=9)
-    ws.cell(r, 1).fill      = FILL_HEADER
-    ws.cell(r, 1).font      = FONT_HEADER
+    ws.cell(r, 1).fill      = GANTT_FILL_HEADER
+    ws.cell(r, 1).font      = GANTT_FONT_HEADER
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     ws.append([f'Escenario analizado: {plan_analisis.escenario.nombre}'])
@@ -607,8 +607,8 @@ def write_dashboard(
         'Red. proyecto (d)', 'Impacto',
     ])
     for cell in ws[ws.max_row]:
-        cell.fill      = FILL_HEADER
-        cell.font      = FONT_HEADER
+        cell.fill      = GANTT_FILL_HEADER
+        cell.font      = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     sensibilidad = calcular_sensibilidad(plan_analisis, presupuesto)
@@ -619,7 +619,7 @@ def write_dashboard(
         if item['tarea_id'] not in tarea_ids_orden:
             tarea_ids_orden.append(item['tarea_id'])
     color_por_tarea = {
-        tid: (FILL_ALT if idx % 2 == 0 else FILL_WHITE)
+        tid: (GANTT_FILL_ALT if idx % 2 == 0 else GANTT_FILL_WHITE)
         for idx, tid in enumerate(tarea_ids_orden)
     }
 
@@ -649,12 +649,12 @@ def write_dashboard(
         for cell in row:
             cell.fill = fill
         if red > 5:
-            row[8].fill = FILL_GREEN
+            row[8].fill = GANTT_FILL_GREEN
         elif red > 0:
-            row[8].fill = FILL_YELLOW
+            row[8].fill = GANTT_FILL_YELLOW
         if item['es_limitante']:
             for cell in row:
-                cell.font = FONT_BOLD
+                cell.font = GANTT_FONT_BOLD
 
     # ── TABLA 3: CONFIGURACIÓN ÓPTIMA DE RECURSOS ─────────────────────────────
     ws.append([])
@@ -662,8 +662,8 @@ def write_dashboard(
     ws.append(['CONFIGURACION OPTIMA DE RECURSOS'])
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=7)
-    ws.cell(r, 1).fill      = FILL_HEADER
-    ws.cell(r, 1).font      = FONT_HEADER
+    ws.cell(r, 1).fill      = GANTT_FILL_HEADER
+    ws.cell(r, 1).font      = GANTT_FONT_HEADER
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     ws.append([f'Objetivo: cumplir {params.plazo_contractual_dias} dias habiles'])
@@ -693,8 +693,8 @@ def write_dashboard(
 
     ws.append(['Perfil MO', 'Descripcion', 'Actual', 'Optimo', 'Ajuste', 'Progresion duracion', 'Tipo'])
     for cell in ws[ws.max_row]:
-        cell.fill      = FILL_HEADER
-        cell.font      = FONT_HEADER
+        cell.fill      = GANTT_FILL_HEADER
+        cell.font      = GANTT_FONT_HEADER
         cell.alignment = Alignment(horizontal='center')
 
     for i, codigo in enumerate(plan_analisis.escenario.operarios_por_recurso):
@@ -707,17 +707,17 @@ def write_dashboard(
             prog           = progresion_por_perfil.get(codigo, [])
             progresion_str = ' -> '.join(f'{d}d' for d in prog)
             tipo           = 'Incremento necesario'
-            fill_tipo      = FILL_RED
+            fill_tipo      = GANTT_FILL_RED
         elif codigo in sobredim_map:
             ops_optimo     = sobredim_map[codigo]['operarios_optimo']
             progresion_str = 'Sin impacto en plazo'
             tipo           = 'Reduccion posible'
-            fill_tipo      = FILL_GREEN
+            fill_tipo      = GANTT_FILL_GREEN
         else:
             ops_optimo     = ops_actual
             progresion_str = '-'
             tipo           = 'Optimo'
-            fill_tipo      = FILL_WHITE
+            fill_tipo      = GANTT_FILL_WHITE
 
         delta      = ops_optimo - ops_actual
         ajuste_str = f'+{delta}' if delta > 0 else str(delta) if delta < 0 else '='
@@ -728,7 +728,7 @@ def write_dashboard(
         ])
         row = ws[ws.max_row]
         for cell in row:
-            cell.fill = FILL_ALT if i % 2 == 0 else FILL_WHITE
+            cell.fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
         row[6].fill = fill_tipo
 
     # Fila resultado final
@@ -746,8 +746,8 @@ def write_dashboard(
         end_row=fila_res[0].row,   end_column=7,
     )
     for cell in fila_res:
-        cell.fill = FILL_GREEN if cumple_final else FILL_RED
-        cell.font = FONT_BOLD
+        cell.fill = GANTT_FILL_GREEN if cumple_final else GANTT_FILL_RED
+        cell.font = GANTT_FONT_BOLD
 
     ws.append(['Validar disponibilidad de recursos antes de aplicar ajustes', '', '', '', '', '', ''])
     fila_av = ws[ws.max_row]
@@ -756,8 +756,8 @@ def write_dashboard(
         end_row=fila_av[0].row,   end_column=7,
     )
     for cell in fila_av:
-        cell.fill = FILL_YELLOW
-        cell.font = FONT_ITALIC
+        cell.fill = GANTT_FILL_YELLOW
+        cell.font = GANTT_FONT_ITALIC
 
     # Anchos de columna ajustados a 10 columnas (Tabla 2 es la más ancha)
     for col, w in [('A', 12), ('B', 35), ('C', 18), ('D', 30), ('E', 10), ('F', 6), ('G', 12), ('H', 12), ('I', 16), ('J', 10)]:

@@ -1,0 +1,21 @@
+# Configuración del proyecto — 4t_2t Sótano
+# Modifica este archivo para adaptar los documentos generados.
+
+# ── Metadatos documentales ────────────────────────────────────────────────────
+entidad:            UNIVERSITAT DE LES ILLES BALEARS
+proyecto:           Control Automàtic Canvi Estiu/Hivern — Empalme circuit 4t a 2t
+edificio:           COMPLEXE BALEAR DE RECERCA (Sòtan)
+numero_expediente:  ''
+footer_org:         Complexe Balear de Recerca
+footer_exp:         Expedient de licitació
+
+# ── Parámetros financieros del contrato ───────────────────────────────────────
+porcentaje_gg:          0.13   # Gastos Generales (13 %)
+porcentaje_bi:          0.06   # Beneficio Industrial (6 %)
+iva_obra:               0.21   # IVA general obra (21 %)
+iva_gr:                 0.10   # IVA gestión de residuos (10 %)
+porcentaje_liquidacion: 0.10   # Porcentaje liquidación máxima (10 %)
+
+# ── Estructura del presupuesto ────────────────────────────────────────────────
+# Dejar vacío si el proyecto no tiene capítulo de gestión de residuos
+codigo_capitulo_gr: ''

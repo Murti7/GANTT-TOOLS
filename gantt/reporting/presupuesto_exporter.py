@@ -9,74 +9,24 @@ from pathlib import Path
 import math
 import re
 import textwrap
+from weakref import WeakKeyDictionary
 
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.styles import Alignment, Border, Font, Side  # usados inline en helpers de layout
 from openpyxl.utils import get_column_letter
 
-from gantt.bc3.models import Capitulo, Partida, Presupuesto
+from gantt.bc3.models import Capitulo, Partida, Presupuesto, ProjectConfig
+from gantt.bc3.parser import expandir_descompuesto
 
-# ── Constantes financieras ────────────────────────────────────────────────────
-PORCENTAJE_GG          = 0.13
-PORCENTAJE_BI          = 0.06
-PORCENTAJE_IVA_OBRA    = 0.21
-PORCENTAJE_IVA_GR      = 0.10
-PORCENTAJE_LIQUIDACION = 0.10
-CODIGO_CAPITULO_GR     = '13#'
 
-# ── Paleta de colores (específica de documentos de presupuesto) ───────────────
-PRES_GRIS_OSCURO    = '404040'
-PRES_GRIS_CABECERA  = 'D9D9D9'
-PRES_GRIS_LINEA     = 'C8C8C8'
-PRES_GRIS_SUAVE     = 'F2F2F2'
-PRES_BLANCO         = 'FFFFFF'
-PRES_EDITABLE       = 'FFF9E6'
-PRES_GRIS_TEXTO     = '404040'
-
-# Tipografía configurable del exportador de presupuestos
-PRES_FONT_FAMILY   = 'UIBSans'  # Cambiar a 'Arial' si no está instalada la fuente corporativa
-PRES_FONT_SIZE     = 10
-PRES_DETAIL_SIZE   = 9
-PRES_TITLE_SIZE    = 12
-
-# Fills internos
-_FC  = PatternFill('solid', fgColor=PRES_GRIS_OSCURO)    # cabecera principal
-_FCP = PatternFill('solid', fgColor=PRES_GRIS_CABECERA)  # cabecera tabla / capítulo
-_FSC = PatternFill('solid', fgColor=PRES_GRIS_SUAVE)     # subcapítulo
-_FD  = PatternFill('solid', fgColor=PRES_GRIS_SUAVE)     # detalle / alterno
-_FB  = PatternFill('solid', fgColor=PRES_BLANCO)          # blanco
-_FA  = PatternFill('solid', fgColor=PRES_EDITABLE)        # a rellenar
-
-# Fonts internos
-_FT  = Font(name=PRES_FONT_FAMILY, size=PRES_TITLE_SIZE, bold=True,  color='FFFFFF')  # título sección
-_FCF = Font(name=PRES_FONT_FAMILY, size=PRES_FONT_SIZE, bold=True,  color='000000')  # capítulo
-_FN  = Font(name=PRES_FONT_FAMILY, size=PRES_FONT_SIZE,             color='000000')  # normal
-_FDE = Font(name=PRES_FONT_FAMILY, size=PRES_DETAIL_SIZE,              color=PRES_GRIS_TEXTO)  # detalle
-_FTO = Font(name=PRES_FONT_FAMILY, size=PRES_FONT_SIZE, bold=True,  color='000000')  # total
-
-# Alineaciones internas
-_AD  = Alignment(horizontal='left',   vertical='top',    wrap_text=True)
-_AN  = Alignment(horizontal='right',  vertical='top')
-_ANC = Alignment(horizontal='right',  vertical='center')
-_AC  = Alignment(horizontal='center', vertical='center')
-_AT  = Alignment(horizontal='left',   vertical='top')
-_ALC = Alignment(horizontal='left',   vertical='center')
-
-# Formatos numéricos internos (notación localizada española para Excel)
-_FE  = '#,##0.00 €'  # euros; Excel lo muestra según configuración regional
-_FQ  = '#,##0.###'   # cantidades; evita 0 final y coma decimal sobrante
-_FU  = '#,##0.000'   # cantidades unitarias de recursos
-_FP  = '0.###%'      # porcentajes; evita ,050 y conserva el 0 inicial
-
-# Bordes internos
-_BORDE_FINO  = Border(bottom=Side(style='thin', color=PRES_GRIS_LINEA))
-_BORDE_TABLA = Border(
-    left=Side(style='thin', color=PRES_GRIS_LINEA),
-    right=Side(style='thin', color=PRES_GRIS_LINEA),
-    top=Side(style='thin', color=PRES_GRIS_LINEA),
-    bottom=Side(style='thin', color=PRES_GRIS_LINEA),
+from gantt.reporting.styles import (
+    PRES_FC, PRES_FCP, PRES_FSC, PRES_FD, PRES_FB, PRES_FA,
+    PRES_FT, PRES_FCF, PRES_FN, PRES_FDE, PRES_FTO,
+    PRES_AD, PRES_AN, PRES_ANC, PRES_AC, PRES_AT, PRES_ALC,
+    PRES_FE, PRES_FQ, PRES_FU, PRES_FP,
+    PRES_BORDE_FINO, PRES_BORDE_TABLA, PRES_BORDE_TOTAL,
 )
-_BORDE_TOTAL = Border(top=Side(style='medium', color='000000'))
+from gantt.reporting.palette import FONT_PRES, GRIS_LINEA, GRIS_TEXTO
 
 
 # ── Tablas para conversión numérica ──────────────────────────────────────────
@@ -93,7 +43,7 @@ _CENTENAS = ['', 'CIENTO', 'DOSCIENTOS', 'TRESCIENTOS', 'CUATROCIENTOS',
              'QUINIENTOS', 'SEISCIENTOS', 'SETECIENTOS', 'OCHOCIENTOS', 'NOVECIENTOS']
 
 
-def _grupo_a_letras(n: int) -> str:
+def grupo_a_letras(n: int) -> str:
     """Convierte 1-999 a palabras en castellano (uso interno)."""
     if n == 100:
         return 'CIEN'
@@ -133,16 +83,16 @@ def numero_a_letras(importe: float) -> str:
         if miles == 1:
             euros_txt.append('MIL')
         elif miles > 1:
-            euros_txt.append(_grupo_a_letras(miles) + ' MIL')
+            euros_txt.append(grupo_a_letras(miles) + ' MIL')
         if resto > 0:
-            euros_txt.append(_grupo_a_letras(resto))
+            euros_txt.append(grupo_a_letras(resto))
         partes.extend(euros_txt)
         partes.append('EURO' if euros == 1 else 'EUROS')
 
     if cents > 0:
         if euros > 0:
             partes.append('CON')
-        partes.append(_grupo_a_letras(cents))
+        partes.append(grupo_a_letras(cents))
         partes.append('CÉNTIMO' if cents == 1 else 'CÉNTIMOS')
 
     return ' '.join(partes)
@@ -155,21 +105,21 @@ def aplicar_estilo_cabecera(ws, fila: int, n_cols: int) -> None:
     if n_cols > 1:
         ws.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=n_cols)
     cell = ws.cell(fila, 1)
-    cell.fill      = _FC
-    cell.font      = _FT
-    cell.alignment = _AC
+    cell.fill      = PRES_FC
+    cell.font      = PRES_FT
+    cell.alignment = PRES_AC
     for c in range(1, n_cols + 1):
-        ws.cell(fila, c).border = _BORDE_TABLA
+        ws.cell(fila, c).border = PRES_BORDE_TABLA
     ws.row_dimensions[fila].height = 26.0
-    _registrar_altura_manual(ws, fila)
+    registrar_altura_manual(ws, fila)
 
 
 def aplicar_estilo_capitulo(ws, fila: int, n_cols: int) -> None:
     """Aplica estilo de capítulo (azul claro, negrita) a las celdas de una fila."""
     for c in range(1, n_cols + 1):
-        ws.cell(fila, c).fill = _FCP
-        ws.cell(fila, c).font = _FCF
-        ws.cell(fila, c).border = _BORDE_TABLA
+        ws.cell(fila, c).fill = PRES_FCP
+        ws.cell(fila, c).font = PRES_FCF
+        ws.cell(fila, c).border = PRES_BORDE_TABLA
 
 
 
@@ -177,21 +127,21 @@ def aplicar_estilo_capitulo(ws, fila: int, n_cols: int) -> None:
 def aplicar_estilo_subtotal(ws, fila: int, n_cols: int) -> None:
     """Aplica estilo de subtotal: blanco, negrita y borde superior fino/medio."""
     for c in range(1, n_cols + 1):
-        ws.cell(fila, c).fill = _FB
-        ws.cell(fila, c).font = _FCF
-        ws.cell(fila, c).border = _BORDE_TOTAL
-        ws.cell(fila, c).alignment = _ANC
+        ws.cell(fila, c).fill = PRES_FB
+        ws.cell(fila, c).font = PRES_FCF
+        ws.cell(fila, c).border = PRES_BORDE_TOTAL
+        ws.cell(fila, c).alignment = PRES_ANC
     ws.row_dimensions[fila].height = 22.0
-    _registrar_altura_manual(ws, fila)
+    registrar_altura_manual(ws, fila)
 
 def aplicar_estilo_total(ws, fila: int, n_cols: int) -> None:
     """Aplica estilo de total sobrio: blanco, negrita y borde superior."""
     for c in range(1, n_cols + 1):
-        ws.cell(fila, c).fill = _FB
-        ws.cell(fila, c).font = _FTO
-        ws.cell(fila, c).border = _BORDE_TOTAL
+        ws.cell(fila, c).fill = PRES_FB
+        ws.cell(fila, c).font = PRES_FTO
+        ws.cell(fila, c).border = PRES_BORDE_TOTAL
     ws.row_dimensions[fila].height = 24.0
-    _registrar_altura_manual(ws, fila)
+    registrar_altura_manual(ws, fila)
 
 
 def ajustar_columnas(ws, config: dict[str, int]) -> None:
@@ -200,39 +150,48 @@ def ajustar_columnas(ws, config: dict[str, int]) -> None:
         ws.column_dimensions[col_letter].width = width
 
 
-def aplicar_encabezado_documental(ws, anexo: str, titulo: str, n_cols: int) -> None:
-    """Escribe el encabezado documental común de los anexos económicos."""
-    filas = [
-        'UNIVERSITAT DE LES ILLES BALEARS',
-        'REFORMA DEL SISTEMA DE CLIMATIZACIÓN',
-        'COMPLEXE BALEAR DE RECERCA',
+def aplicar_encabezado_documental(
+    ws, config: ProjectConfig, anexo: str, titulo: str, n_cols: int
+) -> None:
+    """Escribe el encabezado documental. Las líneas vacías del config se omiten."""
+    candidatas = [
+        config.entidad,
+        config.proyecto,
+        config.edificio,
         f'ANEXO ECONÓMICO {anexo}',
         titulo,
     ]
-    for texto in filas:
+    filas = [f for f in candidatas if f]
+    for i, texto in enumerate(filas):
+        es_titulo = (i == len(filas) - 1)
         ws.append([texto] + [''] * (n_cols - 1))
         fila = ws.max_row
         ws.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=n_cols)
         cell = ws.cell(fila, 1)
-        cell.alignment = _AC
-        cell.fill = _FC if fila == 5 else _FB
+        cell.alignment = PRES_AC
+        cell.fill = PRES_FC if es_titulo else PRES_FB
         cell.font = (
-            Font(name=PRES_FONT_FAMILY, size=PRES_TITLE_SIZE, bold=True, color='FFFFFF')
-            if fila == 5 else
-            Font(name=PRES_FONT_FAMILY, size=PRES_FONT_SIZE, bold=True, color='000000')
+            Font(name=FONT_PRES, size=12, bold=True, color='FFFFFF')
+            if es_titulo else
+            Font(name=FONT_PRES, size=10, bold=True, color='000000')
         )
         ws.row_dimensions[fila].height = 18
-        _registrar_altura_manual(ws, fila)
+        registrar_altura_manual(ws, fila)
 
 
-def configurar_impresion(ws, orientacion: str, fila_cabecera: int | None = None) -> None:
+def configurar_impresion(
+    ws,
+    orientacion: str,
+    fila_cabecera: int | None = None,
+    config: ProjectConfig | None = None,
+) -> None:
     """Configura pie de página, márgenes e impresión ajustada a ancho."""
     for row in ws.iter_rows():
         for cell in row:
-            if cell.value is not None and cell.font.name in (None, 'Calibri'):
-                cell.font = _FN
-    ws.oddFooter.left.text = 'Complexe Balear de Recerca'
-    ws.oddFooter.center.text = 'Expediente de licitación'
+            if cell.value is not None and cell.font.name in (None, 'Calibri', FONT_PRES):
+                cell.font = PRES_FN
+    ws.oddFooter.left.text   = config.footer_org if config else ''
+    ws.oddFooter.center.text = config.footer_exp if config else ''
     ws.oddFooter.right.text = 'Página &[Page] de &[Pages]'
     ws.page_setup.orientation = orientacion
     ws.page_setup.fitToWidth = 1
@@ -254,8 +213,8 @@ def configurar_impresion(ws, orientacion: str, fila_cabecera: int | None = None)
 
 def get_recurso_info(codigo: str, presupuesto: Presupuesto) -> tuple[str, str, float]:
     """
-    Retorna (descripcion, unidad, precio) para un código de recurso.
-    Busca en MO, MT y MQ; devuelve el código como descripción si no se encuentra.
+    Retorna (descripcion, unidad, precio) para un código de recurso o partida alzada.
+    Busca en MO, MT, MQ y PA; devuelve el código como descripción si no se encuentra.
     """
     if codigo in presupuesto.recursos_mo:
         r = presupuesto.recursos_mo[codigo]
@@ -266,20 +225,39 @@ def get_recurso_info(codigo: str, presupuesto: Presupuesto) -> tuple[str, str, f
     if codigo in presupuesto.recursos_mq:
         r = presupuesto.recursos_mq[codigo]
         return r.descripcion, r.unidad, r.precio_unidad
+    if codigo in presupuesto.recursos_pa:
+        r = presupuesto.recursos_pa[codigo]
+        return r.descripcion, r.unidad, r.precio_unidad
     return codigo, '-', 0.0
 
 
-def tipo_recurso(codigo: str) -> str:
-    """Clasifica un código de recurso en MO, MT, MQ o %."""
+def recursos_expandidos(codigo: str, presupuesto: Presupuesto) -> dict[str, float]:
+    """Retorna {codigo_recurso: cantidad_efectiva} expandiendo PAs recursivamente."""
+    return expandir_descompuesto(
+        codigo,
+        presupuesto.descompuestos_raw,
+        set(presupuesto.recursos_pa),
+    )
+
+
+def tipo_recurso(codigo: str, presupuesto: Presupuesto) -> str:
+    """
+    Clasifica un código en MO, MT, MQ, PA, % o '?' (no reconocido).
+    Usa los diccionarios del presupuesto como fuente de verdad.
+    Los costes indirectos se detectan por el código antes del fallback '?',
+    para que recursos genuinamente desconocidos no contaminen cálculos de coste.
+    """
+    if codigo in presupuesto.recursos_mo:
+        return 'MO'
+    if codigo in presupuesto.recursos_mt:
+        return 'MT'
+    if codigo in presupuesto.recursos_mq:
+        return 'MQ'
+    if codigo in presupuesto.recursos_pa:
+        return 'PA'
     if codigo.startswith('%'):
         return '%'
-    if codigo.startswith('MO-'):
-        return 'MO'
-    if codigo.startswith('MT-'):
-        return 'MT'
-    if codigo.startswith('MQ-'):
-        return 'MQ'
-    return '%'
+    return '?'
 
 
 def iter_todas_partidas(presupuesto: Presupuesto):
@@ -299,18 +277,19 @@ def iter_todas_partidas(presupuesto: Presupuesto):
 
 def es_partida_liquidable(codigo: str, presupuesto: Presupuesto) -> bool:
     """
-    Retorna True si la partida tiene mano de obra Y material simultáneamente.
+    Retorna True si la partida tiene mano de obra Y material simultáneamente,
+    expandiendo PAs recursivamente para detectar recursos en descompuestos anidados.
     Criterio para incluir en la base de cálculo de la liquidación máxima.
     """
-    items = presupuesto.descompuestos_raw.get(codigo, [])
-    tiene_mo = any(r.startswith('MO-') for r, _ in items)
-    tiene_mt = any(r.startswith('MT-') or r.startswith('%MT') for r, _ in items)
+    recursos = recursos_expandidos(codigo, presupuesto)
+    tiene_mo = any(tipo_recurso(r, presupuesto) == 'MO' for r in recursos)
+    tiene_mt = any(tipo_recurso(r, presupuesto) == 'MT' for r in recursos)
     return tiene_mo and tiene_mt
 
 
 
 
-def _normalizar_texto_largo(texto: str | None) -> str:
+def normalizar_texto_largo(texto: str | None) -> str:
     """
     Normaliza descripciones largas para que sean legibles en Excel.
 
@@ -343,29 +322,29 @@ def _normalizar_texto_largo(texto: str | None) -> str:
     return limpio.strip()
 
 
-def _forzar_altura_fila(ws, fila: int, altura: float) -> None:
+def forzar_altura_fila(ws, fila: int, altura: float) -> None:
     """Aplica la mayor altura calculada a una fila sin reducir alturas previas."""
     actual = ws.row_dimensions[fila].height or 0
     ws.row_dimensions[fila].height = max(actual, altura)
 
 
-def _registrar_altura_manual(ws, fila: int) -> None:
+_alturas_manuales: WeakKeyDictionary = WeakKeyDictionary()
+
+
+def registrar_altura_manual(ws, fila: int) -> None:
     """Marca una fila para que el ajuste global de alturas no la recalcule."""
-    filas = getattr(ws, '_pres_alturas_manuales', None)
-    if filas is None:
-        filas = set()
-        setattr(ws, '_pres_alturas_manuales', filas)
-    filas.add(fila)
+    if ws not in _alturas_manuales:
+        _alturas_manuales[ws] = set()
+    _alturas_manuales[ws].add(fila)
 
 
-def _tiene_altura_manual(ws, fila: int) -> bool:
+def tiene_altura_manual(ws, fila: int) -> bool:
     """Indica si una fila tiene altura calculada y fijada explícitamente."""
-    filas = getattr(ws, '_pres_alturas_manuales', set())
-    return fila in filas
+    return fila in _alturas_manuales.get(ws, set())
 
 # ── Helpers internos de escritura Excel ──────────────────────────────────────
 
-def _row_height(
+def row_height(
     desc: str,
     width_chars: int = 55,
     line_height: float = 13.0,
@@ -388,7 +367,7 @@ def _row_height(
     return max(min_height, min(max_height, lineas * line_height))
 
 
-def _cel_desc(
+def cel_desc(
     ws,
     fila: int,
     col: int,
@@ -402,34 +381,34 @@ def _cel_desc(
     """Escribe una celda de descripción con wrap_text y ajuste de altura."""
     cell = ws.cell(fila, col, texto)
     cell.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
-    cell.font = font or _FN
-    cell.border = _BORDE_TABLA
-    altura = _row_height(
+    cell.font = font or PRES_FN
+    cell.border = PRES_BORDE_TABLA
+    altura = row_height(
         texto,
         width_chars=width_chars,
         line_height=line_height,
         min_height=min_height,
         max_height=max_height,
     )
-    _forzar_altura_fila(ws, fila, altura)
+    forzar_altura_fila(ws, fila, altura)
 
 
-def _cel_eur(ws, fila: int, col: int, valor: float, font=None) -> None:
+def cel_eur(ws, fila: int, col: int, valor: float, font=None) -> None:
     """Escribe una celda numérica en euros con formato y alineación derecha."""
     cell              = ws.cell(fila, col, valor)
-    cell.number_format = _FE
-    cell.alignment    = _AN
-    cell.font         = font or _FN
-    cell.border       = _BORDE_TABLA
+    cell.number_format = PRES_FE
+    cell.alignment    = PRES_AN
+    cell.font         = font or PRES_FN
+    cell.border       = PRES_BORDE_TABLA
 
 
-def _cel_cantidad(ws, fila: int, col: int, valor: float, font=None, recurso: bool = False) -> None:
+def cel_cantidad(ws, fila: int, col: int, valor: float, font=None, recurso: bool = False) -> None:
     """Escribe una cantidad con cero inicial y sin coma decimal sobrante."""
     cell = ws.cell(fila, col, valor)
-    cell.number_format = _FU if recurso else _FQ
-    cell.alignment = _ANC
-    cell.font = font or _FN
-    cell.border = _BORDE_TABLA
+    cell.number_format = PRES_FU if recurso else PRES_FQ
+    cell.alignment = PRES_ANC
+    cell.font = font or PRES_FN
+    cell.border = PRES_BORDE_TABLA
 
 
 
@@ -443,22 +422,22 @@ PRES_ROW_MIN_HEIGHT_PT = 15.0
 PRES_ROW_MAX_HEIGHT_PT = 409.0
 
 
-def _col_width_to_points(col_width_chars: float) -> float:
+def col_width_to_points(col_width_chars: float) -> float:
     """Convierte ancho de columna openpyxl aproximado a puntos."""
     return col_width_chars * 7.0
 
 
-def _points_to_row_height(points: float) -> float:
+def _points_torow_height(points: float) -> float:
     """openpyxl espera la altura de fila directamente en puntos."""
     return points
 
 
-def _cell_has_text(value) -> bool:
+def cell_has_text(value) -> bool:
     """Indica si una celda contiene texto o dato visible."""
     return value is not None and str(value).strip() != ''
 
 
-def _calcular_altura_fila_por_ancho_efectivo(row_cells, col_widths_points) -> float:
+def calcular_altura_fila_por_ancho_efectivo(row_cells, col_widths_points) -> float:
     """
     Calcula la altura necesaria de una fila.
 
@@ -470,12 +449,12 @@ def _calcular_altura_fila_por_ancho_efectivo(row_cells, col_widths_points) -> fl
     max_lines = 1
 
     for col_index, cell_text in enumerate(row_cells):
-        if not _cell_has_text(cell_text):
+        if not cell_has_text(cell_text):
             continue
 
         effective_width = col_widths_points[col_index]
         for next_col in range(col_index + 1, len(row_cells)):
-            if _cell_has_text(row_cells[next_col]):
+            if cell_has_text(row_cells[next_col]):
                 break
             effective_width += col_widths_points[next_col]
 
@@ -505,18 +484,18 @@ def ajustar_alturas_filas_por_contenido(ws, max_col: int, min_row: int = 1) -> N
     for col_idx in range(1, max_col + 1):
         col_letter = get_column_letter(col_idx)
         width_chars = ws.column_dimensions[col_letter].width or 8
-        col_widths_points.append(_col_width_to_points(width_chars))
+        col_widths_points.append(col_width_to_points(width_chars))
 
     for row_idx in range(min_row, ws.max_row + 1):
-        if _tiene_altura_manual(ws, row_idx):
+        if tiene_altura_manual(ws, row_idx):
             continue
 
         row_cells = [ws.cell(row_idx, col_idx).value for col_idx in range(1, max_col + 1)]
-        if not any(_cell_has_text(value) for value in row_cells):
+        if not any(cell_has_text(value) for value in row_cells):
             continue
 
-        height_points = _calcular_altura_fila_por_ancho_efectivo(row_cells, col_widths_points)
-        calculated_height = _points_to_row_height(height_points)
+        height_points = calcular_altura_fila_por_ancho_efectivo(row_cells, col_widths_points)
+        calculated_height = _points_torow_height(height_points)
 
         # Nunca se reduce una altura ya asignada. Esto evita que el ajuste global
         # colapse filas de texto, subtotales o filas que han sido dimensionadas
@@ -526,17 +505,17 @@ def ajustar_alturas_filas_por_contenido(ws, max_col: int, min_row: int = 1) -> N
 
 
 
-def _ancho_rango_en_puntos(ws, start_col: int, end_col: int) -> float:
+def ancho_rango_en_puntos(ws, start_col: int, end_col: int) -> float:
     """Devuelve el ancho aproximado en puntos de un rango de columnas."""
     total = 0.0
     for col_idx in range(start_col, end_col + 1):
         col_letter = get_column_letter(col_idx)
         width_chars = ws.column_dimensions[col_letter].width or 8
-        total += _col_width_to_points(width_chars)
+        total += col_width_to_points(width_chars)
     return total
 
 
-def _lineas_estimadas_texto(texto: str, chars_per_line: int) -> int:
+def lineas_estimadas_texto(texto: str, chars_per_line: int) -> int:
     """Estima líneas visibles respetando saltos de línea explícitos."""
     total = 0
     for paragraph in str(texto or '').split('\n'):
@@ -547,13 +526,13 @@ def _lineas_estimadas_texto(texto: str, chars_per_line: int) -> int:
     return max(total, 1)
 
 
-def _altura_por_lineas(lineas: int) -> float:
+def altura_por_lineas(lineas: int) -> float:
     """Calcula altura de fila en puntos para un número de líneas."""
     altura = round(lineas * PRES_ROW_LINE_HEIGHT_PT + PRES_ROW_PADDING_PT)
     return max(PRES_ROW_MIN_HEIGHT_PT, min(altura, PRES_ROW_MAX_HEIGHT_PT))
 
 
-def _dividir_texto_en_bloques_visibles(
+def dividir_texto_en_bloques_visibles(
     texto: str,
     width_points: float,
     max_height_points: float = 300.0,
@@ -603,16 +582,16 @@ def _dividir_texto_en_bloques_visibles(
     return bloques or ['']
 
 
-def _border_continuacion_texto() -> Border:
+def border_continuacion_texto() -> Border:
     """Borde para filas de continuación: sin borde superior."""
     return Border(
-        left=Side(style='thin', color=PRES_GRIS_LINEA),
-        right=Side(style='thin', color=PRES_GRIS_LINEA),
-        bottom=Side(style='thin', color=PRES_GRIS_LINEA),
+        left=Side(style='thin', color=GRIS_LINEA),
+        right=Side(style='thin', color=GRIS_LINEA),
+        bottom=Side(style='thin', color=GRIS_LINEA),
     )
 
 
-def _aplicar_estilo_rango_texto(
+def aplicar_estilo_rango_texto(
     ws,
     fila: int,
     start_col: int,
@@ -622,16 +601,16 @@ def _aplicar_estilo_rango_texto(
     continuation: bool = False,
 ) -> None:
     """Aplica estilo a una fila de descripción, incluyendo continuaciones."""
-    borde = _border_continuacion_texto() if continuation else _BORDE_TABLA
+    borde = border_continuacion_texto() if continuation else PRES_BORDE_TABLA
     for col in range(start_col, end_col + 1):
         cell = ws.cell(fila, col)
-        cell.font = font or _FN
-        cell.fill = fill or _FB
+        cell.font = font or PRES_FN
+        cell.fill = fill or PRES_FB
         cell.border = borde
         cell.alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
 
 
-def _append_descripcion_fusionada_partida(
+def append_descripcion_fusionada_partida(
     ws,
     n_cols: int,
     start_col: int,
@@ -648,8 +627,8 @@ def _append_descripcion_fusionada_partida(
     continuación debajo, sin borde superior, para que visualmente pertenezcan a
     la misma descripción.
     """
-    width_points = _ancho_rango_en_puntos(ws, start_col, end_col)
-    chunks = _dividir_texto_en_bloques_visibles(texto, width_points, max_height_points)
+    width_points = ancho_rango_en_puntos(ws, start_col, end_col)
+    chunks = dividir_texto_en_bloques_visibles(texto, width_points, max_height_points)
     filas: list[int] = []
 
     for idx, chunk in enumerate(chunks):
@@ -659,31 +638,31 @@ def _append_descripcion_fusionada_partida(
         ws.cell(fila, start_col, chunk)
         if end_col > start_col:
             ws.merge_cells(start_row=fila, start_column=start_col, end_row=fila, end_column=end_col)
-        _aplicar_estilo_rango_texto(
+        aplicar_estilo_rango_texto(
             ws,
             fila,
             start_col,
             end_col,
-            font=font or _FN,
-            fill=fill or _FB,
+            font=font or PRES_FN,
+            fill=fill or PRES_FB,
             continuation=idx > 0,
         )
-        lineas = _lineas_estimadas_texto(chunk, max(int(width_points / PRES_ROW_FONT_WIDTH_PT), 1))
-        ws.row_dimensions[fila].height = _altura_por_lineas(lineas)
-        _registrar_altura_manual(ws, fila)
+        lineas = lineas_estimadas_texto(chunk, max(int(width_points / PRES_ROW_FONT_WIDTH_PT), 1))
+        ws.row_dimensions[fila].height = altura_por_lineas(lineas)
+        registrar_altura_manual(ws, fila)
 
     return filas
 
 
-def _append_fila_cuadro_precios_1(
+def append_fila_cuadro_precios_1(
     ws,
     codigo: str,
     texto: str,
     precio: float,
 ) -> None:
     """Añade una partida de PRES.02.01, dividiendo la descripción si es necesario."""
-    width_points = _ancho_rango_en_puntos(ws, 2, 2)
-    chunks = _dividir_texto_en_bloques_visibles(texto, width_points, max_height_points=300.0)
+    width_points = ancho_rango_en_puntos(ws, 2, 2)
+    chunks = dividir_texto_en_bloques_visibles(texto, width_points, max_height_points=300.0)
     chars_per_line = max(int(width_points / PRES_ROW_FONT_WIDTH_PT), 1)
 
     for idx, chunk in enumerate(chunks):
@@ -694,33 +673,33 @@ def _append_fila_cuadro_precios_1(
         fila = ws.max_row
         for col in range(1, 4):
             cell = ws.cell(fila, col)
-            cell.fill = _FB
-            cell.font = _FN
-            cell.border = _border_continuacion_texto() if idx > 0 else _BORDE_TABLA
-        ws.cell(fila, 1).alignment = _AT
+            cell.fill = PRES_FB
+            cell.font = PRES_FN
+            cell.border = border_continuacion_texto() if idx > 0 else PRES_BORDE_TABLA
+        ws.cell(fila, 1).alignment = PRES_AT
         ws.cell(fila, 2).alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
         if idx == 0:
-            _cel_eur(ws, fila, 3, precio)
+            cel_eur(ws, fila, 3, precio)
         else:
-            ws.cell(fila, 3).alignment = _AN
-        lineas = _lineas_estimadas_texto(chunk, chars_per_line)
-        ws.row_dimensions[fila].height = _altura_por_lineas(lineas)
-        _registrar_altura_manual(ws, fila)
+            ws.cell(fila, 3).alignment = PRES_AN
+        lineas = lineas_estimadas_texto(chunk, chars_per_line)
+        ws.row_dimensions[fila].height = altura_por_lineas(lineas)
+        registrar_altura_manual(ws, fila)
 
-def _cabecera_tabla(ws, headers: list[str]) -> None:
+def cabecera_tabla(ws, headers: list[str]) -> None:
     """Escribe una fila de cabecera de tabla con estilo de cabecera."""
     ws.append(headers)
     r = ws.max_row
     for c, _ in enumerate(headers, 1):
-        ws.cell(r, c).fill      = _FCP
-        ws.cell(r, c).font      = _FCF
-        ws.cell(r, c).alignment = _AC
-        ws.cell(r, c).border    = _BORDE_TABLA
+        ws.cell(r, c).fill      = PRES_FCP
+        ws.cell(r, c).font      = PRES_FCF
+        ws.cell(r, c).alignment = PRES_AC
+        ws.cell(r, c).border    = PRES_BORDE_TABLA
     ws.row_dimensions[r].height = 22.0
-    _registrar_altura_manual(ws, r)
+    registrar_altura_manual(ws, r)
 
 
-def _sep_vacia(ws, altura: float = 4.0, n_cols: int = 1) -> None:
+def sep_vacia(ws, altura: float = 4.0, n_cols: int = 1) -> None:
     """Inserta una fila separadora real sin modificar la fila anterior.
 
     openpyxl no siempre incrementa ws.max_row cuando se usa ws.append([]).
@@ -730,34 +709,34 @@ def _sep_vacia(ws, altura: float = 4.0, n_cols: int = 1) -> None:
     fila = ws.max_row + 1
     for col in range(1, n_cols + 1):
         cell = ws.cell(fila, col, '')
-        cell.fill = _FB
+        cell.fill = PRES_FB
         cell.border = Border()
     ws.row_dimensions[fila].height = altura
-    _registrar_altura_manual(ws, fila)
+    registrar_altura_manual(ws, fila)
 
 
-def _capitulo_limpio(codigo: str) -> str:
+def capitulo_limpio(codigo: str) -> str:
     """Devuelve el código de capítulo sin el sufijo '#'."""
     return codigo.rstrip('#')
 
 
-def _get_cap_gr(presupuesto: Presupuesto) -> 'Capitulo | None':
+def get_cap_gr(presupuesto: Presupuesto) -> 'Capitulo | None':
     """Localiza el capítulo de gestión de residuos por código."""
-    return next((c for c in presupuesto.capitulos if c.codigo == CODIGO_CAPITULO_GR), None)
+    return next((c for c in presupuesto.capitulos if c.codigo == presupuesto.config.codigo_capitulo_gr), None)
 
 
-def _fila_separador_cascade(ws, n_cols: int) -> None:
+def fila_separador_cascade(ws, n_cols: int) -> None:
     """Inserta una fila separadora con fondo azul muy claro entre bloques de cascada."""
     ws.append([''] * n_cols)
     r = ws.max_row
     for c in range(1, n_cols + 1):
-        ws.cell(r, c).fill = _FSC
-        ws.cell(r, c).border = _BORDE_FINO
+        ws.cell(r, c).fill = PRES_FSC
+        ws.cell(r, c).border = PRES_BORDE_FINO
     ws.row_dimensions[r].height = 6.0
-    _registrar_altura_manual(ws, r)
+    registrar_altura_manual(ws, r)
 
 
-def _escribir_cascade(ws, filas: list[tuple], n_cols: int = 3) -> None:
+def escribir_cascade(ws, filas: list[tuple], n_cols: int = 3) -> None:
     """
     Escribe una tabla en cascada de 3 columnas: (etiqueta, pct_str, importe).
     None como etiqueta inserta un separador visual.
@@ -765,30 +744,30 @@ def _escribir_cascade(ws, filas: list[tuple], n_cols: int = 3) -> None:
     """
     for item in filas:
         if item is None:
-            _fila_separador_cascade(ws, n_cols)
+            fila_separador_cascade(ws, n_cols)
             continue
         label, pct, valor, es_total = item
         ws.append([label, pct, ''] if n_cols >= 3 else [label, pct])
         r = ws.max_row
-        ws.cell(r, 1).font = _FTO if es_total else _FN
-        ws.cell(r, 1).fill = _FB
-        ws.cell(r, 2).font = _FTO if es_total else _FN
-        ws.cell(r, 2).fill = _FB
-        ws.cell(r, 2).alignment = _AC
-        _cel_eur(ws, r, 3, valor, font=_FTO if es_total else _FN)
-        ws.cell(r, 3).fill = _FB
+        ws.cell(r, 1).font = PRES_FTO if es_total else PRES_FN
+        ws.cell(r, 1).fill = PRES_FB
+        ws.cell(r, 2).font = PRES_FTO if es_total else PRES_FN
+        ws.cell(r, 2).fill = PRES_FB
+        ws.cell(r, 2).alignment = PRES_AC
+        cel_eur(ws, r, 3, valor, font=PRES_FTO if es_total else PRES_FN)
+        ws.cell(r, 3).fill = PRES_FB
         for c in range(1, n_cols + 1):
-            ws.cell(r, c).border = _BORDE_TOTAL if es_total else _BORDE_FINO
+            ws.cell(r, c).border = PRES_BORDE_TOTAL if es_total else PRES_BORDE_FINO
         ws.row_dimensions[r].height = 24.0 if es_total else 21.0
-        _registrar_altura_manual(ws, r)
+        registrar_altura_manual(ws, r)
 
 
 def descripcion_completa(partida: Partida) -> str:
     """Retorna la descripción larga (~T) normalizada para lectura documental."""
-    return _normalizar_texto_largo(partida.descripcion_larga or partida.descripcion)
+    return normalizar_texto_largo(partida.descripcion_larga or partida.descripcion)
 
 
-def _fmt_numero_texto(valor: float, decimales: int = 3) -> str:
+def fmt_numero_texto(valor: float, decimales: int = 3) -> str:
     """Formatea un número para textos visibles con separadores españoles."""
     texto = f'{valor:,.{decimales}f}'.rstrip('0').rstrip('.')
     return texto.translate(str.maketrans(',.', '.,'))
@@ -805,18 +784,18 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 16, 'B': 55, 'C': 6, 'D': 12,
                           'E': 16, 'F': 16, 'G': 18, 'H': 18})
 
-    aplicar_encabezado_documental(ws, 'PRES.01', 'CUADRO DE OFERTA', N)
+    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.01', 'CUADRO DE OFERTA', N)
 
     ws.append(['Rellene las columnas en amarillo con su precio unitario ofertado']
               + [''] * (N - 1))
     r2 = ws.max_row
     ws.merge_cells(start_row=r2, start_column=1, end_row=r2, end_column=N)
-    ws.cell(r2, 1).fill      = _FA
-    ws.cell(r2, 1).font      = Font(name=PRES_FONT_FAMILY, size=PRES_FONT_SIZE, italic=True, color='000000')
-    ws.cell(r2, 1).alignment = _AC
+    ws.cell(r2, 1).fill      = PRES_FA
+    ws.cell(r2, 1).font      = Font(name=FONT_PRES, size=10, italic=True, color='000000')
+    ws.cell(r2, 1).alignment = PRES_AC
     ws.row_dimensions[r2].height = 16
 
-    _cabecera_tabla(ws, [
+    cabecera_tabla(ws, [
         'Código', 'Descripción', 'Ud.', 'Cantidad',
         'P. Unit. ref. (€)', 'Importe ref. (€)',
         'P. Unit. ofertado (€)', 'Importe ofertado (€)',
@@ -832,26 +811,26 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
         if cap is not current_cap:
             current_cap = cap
             current_sub = None
-            ws.append([_capitulo_limpio(cap.codigo), cap.descripcion]
+            ws.append([capitulo_limpio(cap.codigo), cap.descripcion]
                       + [''] * (N - 2))
             r = ws.max_row
             aplicar_estilo_capitulo(ws, r, N)
-            _cel_desc(ws, r, 2, cap.descripcion, font=_FCF, width_chars=55)
+            cel_desc(ws, r, 2, cap.descripcion, font=PRES_FCF, width_chars=55)
 
         if sub is not current_sub:
             current_sub = sub
             if sub is not None:
-                ws.append([_capitulo_limpio(sub.codigo), '  ' + sub.descripcion]
+                ws.append([capitulo_limpio(sub.codigo), '  ' + sub.descripcion]
                           + [''] * (N - 2))
                 r = ws.max_row
                 for c in range(1, N + 1):
-                    ws.cell(r, c).fill = _FSC
-                    ws.cell(r, c).font = _FCF
-                _cel_desc(ws, r, 2, '  ' + sub.descripcion, font=_FCF, width_chars=55)
-                ws.cell(r, 2).fill = _FSC
+                    ws.cell(r, c).fill = PRES_FSC
+                    ws.cell(r, c).font = PRES_FCF
+                cel_desc(ws, r, 2, '  ' + sub.descripcion, font=PRES_FCF, width_chars=55)
+                ws.cell(r, 2).fill = PRES_FSC
 
         importe = partida.precio_unitario * partida.cantidad
-        fill = _FD if alt else _FB
+        fill = PRES_FD if alt else PRES_FB
         alt  = not alt
 
         ws.append([partida.codigo, partida.descripcion, partida.unidad,
@@ -859,31 +838,31 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
         r = ws.max_row
         for c in range(1, N + 1):
             ws.cell(r, c).fill = fill
-            ws.cell(r, c).font = _FN
-            ws.cell(r, c).border = _BORDE_TABLA
-        _cel_desc(ws, r, 2, partida.descripcion, width_chars=55)
+            ws.cell(r, c).font = PRES_FN
+            ws.cell(r, c).border = PRES_BORDE_TABLA
+        cel_desc(ws, r, 2, partida.descripcion, width_chars=55)
         ws.cell(r, 2).fill = fill
-        _cel_cantidad(ws, r, 4, partida.cantidad)
+        cel_cantidad(ws, r, 4, partida.cantidad)
         ws.cell(r, 4).fill = fill
-        ws.cell(r, 5).number_format = _FE
-        ws.cell(r, 5).alignment = _AN
-        ws.cell(r, 6).number_format = _FE
-        ws.cell(r, 6).alignment = _AN
-        ws.cell(r, 7).fill = _FA   # precio ofertado
-        ws.cell(r, 8).fill = _FA   # importe ofertado
+        ws.cell(r, 5).number_format = PRES_FE
+        ws.cell(r, 5).alignment = PRES_AN
+        ws.cell(r, 6).number_format = PRES_FE
+        ws.cell(r, 6).alignment = PRES_AN
+        ws.cell(r, 7).fill = PRES_FA   # precio ofertado
+        ws.cell(r, 8).fill = PRES_FA   # importe ofertado
 
     # Fila TOTAL PEM
     ws.append(['', 'TOTAL PRESUPUESTO DE EJECUCIÓN MATERIAL'] + [''] * 3
               + [presupuesto.importe_total, '', ''])
     r = ws.max_row
     aplicar_estilo_total(ws, r, N)
-    _cel_eur(ws, r, 6, presupuesto.importe_total, font=_FTO)
-    ws.cell(r, 6).fill = _FB
+    cel_eur(ws, r, 6, presupuesto.importe_total, font=PRES_FTO)
+    ws.cell(r, 6).fill = PRES_FB
 
     ajustar_columnas(ws, {'A': 16, 'B': 55, 'C': 6, 'D': 12,
                           'E': 16, 'F': 16, 'G': 18, 'H': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'landscape', fila_cabecera)
+    configurar_impresion(ws, 'landscape', fila_cabecera, presupuesto.config)
     wb.save(filepath)
 
 
@@ -897,9 +876,9 @@ def generar_pres0201(presupuesto: Presupuesto, filepath: Path) -> None:
     N = 3
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
 
-    aplicar_encabezado_documental(ws, 'PRES.02.01', 'CUADRO DE PRECIOS N.º 1', N)
+    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.01', 'CUADRO DE PRECIOS N.º 1', N)
 
-    _cabecera_tabla(ws, ['Código', 'Descripción del precio', 'Precio unit. (€)'])
+    cabecera_tabla(ws, ['Código', 'Descripción del precio', 'Precio unit. (€)'])
     fila_cabecera = ws.max_row
     ws.freeze_panes = 'A7'
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
@@ -909,28 +888,28 @@ def generar_pres0201(presupuesto: Presupuesto, filepath: Path) -> None:
     for cap, sub, partida in iter_todas_partidas(presupuesto):
         if cap is not current_cap:
             current_cap = cap
-            ws.append([_capitulo_limpio(cap.codigo), cap.descripcion, ''])
+            ws.append([capitulo_limpio(cap.codigo), cap.descripcion, ''])
             r = ws.max_row
             ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N)
             aplicar_estilo_capitulo(ws, r, N)
-            _cel_desc(ws, r, 1,
-                      f'CAPÍTULO {_capitulo_limpio(cap.codigo)} — {cap.descripcion}',
-                      font=_FCF)
+            cel_desc(ws, r, 1,
+                      f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}',
+                      font=PRES_FCF)
 
         desc_precio  = descripcion_completa(partida)
         precio_letra = numero_a_letras(partida.precio_unitario)
         contenido_b  = f'{desc_precio}\n\nPRECIO: {precio_letra}'
-        _append_fila_cuadro_precios_1(
+        append_fila_cuadro_precios_1(
             ws,
             partida.codigo,
             contenido_b,
             partida.precio_unitario,
         )
-        _sep_vacia(ws, 4.0, N)
+        sep_vacia(ws, 4.0, N)
 
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'portrait', fila_cabecera)
+    configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
     wb.save(filepath)
 
 
@@ -944,9 +923,9 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
     N = 7
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
 
-    aplicar_encabezado_documental(ws, 'PRES.02.02', 'CUADRO DE PRECIOS N.º 2', N)
+    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.02', 'CUADRO DE PRECIOS N.º 2', N)
 
-    _cabecera_tabla(ws, ['Tipo', 'Código', 'Descripción',
+    cabecera_tabla(ws, ['Tipo', 'Código', 'Descripción',
                          'Ud.', 'Cant./ud', 'P. unit./Base (€)', 'Coste (€)'])
     fila_cabecera = ws.max_row
     ws.freeze_panes = 'A7'
@@ -958,47 +937,48 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                    '', '', '', ''])
         r = ws.max_row
         aplicar_estilo_capitulo(ws, r, N)
-        _cel_desc(ws, r, 2, partida.descripcion, font=_FCF, width_chars=38, max_height=80.0)
-        ws.cell(r, 2).fill = _FCP
+        cel_desc(ws, r, 2, partida.descripcion, font=PRES_FCF, width_chars=38, max_height=80.0)
+        ws.cell(r, 2).fill = PRES_FCP
         for c in (1, 3, 4, 5, 6, 7):
-            ws.cell(r, c).alignment = _AC
+            ws.cell(r, c).alignment = PRES_AC
         ws.row_dimensions[r].height = max(ws.row_dimensions[r].height or 20, 22)
-        _registrar_altura_manual(ws, r)
+        registrar_altura_manual(ws, r)
 
         # Fila descripción técnica completa. Si supera el límite de altura
         # de Excel, se parte en filas de continuación sin borde superior.
         desc_larga = descripcion_completa(partida)
-        _append_descripcion_fusionada_partida(
+        append_descripcion_fusionada_partida(
             ws,
             n_cols=N,
             start_col=2,
             end_col=N,
             texto=desc_larga,
-            font=_FN,
-            fill=_FB,
+            font=PRES_FN,
+            fill=PRES_FB,
             max_height_points=300.0,
         )
 
-        items = presupuesto.descompuestos_raw.get(partida.codigo, [])
+        recursos = recursos_expandidos(partida.codigo, presupuesto)
 
-        if not items:
+        if not recursos:
             # Partida de precio alzado
             ws.append(['', 'Precio alzado', '', '', '', '', partida.precio_unitario])
             r = ws.max_row
             for c in range(1, N + 1):
-                ws.cell(r, c).fill = _FD
-                ws.cell(r, c).font = _FDE
-                ws.cell(r, c).border = _BORDE_TABLA
-            _cel_eur(ws, r, 7, partida.precio_unitario, font=_FDE)
-            ws.cell(r, 7).fill = _FD
+                ws.cell(r, c).fill = PRES_FD
+                ws.cell(r, c).font = PRES_FDE
+                ws.cell(r, c).border = PRES_BORDE_TABLA
+            cel_eur(ws, r, 7, partida.precio_unitario, font=PRES_FDE)
+            ws.cell(r, 7).fill = PRES_FD
         else:
-            # Agrupar por tipo
-            grupos = {'MO': [], 'MQ': [], 'MT': [], '%': []}
-            for cod_rec, cant in items:
-                grupos[tipo_recurso(cod_rec)].append((cod_rec, cant))
+            # Expandir PAs y agrupar por tipo
+            grupos = {'MO': [], 'MQ': [], 'MT': [], '%': [], '?': []}
+            for cod_rec, cant in recursos.items():
+                grupos[tipo_recurso(cod_rec, presupuesto)].append((cod_rec, cant))
 
             suma_directos = 0.0
-            for tipo, label in [('MO', 'Mano de obra'), ('MQ', 'Maquinaria'), ('MT', 'Materiales')]:
+            for tipo, label in [('MO', 'Mano de obra'), ('MQ', 'Maquinaria'),
+                                ('MT', 'Materiales'), ('?', 'Sin clasificar')]:
                 if not grupos[tipo]:
                     continue
                 # Subtítulo del grupo
@@ -1006,42 +986,42 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                 r = ws.max_row
                 ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=N)
                 for c in range(1, N + 1):
-                    ws.cell(r, c).fill = _FD
-                    ws.cell(r, c).font = Font(name=PRES_FONT_FAMILY, size=PRES_DETAIL_SIZE,
-                                              bold=True, color=PRES_GRIS_TEXTO)
-                    ws.cell(r, c).border = _BORDE_TABLA
+                    ws.cell(r, c).fill = PRES_FD
+                    ws.cell(r, c).font = Font(name=FONT_PRES, size=9,
+                                              bold=True, color=GRIS_TEXTO)
+                    ws.cell(r, c).border = PRES_BORDE_TABLA
 
-                for i, (cod_rec, cant) in enumerate(grupos[tipo]):
+                for cod_rec, cant in grupos[tipo]:
                     desc, unidad, precio = get_recurso_info(cod_rec, presupuesto)
                     coste = round(cant * precio, 4)
                     suma_directos += coste
-                    fill = _FB
+                    fill = PRES_FB
                     ws.append([tipo, cod_rec, desc, unidad, cant, precio, coste])
                     r = ws.max_row
                     for c in range(1, N + 1):
                         ws.cell(r, c).fill = fill
-                        ws.cell(r, c).font = _FDE
-                        ws.cell(r, c).border = _BORDE_TABLA
-                        ws.cell(r, c).alignment = _AC
-                    _cel_desc(ws, r, 3, desc, font=_FDE, width_chars=55, max_height=90.0)
+                        ws.cell(r, c).font = PRES_FDE
+                        ws.cell(r, c).border = PRES_BORDE_TABLA
+                        ws.cell(r, c).alignment = PRES_AC
+                    cel_desc(ws, r, 3, desc, font=PRES_FDE, width_chars=55, max_height=90.0)
                     ws.cell(r, 3).fill = fill
-                    ws.cell(r, 1).alignment = _ALC
-                    ws.cell(r, 2).alignment = _ALC
-                    _cel_cantidad(ws, r, 5, cant, font=_FDE, recurso=True)
+                    ws.cell(r, 1).alignment = PRES_ALC
+                    ws.cell(r, 2).alignment = PRES_ALC
+                    cel_cantidad(ws, r, 5, cant, font=PRES_FDE, recurso=True)
                     ws.cell(r, 5).fill = fill
-                    ws.cell(r, 6).number_format = _FE
-                    ws.cell(r, 6).alignment = _ANC
-                    ws.cell(r, 7).number_format = _FE
-                    ws.cell(r, 7).alignment = _ANC
+                    ws.cell(r, 6).number_format = PRES_FE
+                    ws.cell(r, 6).alignment = PRES_ANC
+                    ws.cell(r, 7).number_format = PRES_FE
+                    ws.cell(r, 7).alignment = PRES_ANC
 
             # Subtotal directos
             ws.append(['', '', '', '', '', 'Suma directos:', round(suma_directos, 2)])
             r = ws.max_row
             aplicar_estilo_subtotal(ws, r, N)
             ws.row_dimensions[r].height = 22.0
-            ws.cell(r, 6).alignment = _ANC
-            _cel_eur(ws, r, 7, round(suma_directos, 2), font=_FCF)
-            ws.cell(r, 7).fill = _FB
+            ws.cell(r, 6).alignment = PRES_ANC
+            cel_eur(ws, r, 7, round(suma_directos, 2), font=PRES_FCF)
+            ws.cell(r, 7).fill = PRES_FB
 
             total_auxiliares = 0.0
             if grupos['%']:
@@ -1049,10 +1029,10 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                 r = ws.max_row
                 ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=N)
                 for c in range(1, N + 1):
-                    ws.cell(r, c).fill = _FB
-                    ws.cell(r, c).font = Font(name=PRES_FONT_FAMILY, size=PRES_DETAIL_SIZE,
-                                              bold=True, color=PRES_GRIS_TEXTO)
-                    ws.cell(r, c).border = _BORDE_FINO
+                    ws.cell(r, c).fill = PRES_FB
+                    ws.cell(r, c).font = Font(name=FONT_PRES, size=9,
+                                              bold=True, color=GRIS_TEXTO)
+                    ws.cell(r, c).border = PRES_BORDE_FINO
 
                 for cod_rec, cant in grupos['%']:
                     desc, unidad, _precio = get_recurso_info(cod_rec, presupuesto)
@@ -1064,206 +1044,233 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                                porcentaje, suma_directos, importe_auxiliar])
                     r = ws.max_row
                     for c in range(1, N + 1):
-                        ws.cell(r, c).fill = _FB
-                        ws.cell(r, c).font = _FDE
-                        ws.cell(r, c).border = _BORDE_TABLA
-                        ws.cell(r, c).alignment = _AC
-                    _cel_desc(ws, r, 3, desc, font=_FDE, width_chars=55, max_height=90.0)
-                    ws.cell(r, 1).alignment = _ALC
-                    ws.cell(r, 2).alignment = _ALC
-                    ws.cell(r, 5).number_format = _FP
-                    ws.cell(r, 5).alignment = _ANC
-                    ws.cell(r, 6).number_format = _FE
-                    ws.cell(r, 6).alignment = _ANC
-                    ws.cell(r, 7).number_format = _FE
-                    ws.cell(r, 7).alignment = _ANC
+                        ws.cell(r, c).fill = PRES_FB
+                        ws.cell(r, c).font = PRES_FDE
+                        ws.cell(r, c).border = PRES_BORDE_TABLA
+                        ws.cell(r, c).alignment = PRES_AC
+                    cel_desc(ws, r, 3, desc, font=PRES_FDE, width_chars=55, max_height=90.0)
+                    ws.cell(r, 1).alignment = PRES_ALC
+                    ws.cell(r, 2).alignment = PRES_ALC
+                    ws.cell(r, 5).number_format = PRES_FP
+                    ws.cell(r, 5).alignment = PRES_ANC
+                    ws.cell(r, 6).number_format = PRES_FE
+                    ws.cell(r, 6).alignment = PRES_ANC
+                    ws.cell(r, 7).number_format = PRES_FE
+                    ws.cell(r, 7).alignment = PRES_ANC
 
             if grupos['%']:
                 ws.append(['', '', '', '', '', 'Total auxiliares:', round(total_auxiliares, 2)])
                 r = ws.max_row
                 aplicar_estilo_subtotal(ws, r, N)
                 ws.row_dimensions[r].height = 22.0
-                _cel_eur(ws, r, 7, round(total_auxiliares, 2), font=_FCF)
-                ws.cell(r, 7).fill = _FB
+                cel_eur(ws, r, 7, round(total_auxiliares, 2), font=PRES_FCF)
+                ws.cell(r, 7).fill = PRES_FB
 
         # Fila total partida
         ws.append(['', '', '', '', '', 'Precio unitario total:', partida.precio_unitario])
         r = ws.max_row
         for c in range(1, N + 1):
-            ws.cell(r, c).fill = _FB
-            ws.cell(r, c).font = _FTO
-            ws.cell(r, c).border = _BORDE_TOTAL
-            ws.cell(r, c).alignment = _ANC
+            ws.cell(r, c).fill = PRES_FB
+            ws.cell(r, c).font = PRES_FTO
+            ws.cell(r, c).border = PRES_BORDE_TOTAL
+            ws.cell(r, c).alignment = PRES_ANC
         ws.cell(r, 6).alignment = Alignment(horizontal='right', vertical='center')
-        _cel_eur(ws, r, 7, partida.precio_unitario, font=_FTO)
-        ws.cell(r, 7).fill = _FB
+        cel_eur(ws, r, 7, partida.precio_unitario, font=PRES_FTO)
+        ws.cell(r, 7).fill = PRES_FB
         ws.row_dimensions[r].height = 24.0
-        _registrar_altura_manual(ws, r)
+        registrar_altura_manual(ws, r)
 
-        _sep_vacia(ws, 6.0, N)
+        sep_vacia(ws, 6.0, N)
 
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'portrait', fila_cabecera)
+    configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
     wb.save(filepath)
 
 
-# ── PRES.02.03 — Presupuesto Descompuesto y Mediciones ───────────────────────
+# ── PRES.02.03 / PRES.03 — Presupuesto Descompuesto y Mediciones ─────────────
 
-def generar_pres0203(presupuesto: Presupuesto, filepath: Path) -> None:
-    """Genera el Presupuesto Descompuesto y Mediciones por capítulos."""
-    wb  = Workbook()
-    ws  = wb.active
-    ws.title = 'Presupuesto Descompuesto'
-    N = 6
-    ajustar_columnas(ws, {'A': 8, 'B': 55, 'C': 6, 'D': 12, 'E': 16, 'F': 16})
+def generar_descompuesto_doc(
+    presupuesto: Presupuesto,
+    filepath: Path,
+    mostrar_precios: bool,
+) -> None:
+    """
+    Generador compartido para PRES.02.03 (con precios) y PRES.03 (mediciones ciegas).
+    Con mostrar_precios=True: 6 columnas, precios, importes, horas MO visibles, PEM final.
+    Con mostrar_precios=False: 4 columnas, sin precios, sin importes, horas MO ocultas.
+    """
+    N          = 6 if mostrar_precios else 4
+    col_widths = {'A': 8, 'B': 55, 'C': 6, 'D': 12, 'E': 16, 'F': 16} if mostrar_precios \
+                 else {'A': 8, 'B': 55, 'C': 6, 'D': 12}
+    headers    = (['Código', 'Descripción', 'Ud.', 'Cantidad', 'P. unit. (€)', 'Importe (€)']
+                  if mostrar_precios else ['Código', 'Descripción', 'Ud.', 'Cantidad'])
+    anexo      = 'PRES.02.03' if mostrar_precios else 'PRES.03'
+    titulo     = 'PRESUPUESTO DESCOMPUESTO Y MEDICIONES' if mostrar_precios else 'MEDICIONES'
 
-    aplicar_encabezado_documental(
-        ws,
-        'PRES.02.03',
-        'PRESUPUESTO DESCOMPUESTO Y MEDICIONES',
-        N,
-    )
-
-    _cabecera_tabla(ws, ['Código', 'Descripción', 'Ud.',
-                         'Cantidad', 'P. unit. (€)', 'Importe (€)'])
+    wb = Workbook()
+    ws = wb.active
+    ws.title = 'Presupuesto Descompuesto' if mostrar_precios else 'Mediciones Ciegas'
+    ajustar_columnas(ws, col_widths)
+    aplicar_encabezado_documental(ws, presupuesto.config, anexo, titulo, N)
+    cabecera_tabla(ws, headers)
     fila_cabecera = ws.max_row
     ws.freeze_panes = 'A7'
-    ajustar_columnas(ws, {'A': 8, 'B': 55, 'C': 6, 'D': 12, 'E': 16, 'F': 16})
+    ajustar_columnas(ws, col_widths)
+
+    def escribir_partidas_de(nodo: Capitulo) -> None:
+        for sub in nodo.subcapitulos:
+            ws.append(['', f'{capitulo_limpio(sub.codigo)} — {sub.descripcion}']
+                      + [''] * (N - 2))
+            r_sub = ws.max_row
+            ws.merge_cells(start_row=r_sub, start_column=1, end_row=r_sub, end_column=N)
+            for c in range(1, N + 1):
+                ws.cell(r_sub, c).fill = PRES_FSC
+                ws.cell(r_sub, c).font = PRES_FCF
+            cel_desc(ws, r_sub, 1,
+                      f'{capitulo_limpio(sub.codigo)} — {sub.descripcion}', font=PRES_FCF)
+            ws.cell(r_sub, 1).fill = PRES_FSC
+            escribir_partidas_de(sub)
+
+        for partida in nodo.partidas:
+            importe = partida.precio_unitario * partida.cantidad
+            fila_p  = [partida.codigo, partida.descripcion, partida.unidad, partida.cantidad]
+            if mostrar_precios:
+                fila_p += [partida.precio_unitario, importe]
+            ws.append(fila_p)
+            r_p = ws.max_row
+            aplicar_estilo_capitulo(ws, r_p, N)
+            cel_desc(ws, r_p, 2, partida.descripcion, font=PRES_FCF, width_chars=42, max_height=90.0)
+            ws.cell(r_p, 2).fill = PRES_FCP
+            cel_cantidad(ws, r_p, 4, partida.cantidad, font=PRES_FCF)
+            ws.cell(r_p, 4).fill = PRES_FCP
+            if mostrar_precios:
+                cel_eur(ws, r_p, 5, partida.precio_unitario, font=PRES_FCF)
+                ws.cell(r_p, 5).fill = PRES_FCP
+                cel_eur(ws, r_p, 6, importe, font=PRES_FCF)
+                ws.cell(r_p, 6).fill = PRES_FCP
+
+            append_descripcion_fusionada_partida(
+                ws, n_cols=N, start_col=2, end_col=N,
+                texto=descripcion_completa(partida),
+                font=PRES_FN, fill=PRES_FB, max_height_points=300.0,
+            )
+
+            recursos = recursos_expandidos(partida.codigo, presupuesto)
+            if recursos:
+                grupos = {'MO': [], 'MQ': [], 'MT': [], '%': [], '?': []}
+                for cod_rec, cant in recursos.items():
+                    grupos[tipo_recurso(cod_rec, presupuesto)].append((cod_rec, cant))
+
+                suma_directos_local = 0.0
+                if mostrar_precios:
+                    for tipo_d in ['MO', 'MQ', 'MT']:
+                        for cod_tmp, cant_tmp in grupos[tipo_d]:
+                            _, _, precio_tmp = get_recurso_info(cod_tmp, presupuesto)
+                            suma_directos_local += round(cant_tmp * precio_tmp, 4)
+
+                for tipo, _ in [('MO', None), ('MQ', None), ('MT', None),
+                                 ('%', None), ('?', None)]:
+                    if not grupos[tipo]:
+                        continue
+                    for cod_rec, cant in grupos[tipo]:
+                        desc_r, unidad_r, precio_r = get_recurso_info(cod_rec, presupuesto)
+                        if tipo == '%':
+                            cant = cant / 100 if abs(cant) > 1 else cant
+                            unidad_r = '%'
+                            if mostrar_precios:
+                                precio_r = suma_directos_local
+
+                        if mostrar_precios:
+                            coste = round(suma_directos_local * cant, 4) if tipo == '%' \
+                                    else round(cant * precio_r, 4)
+                            ws.append([tipo, f'{cod_rec} — {desc_r}',
+                                       unidad_r, cant, precio_r, coste])
+                        else:
+                            cant_visible = '' if tipo == 'MO' else cant
+                            ws.append([tipo, f'{cod_rec} — {desc_r}', unidad_r, cant_visible])
+
+                        r_r = ws.max_row
+                        for c in range(1, N + 1):
+                            ws.cell(r_r, c).fill = PRES_FB
+                            ws.cell(r_r, c).font = PRES_FDE
+                            ws.cell(r_r, c).border = PRES_BORDE_TABLA
+                        cel_desc(ws, r_r, 2, f'{cod_rec} — {desc_r}',
+                                  font=PRES_FDE, width_chars=55, max_height=90.0)
+                        ws.cell(r_r, 2).fill = PRES_FB
+
+                        if mostrar_precios:
+                            cel_cantidad(ws, r_r, 4, cant, font=PRES_FDE, recurso=True)
+                            ws.cell(r_r, 4).fill = PRES_FB
+                            ws.cell(r_r, 5).number_format = PRES_FE
+                            ws.cell(r_r, 5).alignment    = PRES_AN
+                            ws.cell(r_r, 6).number_format = PRES_FE
+                            ws.cell(r_r, 6).alignment    = PRES_AN
+                        else:
+                            cant_visible = '' if tipo == 'MO' else cant
+                            if cant_visible != '':
+                                cel_cantidad(ws, r_r, 4, cant_visible, font=PRES_FDE,
+                                              recurso=(tipo not in ('%', '?')))
+                                ws.cell(r_r, 4).fill = PRES_FB
+
+            sep_vacia(ws, 5.0, N)
 
     for cap in presupuesto.capitulos:
-        ws.append([f'CAPÍTULO {_capitulo_limpio(cap.codigo)} — {cap.descripcion}']
+        ws.append([f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}']
                   + [''] * (N - 1))
         r = ws.max_row
         aplicar_estilo_cabecera(ws, r, N)
-        _cel_desc(ws, r, 1,
-                  f'CAPÍTULO {_capitulo_limpio(cap.codigo)} — {cap.descripcion}',
-                  font=_FT)
-        ws.cell(r, 1).fill = _FC
+        cel_desc(ws, r, 1,
+                  f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}', font=PRES_FT)
+        ws.cell(r, 1).fill = PRES_FC
         ws.row_dimensions[r].height = 18
-        _registrar_altura_manual(ws, r)
-
-        def escribir_partidas_de(nodo: Capitulo) -> None:
-            for sub in nodo.subcapitulos:
-                ws.append(['', f'{_capitulo_limpio(sub.codigo)} — {sub.descripcion}']
-                          + [''] * (N - 2))
-                r_sub = ws.max_row
-                ws.merge_cells(start_row=r_sub, start_column=1, end_row=r_sub, end_column=N)
-                for c in range(1, N + 1):
-                    ws.cell(r_sub, c).fill = _FSC
-                    ws.cell(r_sub, c).font = _FCF
-                _cel_desc(ws, r_sub, 1,
-                          f'{_capitulo_limpio(sub.codigo)} — {sub.descripcion}', font=_FCF)
-                ws.cell(r_sub, 1).fill = _FSC
-                escribir_partidas_de(sub)
-
-            for partida in nodo.partidas:
-                importe = partida.precio_unitario * partida.cantidad
-
-                # Fila resumen de la partida
-                ws.append([partida.codigo, partida.descripcion,
-                           partida.unidad, partida.cantidad,
-                           partida.precio_unitario, importe])
-                r_p = ws.max_row
-                aplicar_estilo_capitulo(ws, r_p, N)
-                _cel_desc(ws, r_p, 2, partida.descripcion, font=_FCF, width_chars=42, max_height=90.0)
-                ws.cell(r_p, 2).fill = _FCP
-                _cel_cantidad(ws, r_p, 4, partida.cantidad, font=_FCF)
-                ws.cell(r_p, 4).fill = _FCP
-                _cel_eur(ws, r_p, 5, partida.precio_unitario, font=_FCF)
-                ws.cell(r_p, 5).fill = _FCP
-                _cel_eur(ws, r_p, 6, importe, font=_FCF)
-                ws.cell(r_p, 6).fill = _FCP
-
-                # Fila descripción técnica completa. Si supera el límite de altura
-                # de Excel, se parte en filas de continuación sin borde superior.
-                desc_larga = descripcion_completa(partida)
-                _append_descripcion_fusionada_partida(
-                    ws,
-                    n_cols=N,
-                    start_col=2,
-                    end_col=N,
-                    texto=desc_larga,
-                    font=_FN,
-                    fill=_FB,
-                    max_height_points=300.0,
-                )
-
-                # Descompost (7 cols ajustados a 6 del documento)
-                items = presupuesto.descompuestos_raw.get(partida.codigo, [])
-                if items:
-                    grupos = {'MO': [], 'MQ': [], 'MT': [], '%': []}
-                    for cod_rec, cant in items:
-                        grupos[tipo_recurso(cod_rec)].append((cod_rec, cant))
-
-                    suma_directos_local = 0.0
-                    for tipo_directo in ['MO', 'MQ', 'MT']:
-                        for cod_tmp, cant_tmp in grupos[tipo_directo]:
-                            _desc_tmp, _unidad_tmp, precio_tmp = get_recurso_info(cod_tmp, presupuesto)
-                            suma_directos_local += round(cant_tmp * precio_tmp, 4)
-
-                    for tipo, label in [('MO', 'Mano de obra'), ('MQ', 'Maquinaria'),
-                                        ('MT', 'Materiales'), ('%', 'Costes indirectos')]:
-                        if not grupos[tipo]:
-                            continue
-                        for i, (cod_rec, cant) in enumerate(grupos[tipo]):
-                            desc_r, unidad_r, precio_r = get_recurso_info(cod_rec, presupuesto)
-                            if tipo == '%':
-                                porcentaje = cant / 100 if abs(cant) > 1 else cant
-                                coste = round(suma_directos_local * porcentaje, 4)
-                                precio_r = suma_directos_local
-                                unidad_r = '%'
-                                cant = porcentaje
-                            else:
-                                coste = round(cant * precio_r, 4)
-                            fill  = _FB
-                            ws.append([tipo, f'{cod_rec} — {desc_r}',
-                                       unidad_r, cant, precio_r, coste])
-                            r_r = ws.max_row
-                            for c in range(1, N + 1):
-                                ws.cell(r_r, c).fill = fill
-                                ws.cell(r_r, c).font = _FDE
-                                ws.cell(r_r, c).border = _BORDE_TABLA
-                            _cel_desc(ws, r_r, 2, f'{cod_rec} — {desc_r}', font=_FDE, width_chars=55, max_height=90.0)
-                            ws.cell(r_r, 2).fill = fill
-                            _cel_cantidad(ws, r_r, 4, cant, font=_FDE, recurso=True)
-                            ws.cell(r_r, 4).fill = fill
-                            ws.cell(r_r, 5).number_format = _FE
-                            ws.cell(r_r, 5).alignment    = _AN
-                            ws.cell(r_r, 6).number_format = _FE
-                            ws.cell(r_r, 6).alignment    = _AN
-
-                _sep_vacia(ws, 5.0, N)
-
+        registrar_altura_manual(ws, r)
         escribir_partidas_de(cap)
 
         # Total capítulo
-        ws.append(['', f'TOTAL CAPÍTULO {_capitulo_limpio(cap.codigo)}: {cap.descripcion}',
-                   '', '', '', cap.importe_total])
+        if mostrar_precios:
+            ws.append(['', f'TOTAL CAPÍTULO {capitulo_limpio(cap.codigo)}: {cap.descripcion}',
+                       '', '', '', cap.importe_total])
+        else:
+            ws.append([f'TOTAL CAPÍTULO {capitulo_limpio(cap.codigo)}: {cap.descripcion}']
+                      + [''] * (N - 1))
         r_tc = ws.max_row
         for c in range(1, N + 1):
-            ws.cell(r_tc, c).fill = _FCP
-            ws.cell(r_tc, c).font = _FCF
-            ws.cell(r_tc, c).border = _BORDE_TABLA
-        ws.merge_cells(start_row=r_tc, start_column=1, end_row=r_tc, end_column=5)
-        _cel_eur(ws, r_tc, 6, cap.importe_total, font=_FCF)
-        ws.cell(r_tc, 6).fill = _FCP
-        _registrar_altura_manual(ws, r_tc)
-        _sep_vacia(ws, 6.0, N)
+            ws.cell(r_tc, c).fill = PRES_FCP
+            ws.cell(r_tc, c).font = PRES_FCF
+            ws.cell(r_tc, c).border = PRES_BORDE_TABLA
+        if mostrar_precios:
+            ws.merge_cells(start_row=r_tc, start_column=1, end_row=r_tc, end_column=5)
+            cel_eur(ws, r_tc, 6, cap.importe_total, font=PRES_FCF)
+            ws.cell(r_tc, 6).fill = PRES_FCP
+        else:
+            ws.merge_cells(start_row=r_tc, start_column=1, end_row=r_tc, end_column=N)
+        registrar_altura_manual(ws, r_tc)
+        sep_vacia(ws, 6.0, N)
 
-    # PEM final
-    ws.append(['PRESUPUESTO DE EJECUCIÓN MATERIAL (PEM)'] + [''] * (N - 2)
-              + [presupuesto.importe_total])
-    r = ws.max_row
-    aplicar_estilo_total(ws, r, N)
-    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N - 1)
-    _cel_eur(ws, r, N, presupuesto.importe_total, font=_FTO)
-    ws.cell(r, N).fill = _FB
+    if mostrar_precios:
+        ws.append(['PRESUPUESTO DE EJECUCIÓN MATERIAL (PEM)'] + [''] * (N - 2)
+                  + [presupuesto.importe_total])
+        r = ws.max_row
+        aplicar_estilo_total(ws, r, N)
+        ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N - 1)
+        cel_eur(ws, r, N, presupuesto.importe_total, font=PRES_FTO)
+        ws.cell(r, N).fill = PRES_FB
 
-    ajustar_columnas(ws, {'A': 8, 'B': 55, 'C': 6, 'D': 12, 'E': 16, 'F': 16})
+    ajustar_columnas(ws, col_widths)
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'portrait', fila_cabecera)
+    configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
     wb.save(filepath)
+
+
+def generar_pres0203(presupuesto: Presupuesto, filepath: Path) -> None:
+    """Genera el Presupuesto Descompuesto y Mediciones por capítulos."""
+    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=True)
+
+
+def generar_pres03_mediciones(presupuesto: Presupuesto, filepath: Path) -> None:
+    """Genera las Mediciones ciegas: descripción y unidades sin precios ni horas MO."""
+    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=False)
 
 
 # ── PRES.02.04 — Resumen por Capítulos ───────────────────────────────────────
@@ -1276,34 +1283,34 @@ def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
     N3 = 3
     ajustar_columnas(ws, {'A': 52, 'B': 14, 'C': 18})
 
-    cap_gr     = _get_cap_gr(presupuesto)
+    cap_gr     = get_cap_gr(presupuesto)
     importe_gr = cap_gr.importe_total if cap_gr else 0.0
     pem_sin_gr = presupuesto.importe_total - importe_gr
-    gg  = pem_sin_gr * PORCENTAJE_GG
-    bi  = pem_sin_gr * PORCENTAJE_BI
+    gg  = pem_sin_gr * presupuesto.config.porcentaje_gg
+    bi  = pem_sin_gr * presupuesto.config.porcentaje_bi
     pec = pem_sin_gr + gg + bi
-    iva_obra = pec * PORCENTAJE_IVA_OBRA
-    iva_gr   = importe_gr * PORCENTAJE_IVA_GR
+    iva_obra = pec * presupuesto.config.iva_obra
+    iva_gr   = importe_gr * presupuesto.config.iva_gr
     pgl      = pec + importe_gr + iva_obra + iva_gr
 
     # ── Sección 1: tabla por capítulos ────────────────────────────────────────
-    aplicar_encabezado_documental(ws, 'PRES.02.04', 'RESUMEN POR CAPÍTULOS', N3)
+    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.04', 'RESUMEN POR CAPÍTULOS', N3)
 
-    _cabecera_tabla(ws, ['Capítulo', 'Descripción', 'Importe (€)'])
+    cabecera_tabla(ws, ['Capítulo', 'Descripción', 'Importe (€)'])
     fila_cabecera = ws.max_row
     ws.freeze_panes = 'A7'
 
     for i, cap in enumerate(presupuesto.capitulos):
-        ws.append([_capitulo_limpio(cap.codigo), cap.descripcion, cap.importe_total])
+        ws.append([capitulo_limpio(cap.codigo), cap.descripcion, cap.importe_total])
         r = ws.max_row
-        fill = _FD if i % 2 == 0 else _FB
+        fill = PRES_FD if i % 2 == 0 else PRES_FB
         for c in range(1, N3 + 1):
             ws.cell(r, c).fill = fill
-            ws.cell(r, c).font = _FN
-            ws.cell(r, c).border = _BORDE_TABLA
-        _cel_desc(ws, r, 2, cap.descripcion)
+            ws.cell(r, c).font = PRES_FN
+            ws.cell(r, c).border = PRES_BORDE_TABLA
+        cel_desc(ws, r, 2, cap.descripcion)
         ws.cell(r, 2).fill = fill
-        _cel_eur(ws, r, 3, cap.importe_total)
+        cel_eur(ws, r, 3, cap.importe_total)
         ws.cell(r, 3).fill = fill
         ws.row_dimensions[r].height = 21.0
 
@@ -1311,39 +1318,39 @@ def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
                presupuesto.importe_total])
     r = ws.max_row
     aplicar_estilo_total(ws, r, N3)
-    _cel_eur(ws, r, 3, presupuesto.importe_total, font=_FTO)
-    ws.cell(r, 3).fill = _FB
+    cel_eur(ws, r, 3, presupuesto.importe_total, font=PRES_FTO)
+    ws.cell(r, 3).fill = PRES_FB
 
-    _sep_vacia(ws, 6.0, N3)
-    _sep_vacia(ws, 6.0, N3)
+    sep_vacia(ws, 6.0, N3)
+    sep_vacia(ws, 6.0, N3)
 
     # ── Sección 2: cascada general ────────────────────────────────────────────
     ws.append(['RESUMEN GENERAL DEL PRESUPUESTO'] + [''] * (N3 - 1))
     r = ws.max_row
     aplicar_estilo_cabecera(ws, r, N3)
     ws.row_dimensions[r].height = 22
-    _registrar_altura_manual(ws, r)
+    registrar_altura_manual(ws, r)
 
-    _cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
+    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
 
     filas = [
         ('PEM (sin residuos)',        '—',   pem_sin_gr, False),
-        (f'Gastos Generales',         f'{PORCENTAJE_GG*100:.0f}%', gg,  False),
-        (f'Beneficio Industrial',     f'{PORCENTAJE_BI*100:.0f}%', bi,  False),
+        (f'Gastos Generales',         f'{presupuesto.config.porcentaje_gg*100:.0f}%', gg,  False),
+        (f'Beneficio Industrial',     f'{presupuesto.config.porcentaje_bi*100:.0f}%', bi,  False),
         None,
         ('PEC',                       '—',   pec,        True),
         ('Gestión de Residuos (GR)',  '—',   importe_gr, False),
         None,
-        (f'IVA obra',                 f'{PORCENTAJE_IVA_OBRA*100:.0f}%', iva_obra, False),
-        (f'IVA residuos',             f'{PORCENTAJE_IVA_GR*100:.0f}%',   iva_gr,   False),
+        (f'IVA obra',                 f'{presupuesto.config.iva_obra*100:.0f}%', iva_obra, False),
+        (f'IVA residuos',             f'{presupuesto.config.iva_gr*100:.0f}%',   iva_gr,   False),
         None,
         ('PGL (Presupuesto Global de Licitación)', '—', pgl, True),
     ]
-    _escribir_cascade(ws, filas, N3)
+    escribir_cascade(ws, filas, N3)
 
     ajustar_columnas(ws, {'A': 52, 'B': 14, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N3)
-    configurar_impresion(ws, 'portrait', fila_cabecera)
+    configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
     wb.save(filepath)
 
 
@@ -1357,11 +1364,11 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     N3 = 3
     ajustar_columnas(ws, {'A': 55, 'B': 14, 'C': 18})
 
-    cap_gr     = _get_cap_gr(presupuesto)
+    cap_gr     = get_cap_gr(presupuesto)
     importe_gr = cap_gr.importe_total if cap_gr else 0.0
     pem_sin_gr = presupuesto.importe_total - importe_gr
-    gg  = pem_sin_gr * PORCENTAJE_GG
-    bi  = pem_sin_gr * PORCENTAJE_BI
+    gg  = pem_sin_gr * presupuesto.config.porcentaje_gg
+    bi  = pem_sin_gr * presupuesto.config.porcentaje_bi
     pec = pem_sin_gr + gg + bi
 
     # ── Calcular base de liquidación (Bloque 2) ───────────────────────────────
@@ -1370,48 +1377,49 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
         for cap, sub, p in iter_todas_partidas(presupuesto)
         if es_partida_liquidable(p.codigo, presupuesto)
     )
-    gg_liq   = pem_liq * PORCENTAJE_GG
-    bi_liq   = pem_liq * PORCENTAJE_BI
+    gg_liq   = pem_liq * presupuesto.config.porcentaje_gg
+    bi_liq   = pem_liq * presupuesto.config.porcentaje_bi
     pec_liq  = pem_liq + gg_liq + bi_liq
-    liq_max  = (pec_liq + importe_gr) * PORCENTAJE_LIQUIDACION
+    liq_max  = (pec_liq + importe_gr) * presupuesto.config.porcentaje_liquidacion
 
     vec      = pec + importe_gr + liq_max
-    iva_obra = pec * PORCENTAJE_IVA_OBRA
-    iva_gr   = importe_gr * PORCENTAJE_IVA_GR
+    iva_obra = pec * presupuesto.config.iva_obra
+    iva_gr   = importe_gr * presupuesto.config.iva_gr
     pgl      = vec + iva_obra + iva_gr
 
     # ── BLOQUE 1: VEC ─────────────────────────────────────────────────────────
     aplicar_encabezado_documental(
         ws,
+        presupuesto.config,
         'PRES.05',
         'VALOR ESTIMADO DEL CONTRATO (VEC) Y LIQUIDACIÓN',
         N3,
     )
 
-    _cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
+    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
     fila_cabecera = ws.max_row
     ws.freeze_panes = 'A7'
 
     filas_b1 = [
         ('PEM (sin residuos)',                       '—',  pem_sin_gr, False),
-        (f'Gastos Generales',                        f'{PORCENTAJE_GG*100:.0f}%',   gg,      False),
-        (f'Beneficio Industrial',                    f'{PORCENTAJE_BI*100:.0f}%',   bi,      False),
+        (f'Gastos Generales',                        f'{presupuesto.config.porcentaje_gg*100:.0f}%',   gg,      False),
+        (f'Beneficio Industrial',                    f'{presupuesto.config.porcentaje_bi*100:.0f}%',   bi,      False),
         None,
         ('PEC',                                      '—',  pec,        True),
         ('Gestión de Residuos (GR)',                 '—',  importe_gr, False),
-        (f'Liquidación máxima ({PORCENTAJE_LIQUIDACION*100:.0f}%)', '—', liq_max, False),
+        (f'Liquidación máxima ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', liq_max, False),
         None,
         ('VEC (sin IVA)',                            '—',  vec,        True),
-        (f'IVA obra ({PORCENTAJE_IVA_OBRA*100:.0f}%)',  f'{PORCENTAJE_IVA_OBRA*100:.0f}%', iva_obra, False),
-        (f'IVA residuos ({PORCENTAJE_IVA_GR*100:.0f}%)', f'{PORCENTAJE_IVA_GR*100:.0f}%', iva_gr, False),
+        (f'IVA obra ({presupuesto.config.iva_obra*100:.0f}%)',  f'{presupuesto.config.iva_obra*100:.0f}%', iva_obra, False),
+        (f'IVA residuos ({presupuesto.config.iva_gr*100:.0f}%)', f'{presupuesto.config.iva_gr*100:.0f}%', iva_gr, False),
         None,
         ('PGL (Presupuesto Global de Licitación)',   '—',  pgl,        True),
     ]
-    _escribir_cascade(ws, filas_b1, N3)
+    escribir_cascade(ws, filas_b1, N3)
 
-    _sep_vacia(ws, 6.0, N3)
-    _sep_vacia(ws, 6.0, N3)
-    _sep_vacia(ws, 6.0, N3)
+    sep_vacia(ws, 6.0, N3)
+    sep_vacia(ws, 6.0, N3)
+    sep_vacia(ws, 6.0, N3)
 
     # ── BLOQUE 2: Base de liquidación ─────────────────────────────────────────
     ws.append(['BLOQUE 2 — BASE DE CÁLCULO DE LA LIQUIDACIÓN MÁXIMA'] + [''] * (N3 - 1))
@@ -1425,60 +1433,60 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     ws.append([nota] + [''] * (N3 - 1))
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N3)
-    ws.cell(r, 1).fill      = _FA
-    ws.cell(r, 1).font      = Font(name=PRES_FONT_FAMILY, size=PRES_DETAIL_SIZE, italic=True, color='000000')
+    ws.cell(r, 1).fill      = PRES_FA
+    ws.cell(r, 1).font      = Font(name=FONT_PRES, size=9, italic=True, color='000000')
     ws.cell(r, 1).alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
-    ws.cell(r, 1).border    = _BORDE_TABLA
+    ws.cell(r, 1).border    = PRES_BORDE_TABLA
     ws.row_dimensions[r].height = 40
-    _registrar_altura_manual(ws, r)
-    _sep_vacia(ws, 6.0, N3)
+    registrar_altura_manual(ws, r)
+    sep_vacia(ws, 6.0, N3)
 
-    _cabecera_tabla(ws, ['Código', 'Descripción', 'Importe (€)'])
+    cabecera_tabla(ws, ['Código', 'Descripción', 'Importe (€)'])
 
     alt = True
     for cap, sub, partida in iter_todas_partidas(presupuesto):
         if not es_partida_liquidable(partida.codigo, presupuesto):
             continue
         importe_p = partida.precio_unitario * partida.cantidad
-        fill = _FD if alt else _FB
+        fill = PRES_FD if alt else PRES_FB
         alt  = not alt
         ws.append([partida.codigo, partida.descripcion, importe_p])
         r = ws.max_row
         for c in range(1, N3 + 1):
             ws.cell(r, c).fill = fill
-            ws.cell(r, c).font = _FN
-            ws.cell(r, c).border = _BORDE_TABLA
-        _cel_desc(ws, r, 2, partida.descripcion, width_chars=55)
+            ws.cell(r, c).font = PRES_FN
+            ws.cell(r, c).border = PRES_BORDE_TABLA
+        cel_desc(ws, r, 2, partida.descripcion, width_chars=55)
         ws.cell(r, 2).fill = fill
-        _cel_eur(ws, r, 3, importe_p)
+        cel_eur(ws, r, 3, importe_p)
         ws.cell(r, 3).fill = fill
 
     ws.append(['', 'TOTAL BASE IMPONIBLE LIQUIDACIÓN', pem_liq])
     r = ws.max_row
     for c in range(1, N3 + 1):
-        ws.cell(r, c).fill = _FCP
-        ws.cell(r, c).font = _FCF
-        ws.cell(r, c).border = _BORDE_TABLA
-    _cel_eur(ws, r, 3, pem_liq, font=_FCF)
-    ws.cell(r, 3).fill = _FCP
-    _registrar_altura_manual(ws, r)
-    _sep_vacia(ws, 6.0, N3)
+        ws.cell(r, c).fill = PRES_FCP
+        ws.cell(r, c).font = PRES_FCF
+        ws.cell(r, c).border = PRES_BORDE_TABLA
+    cel_eur(ws, r, 3, pem_liq, font=PRES_FCF)
+    ws.cell(r, 3).fill = PRES_FCP
+    registrar_altura_manual(ws, r)
+    sep_vacia(ws, 6.0, N3)
 
     filas_b2 = [
         ('PEM liquidación',          '—',   pem_liq,    False),
-        (f'Gastos Generales',        f'{PORCENTAJE_GG*100:.0f}%',  gg_liq,  False),
-        (f'Beneficio Industrial',    f'{PORCENTAJE_BI*100:.0f}%',  bi_liq,  False),
+        (f'Gastos Generales',        f'{presupuesto.config.porcentaje_gg*100:.0f}%',  gg_liq,  False),
+        (f'Beneficio Industrial',    f'{presupuesto.config.porcentaje_bi*100:.0f}%',  bi_liq,  False),
         None,
         ('PEC liquidación',          '—',   pec_liq,    True),
         ('Gestión de Residuos (GR)', '—',   importe_gr, False),
         None,
-        (f'LIQUIDACIÓN MÁXIMA ({PORCENTAJE_LIQUIDACION*100:.0f}%)', '—', liq_max, True),
+        (f'LIQUIDACIÓN MÁXIMA ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', liq_max, True),
     ]
-    _escribir_cascade(ws, filas_b2, N3)
+    escribir_cascade(ws, filas_b2, N3)
 
     ajustar_columnas(ws, {'A': 55, 'B': 14, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N3)
-    configurar_impresion(ws, 'portrait', fila_cabecera)
+    configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
     wb.save(filepath)
 
 
@@ -1496,6 +1504,7 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
 
     aplicar_encabezado_documental(
         ws,
+        presupuesto.config,
         'JUST_PRECIOS',
         'JUSTIFICACIÓN DE PRECIOS — RECURSOS EMPLEADOS EN EL PROYECTO',
         N,
@@ -1510,7 +1519,7 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
     for cap, sub, partida in iter_todas_partidas(presupuesto):
         for cod_rec, cant_ud in presupuesto.descompuestos_raw.get(partida.codigo, []):
             total = cant_ud * partida.cantidad
-            tr = tipo_recurso(cod_rec)
+            tr = tipo_recurso(cod_rec, presupuesto)
             if tr == 'MO':
                 mo_tot[cod_rec] = mo_tot.get(cod_rec, 0) + total
             elif tr == 'MT':
@@ -1524,11 +1533,11 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
         r = ws.max_row
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N)
         for c in range(1, N + 1):
-            ws.cell(r, c).fill = _FCP
-            ws.cell(r, c).font = _FCF
-        ws.cell(r, 1).alignment = _AT
+            ws.cell(r, c).fill = PRES_FCP
+            ws.cell(r, c).font = PRES_FCF
+        ws.cell(r, 1).alignment = PRES_AT
 
-        _cabecera_tabla(ws, ['Código', 'Descripción', 'Ud.',
+        cabecera_tabla(ws, ['Código', 'Descripción', 'Ud.',
                              'P. unit. (€)', 'Cant. total proyecto', 'Coste total (€)'])
 
         coste_total_seccion = 0.0
@@ -1542,29 +1551,29 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
             unidad   = 'h' if hasattr(recurso, 'precio_hora') else recurso.unidad
             coste    = cant * precio
             coste_total_seccion += coste
-            fill = _FD if i % 2 == 0 else _FB
+            fill = PRES_FD if i % 2 == 0 else PRES_FB
             ws.append([cod, recurso.descripcion, unidad, precio, cant, coste])
             r = ws.max_row
             for c in range(1, N + 1):
                 ws.cell(r, c).fill = fill
-                ws.cell(r, c).font = _FN
-                ws.cell(r, c).border = _BORDE_TABLA
-            _cel_desc(ws, r, 2, recurso.descripcion)
+                ws.cell(r, c).font = PRES_FN
+                ws.cell(r, c).border = PRES_BORDE_TABLA
+            cel_desc(ws, r, 2, recurso.descripcion)
             ws.cell(r, 2).fill = fill
-            ws.cell(r, 4).number_format = _FE
-            ws.cell(r, 4).alignment    = _AN
-            _cel_cantidad(ws, r, 5, cant)
+            ws.cell(r, 4).number_format = PRES_FE
+            ws.cell(r, 4).alignment    = PRES_AN
+            cel_cantidad(ws, r, 5, cant)
             ws.cell(r, 5).fill = fill
-            _cel_eur(ws, r, 6, coste)
+            cel_eur(ws, r, 6, coste)
             ws.cell(r, 6).fill = fill
 
         ws.append(['', f'TOTAL {label_total}', '', '', '', coste_total_seccion])
         r = ws.max_row
         aplicar_estilo_total(ws, r, N)
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
-        _cel_eur(ws, r, 6, coste_total_seccion, font=_FTO)
-        ws.cell(r, 6).fill = _FB
-        _sep_vacia(ws, 6.0, N)
+        cel_eur(ws, r, 6, coste_total_seccion, font=PRES_FTO)
+        ws.cell(r, 6).fill = PRES_FB
+        sep_vacia(ws, 6.0, N)
 
     escribir_seccion('MANO DE OBRA', presupuesto.recursos_mo, mo_tot, 'MANO DE OBRA')
     escribir_seccion('MAQUINARIA',   presupuesto.recursos_mq, mq_tot, 'MAQUINARIA')
@@ -1572,7 +1581,7 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
 
     ajustar_columnas(ws, {'A': 18, 'B': 55, 'C': 8, 'D': 14, 'E': 18, 'F': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'portrait', 7)
+    configurar_impresion(ws, 'portrait', 7, presupuesto.config)
     wb.save(filepath)
 
 
@@ -1580,7 +1589,7 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
 
 def generar_todos(presupuesto: Presupuesto, output_dir: Path) -> list[Path]:
     """
-    Genera los siete documentos de presupuesto en output_dir.
+    Genera los ocho documentos de presupuesto en output_dir.
     Retorna lista de rutas de los ficheros generados.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1590,6 +1599,7 @@ def generar_todos(presupuesto: Presupuesto, output_dir: Path) -> list[Path]:
         ('PRES.02.02_Cuadro_Precios_2.xlsx',          generar_pres0202),
         ('PRES.02.03_Presupuesto_Descompuesto.xlsx',  generar_pres0203),
         ('PRES.02.04_Resumen_Capitulos.xlsx',         generar_pres0204),
+        ('PRES.03_Mediciones_Ciegas.xlsx',            generar_pres03_mediciones),
         ('PRES.05_VEC_Liquidacion.xlsx',              generar_pres05),
         ('JUST_PRECIOS_Recursos.xlsx',                generar_just_precios),
     ]

@@ -8,6 +8,33 @@ en el formato estándar BC3 de la construcción española.
 from pydantic import BaseModel, Field
 
 
+class ProjectConfig(BaseModel):
+    """
+    Configuración completa del proyecto: metadatos documentales y parámetros
+    financieros del contrato. Se carga desde config.yaml en input/ del proyecto.
+    Los campos con valor por defecto permiten funcionar sin yaml.
+    Los campos de texto vacíos se omiten en el encabezado documental.
+    """
+
+    # ── Metadatos documentales ────────────────────────────────────────────────
+    entidad:            str = ''   # entidad contratante
+    proyecto:           str = ''   # nombre o descripción del proyecto
+    edificio:           str = ''   # ubicación o nombre del inmueble
+    numero_expediente:  str = ''   # número de expediente de licitación
+    footer_org:         str = ''   # texto izquierdo del pie de página
+    footer_exp:         str = ''   # texto central del pie de página
+
+    # ── Parámetros financieros del contrato ───────────────────────────────────
+    porcentaje_gg:          float = 0.13   # gastos generales
+    porcentaje_bi:          float = 0.06   # beneficio industrial
+    iva_obra:               float = 0.21   # IVA aplicable a la obra
+    iva_gr:                 float = 0.10   # IVA aplicable a gestión de residuos
+    porcentaje_liquidacion: float = 0.10   # porcentaje para cálculo de liquidación máxima
+
+    # ── Estructura del presupuesto ────────────────────────────────────────────
+    codigo_capitulo_gr:  str = ''   # código BC3 del capítulo de gestión de residuos
+
+
 class RecursoMO(BaseModel):
     """
     Recurso de mano de obra definido en el BC3.
@@ -83,7 +110,9 @@ class Presupuesto(BaseModel):
     recursos_mo: dict[str, RecursoMO]       # clave: codigo MO
     recursos_mt: dict[str, RecursoElemental] = Field(default_factory=dict)  # materiales
     recursos_mq: dict[str, RecursoElemental] = Field(default_factory=dict)  # maquinaria
+    recursos_pa: dict[str, RecursoElemental] = Field(default_factory=dict)  # partidas alzadas / unidades auxiliares con descompuesto propio
     descompuestos_raw: dict[str, list[tuple[str, float]]] = Field(default_factory=dict)
+    config: ProjectConfig = Field(default_factory=ProjectConfig)
 
 
 Capitulo.model_rebuild()

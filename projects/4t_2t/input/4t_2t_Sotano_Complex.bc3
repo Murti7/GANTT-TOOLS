@@ -1,0 +1,109 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\3\3\3\2\2\2\2\EUR\|3\13\6\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|4T_2T_SOTANO_COMPLEX##||Importado desde ficheros CSV|1700.45|050326|0|
+~D|4T_2T_SOTANO_COMPLEX##
+|01#\\1
+\|
+~C|01#||Control automático cambio verano/invierno, empalme circuito 4t a 2t Complexe Balear de Recerca|1700.45||0|
+~T|01#|Capítulo correspondiente a los trabajos de ejecución de instalaciones de fontanería necesarias para la dotación de un nuevo punto de consumo de agua fría sanitaria (AFS) y agua caliente sanitaria (ACS) en dependencia interior del edificio Complex I+D+i, en la planta primera módulo M2, Ofice 101, incluyendo las operaciones de derivación desde rede existente, conducción de tuberías, instalación de elementos de regulación y conexión final a los equipos de consumo.
+
+Los trabajos comprendidos en este capítulo incluyen la ejecución de las derivaciones desde la red existente, instalación de conducciones en falso techo, colocación de válvulas de corte y elementos auxiliares, así como la conexión final a los aparatos sanitarios o equipamiento previsto.
+
+La ejecución deberá coordinarse con las instalaciones existentes del edificio, evitando interferencias con otras redes técnicas tales como electricidad, climatización o telecomunicaciones, garantizando en todo momento la continuidad de servicio de las instalaciones en funcionamiento.
+
+Las tuberías se instalarán mediante sistemas adecuados al material especificado, con fijaciones y soportes que aseguren su estabilidad y alineación, manteniendo accesibilidad a los elementos de corte y mantenimiento.
+
+Se prestará especial atención a la estanqueidad de las uniones, protección mecánica en pasos de tabique o elementos estructurales, así como a la correcta identificación y trazabilidad de los circuitos ejecutados cuando proceda.|
+~D|01#
+|01.01\\1
+\01.02\\1
+\|
+~C|01.01|ud|Cuadro eléctrico mural de fuerza y control|608.52||0|
+~T|01.01|Suministro, montaje, conexionado y puesta en servicio de cuadro eléctrico mural destinado al control manual del sistema de conmutación frío/calor de la red de climatización a dos tubos de la planta sótano del Complex I+D+i, permitiendo la selección funcional entre modo verano y modo invierno mediante actuación sobre las válvulas motorizadas existentes de impulsión y retorno de agua fría y caliente. La actuación comprende la fabricación, equipamiento, cableado interior, identificación, verificación y pruebas funcionales del conjunto completo de maniobra y protección.
+
+Incluye:
+Envolvente mural de poliéster reforzado autoextinguible, grado de protección mínimo IP65.
+Placa de montaje, carriles DIN y canaletas interiores de distribución.
+Interruptor diferencial bipolar, intensidad nominal mínima 25 A, sensibilidad 30 mA, clase AC o superior.
+Interruptor magnetotérmico bipolar, curva C, intensidad nominal 10 A, poder de corte mínimo 6 kA.
+Selector mantenido de dos posiciones estables Verano/Invierno, apto para maniobra a 230 Vac.
+Dos contactores o relés modulares de maniobra con bobina de 230 Vac, frecuencia 50 Hz, equipados cada uno con al menos un contacto normalmente abierto y un contacto normalmente cerrado para accionamiento de válvulas.
+Dos pilotos LED verdes de señalización de presencia de tensión sobre las bobinas de maniobra.
+Bornes de potencia, neutro, protección y señales de control.
+Cableado interior mediante conductor flexible de cobre de sección adecuada para los circuitos de mando y protección.
+Prensaestopas, terminales, marcadores, etiquetado y pequeño material auxiliar.
+Esquema eléctrico unifilar y funcional colocado en el interior del cuadro.
+Montaje, fijación, conexionado, comprobaciones eléctricas y pruebas funcionales.
+
+Criterio de medición en proyecto: ud por cuadro eléctrico completo definido en proyecto, totalmente equipado para el control del sistema de conmutación verano/invierno.
+
+Criterio de medición en obra: ud realmente ejecutada, instalada, cableada, identificada, probada y entregada en correcto estado de funcionamiento.|
+~D|01.01
+|MT-Valv1\\1
+\MT-P35amc100ec\\1
+\MT-P35amc022cc\\1
+\MT-D35amc510BB\\1
+\MT-RAC-MC-C90-16\\1
+\MT-RAC-MC-ADP-16-12\\2
+\MT-PASAMUROS-25\\1
+\MT-MT-MAT-AUX-FONT\\1
+\MO-mo001\\6
+\MO-mo102\\4
+\|
+~C|MT-Valv1|u|Envolvente mural de poliéster IP65, 500×400×200 mm, con placa de montaje o chasis interior, carril DIN, canaleta, borneros|104.5||3|
+~T|MT-Valv1|Envolvente mural de poliéster reforzado autoextinguible para instalación interior en sala técnica, grado de protección mínimo IP65, resistencia mecánica adecuada para aplicaciones industriales ligeras, apta para montaje mural de equipos de maniobra y protección eléctrica. Incluye placa de montaje, cierre, accesorios de fijación y elementos necesarios para el montaje de componentes modulares sobre carril DIN. Dimensiones mínimas orientativas 400x300x200 mm o equivalentes.|
+~C|MT-P35amc100ec|u|Int. Dif. Inst., 40A, 2P, DIN, IFN: 30mA, Clase AC, 6kA|18.26||3|
+~T|MT-P35amc100ec|Interruptor diferencial instantáneo, de 2 módulos, bipolar (2P), intensidad nominal 40 A, sensibilidad 30 mA, poder de corte 6 kA, clase AC, de 36x80x77,8 mm, grado de protección IP20, montaje sobre carril DIN (35 mm) y fijación a carril mediante garras, según UNE-EN 61008-1.|
+~C|MT-P35amc022cc|u|Int. Mag., 10A, 4P, DIN, curva C, 6kA|38.69||3|
+~T|MT-P35amc022cc|Interruptor automático magnetotérmico, de 4 módulos, tetrapolar (4P), intensidad nominal 10 A, poder de corte 6 kA, curva C, de 72x80x77,8 mm, grado de protección IP20, montaje sobre carril DIN (35 mm) y fijación a carril mediante garras, según UNE-EN 60898-1.|
+~C|MT-D35amc510BB|u|Piloto luminoso modular simple, verde, DIN, 110..230Vac 50Hz|10.1||3|
+~T|MT-D35amc510BB|Piloto luminoso modular simple fijada en un riel DIN. Tiene en la cara frontal un LED verde de 0.3W con una vida útil de 100000 horas. El voltaje de suministro nominal es de 100 Vac a 230 Vac a una frecuencia de 50/60 Hz, o es de 110 V CC a 130 V CC. La anchura de los pasos de 9mm es 2. Las dimensiones son (An.) 18mm x (Alt.) 82mm x (Prof.) 75mm. El grado de contaminación es 3. La tropicalización es el tratamiento 2 (humedad relativa del 95% a 55°C). La temperatura de funcionamiento es de -20°C a +50°C. La temperatura de almacenamiento es de -40°C a +70°C. Cumple con las normas IEC 60669-1 y IEC 60947-5-1.Montaje sobre carril DIN (35 mm) y fijación a carril mediante garras.|
+~C|MT-RAC-MC-C90-16|u|Selector mantenido verano/invierno 2 posiciones.|31.45||3|
+~T|MT-RAC-MC-C90-16|Selector rotativo mantenido de dos posiciones estables, apto para montaje en puerta o frontal de cuadro eléctrico, tensión de servicio 230 Vac, contactos adecuados para circuitos de maniobra, destinado a la selección manual de los modos de funcionamiento verano e invierno del sistema de climatización.|
+~C|MT-RAC-MC-ADP-16-12|u|Contactor modular 12 A, bobina 230 Vac, 1 NA + 1 NC.|21.78||3|
+~T|MT-RAC-MC-ADP-16-12|Contactor modular para instalación sobre carril DIN, intensidad nominal mínima 12 A en corriente alterna, bobina de accionamiento 230 Vac 50 Hz, equipado como mínimo con un contacto normalmente abierto y un contacto normalmente cerrado, destinado a la maniobra de las señales de apertura y cierre de actuadores motorizados de válvula de muy baja potencia. Se admite equipo de prestaciones superiores, incluyendo contactor de 20 A, siempre que mantenga la tensión de mando y configuración de contactos requeridas.|
+~C|MT-PASAMUROS-25|u|Borneros modulares de potencia y control.|37||3|
+~T|MT-PASAMUROS-25|Conjunto de bornes modulares de paso para conductores de potencia y control, aptos para montaje sobre carril DIN, incluyendo topes, puentes, identificadores y accesorios necesarios para la correcta distribución y conexionado de los circuitos del cuadro.|
+~C|MT-MT-MAT-AUX-FONT|lote|Material auxiliar|35||3|
+~T|MT-MT-MAT-AUX-FONT|Conjunto de materiales auxiliares destinados a la ejecución, terminación y correcta identificación de instalaciones eléctricas de baja tensión en trabajos de montaje, modificación o ampliación de circuitos.|
+~C|MO-mo001|h|Oficial 1ª electricista.|30||1|
+~C|MO-mo102|h|Ayudante electricista.|27.49||1|
+~C|01.02|ud|Cable multipolar apantallado 18G1,5 mm² para control de válvulas motorizadas|1042.4|040626|0|
+~T|01.02|Suministro e instalación de cable multipolar apantallado de control, configuración mínima 18G1,5 mm², destinado a la interconexión entre el cuadro eléctrico de maniobra ubicado en la sala de máquinas y los actuadores motorizados del sistema de conmutación hidráulica frío/calor de la red de climatización a dos tubos. La actuación comprende el tendido completo del cableado, la ejecución de los trabajos auxiliares necesarios para su instalación, el conexionado final de los actuadores existentes y la verificación funcional integral del sistema.
+
+Incluye:
+
+Cable multipolar apantallado de 18 conductores de cobre de sección mínima 1,5 mm².
+Tensión asignada mínima 300/500 V.
+Cubierta exterior apta para instalación fija en interiores.
+Conductor de protección y reserva de hilos para futuras actuaciones.
+Conexionado de las señales de apertura, cierre y neutro de los cuatro actuadores motorizados existentes.
+Tendido sobre bandejas eléctricas existentes.
+Fijación, ordenación y agrupación del cableado.
+Identificación permanente de conductores y señales.
+Entradas a cuadro eléctrico y puntos de conexión.
+Reservas de cable necesarias para mantenimiento y futuras intervenciones.
+Apertura temporal de registros y accesos de falso techo.
+Levantado y reposición de placas o elementos desmontables de falso techo.
+Ejecución de cuatro pasamuros para acceso al patinillo de instalaciones.
+Sellado y remate de los pasos ejecutados.
+Pequeñas ayudas de albañilería asociadas.
+Conexionado completo de los cuatro actuadores motorizados existentes.
+Conexionado de señales de apertura, cierre y neutro.
+Verificación de continuidad e identificación de circuitos.
+Ajustes y corrección de posibles incidencias de cableado.
+Limpieza final de las zonas de trabajo.
+
+Criterio de medición en proyecto: m de cable multipolar instalado según recorrido previsto, medido sobre plano por el eje de la instalación, incluyendo reservas, entradas, conexionado, trabajos auxiliares y puesta en servicio.
+
+Criterio de medición en obra: m realmente instalado y aceptado por la dirección facultativa, incluyendo todos los trabajos auxiliares, conexionados y verificaciones funcionales definidos en la presente partida.|
+~D|01.02
+|MT-CBL-3G15\\50
+\MT-MAT-AUX\\1
+\MO-mo001\\10
+\MO-mo102\\10
+\|
+~C|MT-CBL-3G15|m|Cable multipolar apantallado 18G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos|8.85||3|
+~T|MT-CBL-3G15|Cable de control apantallado 18G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos, baja emisión de humos, no propagador de la llama, con pantalla global y conductor verde/amarillo incluido.|
+~C|MT-MAT-AUX|lote|Material auxiliar|25||3|

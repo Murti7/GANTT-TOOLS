@@ -107,7 +107,7 @@ BANDAS = [
 ]
 
 
-def _fecha_base(tareas: list[TareaGantt]) -> date:
+def fecha_base(tareas: list[TareaGantt]) -> date:
     h1 = next((t for t in tareas if t.id == "H1" and t.fecha_inicio), None)
     if h1 is not None:
         return h1.fecha_inicio
@@ -129,7 +129,7 @@ def x_plot(fecha: date | None, base: date) -> float:
     return ANCHO_PANEL + float(dias_habiles_entre(base, fecha))
 
 
-def _grupo(tarea: TareaGantt) -> str:
+def grupo(tarea: TareaGantt) -> str:
     if tarea.grupo_visual:
         return tarea.grupo_visual
     if tarea.estacional:
@@ -139,14 +139,14 @@ def _grupo(tarea: TareaGantt) -> str:
     return "Inicio / documentación contractual"
 
 
-def _agrupar_tareas(tareas: list[TareaGantt]) -> dict[str, list[TareaGantt]]:
+def agrupar_tareas(tareas: list[TareaGantt]) -> dict[str, list[TareaGantt]]:
     grupos: dict[str, list[TareaGantt]] = defaultdict(list)
 
     for tarea in tareas:
-        grupos[_grupo(tarea)].append(tarea)
+        grupos[grupo(tarea)].append(tarea)
 
-    for tareas_grupo in grupos.values():
-        tareas_grupo.sort(
+    for tareasgrupo in grupos.values():
+        tareasgrupo.sort(
             key=lambda t: (
                 t.orden_visual if t.orden_visual is not None else 999,
                 t.fecha_inicio or date.min,
@@ -157,8 +157,8 @@ def _agrupar_tareas(tareas: list[TareaGantt]) -> dict[str, list[TareaGantt]]:
     return grupos
 
 
-def _calcular_y(tareas: list[TareaGantt]) -> tuple[dict[str, float], dict[str, tuple[float, float]]]:
-    grupos = _agrupar_tareas(tareas)
+def calcular_y(tareas: list[TareaGantt]) -> tuple[dict[str, float], dict[str, tuple[float, float]]]:
+    grupos = agrupar_tareas(tareas)
     y_tareas: dict[str, float] = {}
     bandas: dict[str, tuple[float, float]] = {}
 
@@ -190,7 +190,7 @@ def _calcular_y(tareas: list[TareaGantt]) -> tuple[dict[str, float], dict[str, t
     return y_tareas, bandas
 
 
-def _nodos_post_plazo(tareas: list[TareaGantt]) -> set[str]:
+def nodos_post_plazo(tareas: list[TareaGantt]) -> set[str]:
     sucesores: dict[str, list[str]] = {t.id: [] for t in tareas}
 
     for tarea in tareas:
@@ -215,23 +215,23 @@ def _nodos_post_plazo(tareas: list[TareaGantt]) -> set[str]:
     return post
 
 
-def _es_critica(tarea: TareaGantt, holguras: dict[str, float]) -> bool:
+def es_critica(tarea: TareaGantt, holguras: dict[str, float]) -> bool:
     return holguras.get(tarea.id, 1.0) <= 0
 
 
-def _color_tarea(tarea: TareaGantt, holguras: dict[str, float], post: set[str]) -> tuple[str, str]:
+def color_tarea(tarea: TareaGantt, holguras: dict[str, float], post: set[str]) -> tuple[str, str]:
     if tarea.id in post or tarea.estacional:
         return COLOR_POST, COLOR_POST_BORDE
     if tarea.es_fin_plazo:
         return COLOR_FIN_PLAZO, COLOR_HITO_BORDE
     if tarea.tipo == "hito":
         return COLOR_HITO, COLOR_HITO_BORDE
-    if _es_critica(tarea, holguras):
+    if es_critica(tarea, holguras):
         return COLOR_CRITICO, COLOR_CRITICO_BORDE
     return COLOR_NORMAL, COLOR_NORMAL_BORDE
 
 
-def _wrap(texto: str, ancho: int) -> str:
+def wrap(texto: str, ancho: int) -> str:
     lineas: list[str] = []
 
     for linea in texto.split("\n"):
@@ -301,7 +301,7 @@ def dibujar_panel_bandas(
     ax.axvline(ANCHO_PANEL, color="#BDBDBD", lw=1.0, zorder=3)
 
 
-def _dibujar_barra(
+def dibujar_barra(
     ax,
     tarea: TareaGantt,
     x0: float,
@@ -325,7 +325,7 @@ def _dibujar_barra(
     elif ancho_real < 8.0:
         texto = f"{nombre}\n{dur}" if dur else nombre
     else:
-        texto = _wrap(f"{nombre}\n{dur}", 18) if dur else _wrap(nombre, 18)
+        texto = wrap(f"{nombre}\n{dur}", 18) if dur else wrap(nombre, 18)
 
     ancho_draw = max(ancho_real, 3.5)
 
@@ -355,7 +355,7 @@ def _dibujar_barra(
     )
 
 
-def _dibujar_hito(
+def dibujar_hito(
     ax,
     tarea: TareaGantt,
     x: float,
@@ -406,7 +406,7 @@ def _dibujar_hito(
         )
 
 
-def _dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) -> None:
+def dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) -> None:
     if not tarea.entregables:
         return
 
@@ -441,7 +441,7 @@ def _dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) ->
         )
 
 
-def _dibujar_dependencias(
+def dibujar_dependencias(
     ax,
     tareas: list[TareaGantt],
     y_tareas: dict[str, float],
@@ -465,7 +465,7 @@ def _dibujar_dependencias(
             x_orig = x_plot(origen.fecha_fin, base)
             y_orig = y_tareas[origen.id]
 
-            critica = _es_critica(tarea, holguras) and _es_critica(origen, holguras)
+            critica = es_critica(tarea, holguras) and es_critica(origen, holguras)
             color = COLOR_DEP_CRITICA if critica else COLOR_DEP
             lw = 1.05 if critica else 0.55
 
@@ -485,7 +485,7 @@ def _dibujar_dependencias(
             )
 
 
-def _dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
+def dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
     """
     Dibuja el eje temporal con etiquetas de días hábiles relativos a H1.
     Las marcas se posicionan en x = ANCHO_PANEL + día_relativo.
@@ -526,7 +526,7 @@ def _dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
     )
 
 
-def _dibujar_leyenda(ax, x: float, y: float) -> None:
+def dibujar_leyenda(ax, x: float, y: float) -> None:
     def caja(titulo: str, y_top: float, alto: float) -> None:
         rect = FancyBboxPatch(
             (x, y_top - alto),
@@ -668,11 +668,11 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
     if not tareas:
         raise ValueError("La planificación no contiene tareas.")
 
-    base = _fecha_base(tareas)
+    base = fecha_base(tareas)
     holguras = calcular_holguras(tareas)
-    post = _nodos_post_plazo(tareas)
+    post = nodos_post_plazo(tareas)
 
-    y_tareas, bandas = _calcular_y(tareas)
+    y_tareas, bandas = calcular_y(tareas)
 
     x_max_tareas = max(x_plot(t.fecha_fin, base) for t in tareas if t.fecha_fin)
     x_min_tareas = min(x_plot(t.fecha_inicio, base) for t in tareas if t.fecha_inicio)
@@ -686,8 +686,8 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
 
     dibujar_fondo_bandas(ax, bandas, x_min, x_max)
     dibujar_panel_bandas(ax, bandas)
-    _dibujar_eje(ax, x_min, x_max, y_min)
-    _dibujar_dependencias(ax, tareas, y_tareas, base, holguras)
+    dibujar_eje(ax, x_min, x_max, y_min)
+    dibujar_dependencias(ax, tareas, y_tareas, base, holguras)
 
     for idx, tarea in enumerate(tareas):
         if tarea.id not in y_tareas:
@@ -696,16 +696,16 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
         y = y_tareas[tarea.id]
         x0 = x_plot(tarea.fecha_inicio, base)
         x1 = x_plot(tarea.fecha_fin, base)
-        color, borde = _color_tarea(tarea, holguras, post)
+        color, borde = color_tarea(tarea, holguras, post)
 
         if tarea.tipo == "hito":
-            _dibujar_hito(ax, tarea, x0, y, color, borde)
-            _dibujar_entregables(ax, tarea, x0 + 0.4, y, idx)
+            dibujar_hito(ax, tarea, x0, y, color, borde)
+            dibujar_entregables(ax, tarea, x0 + 0.4, y, idx)
         else:
-            _dibujar_barra(ax, tarea, x0, x1, y, color, borde)
-            _dibujar_entregables(ax, tarea, x1, y, idx)
+            dibujar_barra(ax, tarea, x0, x1, y, color, borde)
+            dibujar_entregables(ax, tarea, x1, y, idx)
 
-    _dibujar_leyenda(ax, x_max - 11.8, y_max - 0.6)
+    dibujar_leyenda(ax, x_max - 11.8, y_max - 0.6)
 
     ax.set_title(
         "DIAGRAMA TEMPORAL DE IMPLANTACIÓN, DEPENDENCIAS PRINCIPALES Y CAMINO CRÍTICO",

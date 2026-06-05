@@ -96,7 +96,7 @@ class PlanificacionProyecto(BaseModel):
 class _StrPreservingLoader(yaml.SafeLoader):
     pass
 
-def _construct_int_preserving_zeros(loader: yaml.SafeLoader, node) -> int | str:
+def construct_int_preserving_zeros(loader: yaml.SafeLoader, node) -> int | str:
     value = loader.construct_scalar(node)
     if value.startswith('0') and len(value) > 1 and value[1:].isdigit():
         return value  # preservar '07', '08', etc. como string
@@ -104,7 +104,7 @@ def _construct_int_preserving_zeros(loader: yaml.SafeLoader, node) -> int | str:
 
 _StrPreservingLoader.add_constructor(
     'tag:yaml.org,2002:int',
-    _construct_int_preserving_zeros,
+    construct_int_preserving_zeros,
 )
 
 

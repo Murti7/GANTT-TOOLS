@@ -19,6 +19,19 @@ import yaml
 from pathlib import Path
 
 from gantt.bc3.parser import parse_bc3
+
+
+def verificar_entorno() -> None:
+    """Comprueba dependencias del entorno antes de procesar. Avisa si algo falta."""
+    try:
+        from matplotlib.font_manager import findfont, FontProperties
+        from gantt.reporting.palette import FONT_PRES
+        if FONT_PRES and 'DejaVu' in findfont(FontProperties(family=FONT_PRES)):
+            print(f'AVISO: fuente "{FONT_PRES}" no encontrada — los documentos de presupuesto'
+                  f' usarán la fuente por defecto del sistema. Instala {FONT_PRES} para'
+                  f' obtener el formato corporativo correcto.')
+    except Exception:
+        pass
 from gantt.planning.calculator import calcular_planificacion
 from gantt.planning.models import cargar_planificacion_yaml
 from gantt.reporting.analysis_charts import AnalysisChartsReport
@@ -122,6 +135,8 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
 
 
 if __name__ == '__main__':
+    verificar_entorno()
+
     if len(sys.argv) < 2:
         print('Uso: python main.py <nombre-proyecto> [archivo.bc3]')
         print('Ejemplos:')

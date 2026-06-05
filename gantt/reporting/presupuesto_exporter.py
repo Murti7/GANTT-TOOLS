@@ -154,10 +154,12 @@ def aplicar_encabezado_documental(
     ws, config: ProjectConfig, anexo: str, titulo: str, n_cols: int
 ) -> None:
     """Escribe el encabezado documental. Las líneas vacías del config se omiten."""
+    exp = f'Nº Exp.: {config.numero_expediente}' if config.numero_expediente else ''
     candidatas = [
         config.entidad,
         config.proyecto,
         config.edificio,
+        exp,
         f'ANEXO ECONÓMICO {anexo}',
         titulo,
     ]

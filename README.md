@@ -1,15 +1,37 @@
-# gantt-tools
+# Gantt Tools — Generador de documentos de presupuesto y planificación
 
-## Descripción del proyecto
+Sistema de procesado de archivos BC3 (FIEBDC-3) para la generación automática de
+documentos de presupuesto en formato Excel, gráficos de análisis económico y
+diagramas de planificación temporal (Gantt).
 
-`gantt-tools` es una herramienta de línea de comandos que genera automáticamente
-un diagrama de Gantt y un archivo Excel de planificación a partir de un presupuesto
-de construcción en formato BC3 (FIEBDC-3) y una configuración de cuadrillas de trabajo.
+---
 
-El sistema lee el presupuesto, calcula las duraciones de cada capítulo y partida
-en función de las horas de mano de obra y la composición de las cuadrillas disponibles,
-y exporta los resultados a un Excel con cuatro hojas: resumen por capítulo,
-partidas detalladas, escenarios de duración y tabla de importación para MS Project.
+## Requisitos
+
+- **Python 3.12 o superior**
+- **Fuente UIBSans** instalada en el sistema (corporativa UIB).
+  Si no está disponible, los documentos usarán la fuente por defecto del sistema;
+  el layout puede variar ligeramente pero los datos son correctos.
+
+### Instalación de dependencias
+
+Con el entorno virtual activado:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Crear y activar el entorno virtual (primera vez)
+
+```bash
+# Windows
+python -m venv .venv
+.venv\Scripts\activate
+
+# Mac / Linux
+python -m venv .venv
+source .venv/bin/activate
+```
 
 ---
 
@@ -18,138 +40,230 @@ partidas detalladas, escenarios de duración y tabla de importación para MS Pro
 ```
 gantt-tools/
 ├── projects/                    # Un subdirectorio por proyecto
-│   └── Complexe-Balear/
-│       ├── input/               # Archivos de entrada: .bc3 y planificacion.yaml
-│       └── output/              # Excel y gráficos generados (ignorado por git)
-├── gantt/                       # Paquete principal con toda la lógica
-│   ├── bc3/                     # Lectura y parseo del archivo BC3
-│   │   ├── models.py            # Modelos Pydantic: Partida, Capitulo, Presupuesto
-│   │   └── parser.py            # parse_bc3(), build_capitulo(), read_bc3_records()
-│   ├── planning/                # Cálculo de duraciones y análisis del cronograma
-│   │   ├── models.py            # TareaGantt, PlanificacionProyecto, EscenarioRecursos
-│   │   ├── calculator.py        # calcular_planificacion(), forward pass CPM
-│   │   └── analyser.py          # calcular_holguras(), calcular_sensibilidad(), etc.
-│   └── reporting/               # Generación de outputs visuales
-│       ├── styles.py            # Constantes de estilo visual (paleta, fonts, formatos)
-│       ├── excel_exporter.py    # exportar_analisis() — Excel multi-hoja con Dashboard
-│       ├── network_diagram.py   # generar_diagrama_red() — PNG embebido en Excel
-│       └── analysis_charts.py   # Gráficos de reporting por capítulo y perfil MO
-├── main.py                      # Punto de entrada: orquesta el pipeline completo
-├── requirements.txt             # Dependencias del proyecto
+│   └── NombreProyecto/
+│       ├── input/
+│       │   ├── archivo.bc3        ← presupuesto (obligatorio)
+│       │   ├── config.yaml        ← configuración del proyecto (recomendado)
+│       │   └── planificacion.yaml ← cronograma (opcional)
+│       └── output/                ← documentos generados aquí
+├── gantt/
+│   ├── bc3/                     # Lectura y parseo del BC3
+│   ├── planning/                # Cálculo de duraciones y análisis CPM
+│   └── reporting/               # Generación de Excel, gráficos y diagramas
+│       ├── palette.py           # Colores y fuentes (modificar para otro cliente)
+│       ├── styles.py            # Objetos openpyxl y paletas matplotlib
+│       ├── presupuesto_exporter.py
+│       ├── excel_exporter.py
+│       ├── analysis_charts.py
+│       └── network_diagram.py
+├── main.py                      # Punto de entrada del pipeline
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Cómo añadir un proyecto nuevo
+## Uso
 
-1. Crear la carpeta del proyecto dentro de `projects/`:
-   ```
-   projects/
-   └── nombre-del-proyecto/
-       ├── input/
-       └── output/
-   ```
-
-2. Copiar el archivo BC3 en `input/` con el nombre `presupuesto.bc3`.
-
-3. Crear el archivo `input/cuadrillas.yaml` con la configuración de cuadrillas
-   para ese proyecto (recursos disponibles y su composición).
-
-4. Ejecutar el pipeline (ver sección siguiente).
-
----
-
-## Cómo ejecutar
-
-Con el entorno virtual activado, desde la raíz del proyecto:
+Desde la raíz del repositorio, con el entorno virtual activado:
 
 ```bash
 python main.py <nombre-proyecto>
 python main.py <nombre-proyecto> <archivo.bc3>
 ```
 
-Ejemplos:
+- Si hay un solo `.bc3` en `input/`, no hace falta especificarlo.
+- Si hay más de uno, es obligatorio indicar cuál usar.
+
+### Ejemplos
 
 ```bash
 python main.py Complexe-Balear
-python main.py Complexe-Balear pressupost_original.bc3
-python main.py Complexe-Balear pressupost_revisat.bc3
-```
-
-Si hay un solo `.bc3` en `input/`, no hace falta especificarlo.
-Si hay más de uno, es obligatorio especificar cuál usar.
-
-El Excel de resultados se escribirá en `projects/Complexe-Balear/output/`.
-
----
-
-## Entorno virtual: creación y activación
-
-Crear el entorno virtual (solo la primera vez):
-
-```bash
-python -m venv .venv
-```
-
-Activar el entorno:
-
-- **Windows:**
-  ```bash
-  .venv\Scripts\activate
-  ```
-- **Mac / Linux:**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-Para desactivarlo:
-
-```bash
-deactivate
+python main.py Complexe-Balear pressupost_v02.bc3
+python main.py 4t_2t
 ```
 
 ---
 
-## Dependencias e instalación
+## Documentos generados
 
-Con el entorno virtual activado:
+### Siempre (solo con BC3 y config.yaml)
 
-```bash
-pip install pydantic openpyxl pyyaml pytest
+| Archivo | Contenido |
+|---|---|
+| `PRES.01_Cuadro_Oferta.xlsx` | Cuadro de oferta con columnas editables para el licitador |
+| `PRES.02.01_Cuadro_Precios_1.xlsx` | Cuadro de precios n.º 1 — precios unitarios por partida |
+| `PRES.02.02_Cuadro_Precios_2.xlsx` | Cuadro de precios n.º 2 — descomposición por recurso |
+| `PRES.02.03_Presupuesto_Descompuesto.xlsx` | Presupuesto descompuesto y mediciones con precios |
+| `PRES.02.04_Resumen_Capitulos.xlsx` | Resumen por capítulos con cascada financiera PEM → PGL |
+| `PRES.03_Mediciones_Ciegas.xlsx` | Mediciones sin precios ni horas MO (para solicitar ofertas) |
+| `PRES.05_VEC_Liquidacion.xlsx` | VEC, liquidación máxima y cascada de IVA |
+| `JUST_PRECIOS_Recursos.xlsx` | Justificación de precios — totales de recursos por proyecto |
+| `*_gantt.xlsx` | Excel de análisis económico (capítulos, MO, partidas detalladas) |
+| `reporting/*.png` | Gráficos: importes por capítulo, horas MO, distribución por perfil |
+
+### Solo si existe `planificacion.yaml`
+
+| Archivo | Contenido |
+|---|---|
+| `*_gantt.xlsx` | Excel actualizado con datos de planificación temporal |
+| `*_gantt.png` | Diagrama de red / Gantt |
+
+---
+
+## Configuración del proyecto — `config.yaml`
+
+Crear en `projects/<nombre>/input/config.yaml`.
+Si no existe, el sistema funciona con valores por defecto (porcentajes estándar
+españoles, encabezados vacíos).
+
+```yaml
+# Metadatos documentales
+entidad:            UNIVERSITAT DE LES ILLES BALEARS
+proyecto:           Reforma del sistema de climatització
+edificio:           COMPLEXE BALEAR DE RECERCA
+numero_expediente:  2025/EXP-001   # aparece en el encabezado de todos los documentos
+footer_org:         Complexe Balear de Recerca
+footer_exp:         Expedient de licitació
+
+# Parámetros financieros del contrato
+porcentaje_gg:          0.13   # Gastos Generales (13 %)
+porcentaje_bi:          0.06   # Beneficio Industrial (6 %)
+iva_obra:               0.21   # IVA obra (21 %)
+iva_gr:                 0.10   # IVA gestión de residuos (10 %)
+porcentaje_liquidacion: 0.10   # Liquidación máxima (10 %)
+
+# Estructura del presupuesto
+# Código BC3 del capítulo de gestión de residuos para IVA diferenciado.
+# Dejar vacío si el proyecto no tiene ese capítulo.
+codigo_capitulo_gr: '13#'
 ```
 
-Para regenerar el archivo `requirements.txt` tras instalar nuevas dependencias:
+Solo incluir los campos que necesites cambiar. Los omitidos usan valores por defecto.
 
-```bash
-pip freeze > requirements.txt
+### Referencia de campos
+
+| Campo | Defecto | Descripción |
+|---|---|---|
+| `entidad` | *(vacío)* | Entidad contratante |
+| `proyecto` | descripción del BC3 | Nombre del proyecto |
+| `edificio` | *(vacío)* | Localización o nombre del inmueble |
+| `numero_expediente` | *(vacío)* | Nº de expediente — aparece en el encabezado |
+| `footer_org` | *(vacío)* | Pie de página izquierda en todos los documentos |
+| `footer_exp` | *(vacío)* | Pie de página central en todos los documentos |
+| `porcentaje_gg` | `0.13` | Gastos Generales |
+| `porcentaje_bi` | `0.06` | Beneficio Industrial |
+| `iva_obra` | `0.21` | IVA aplicable a la obra |
+| `iva_gr` | `0.10` | IVA aplicable al capítulo de residuos |
+| `porcentaje_liquidacion` | `0.10` | Base para cálculo de liquidación máxima |
+| `codigo_capitulo_gr` | *(vacío)* | Código BC3 del capítulo de gestión de residuos |
+
+---
+
+## Planificación temporal — `planificacion.yaml` (opcional)
+
+Permite generar el diagrama de Gantt y el análisis de ruta crítica (CPM).
+Si no existe este archivo, el sistema genera igualmente todos los documentos
+de presupuesto.
+
+```yaml
+parametros:
+  nombre:                  NombreProyecto
+  fecha_inicio:            2025-06-01    # formato AAAA-MM-DD
+  horas_dia:               8
+  dias_semana:             5
+  plazo_contractual_dias:  120
+
+escenarios:
+  - nombre: base
+    recursos:
+      MO-mo001: 1.0      # dedicación diaria en unidades del recurso
+      MO-mo102: 0.5
+  - nombre: optimizado
+    recursos:
+      MO-mo001: 1.5
+      MO-mo102: 1.0
+
+tareas:
+  - id: T01
+    nombre: Instalación cuadro eléctrico
+    partidas: [01.01]
+    dependencias: []
+  - id: T02
+    nombre: Tendido de cable
+    partidas: [01.02]
+    dependencias: [T01]
+  - id: FIN
+    nombre: Entrega
+    es_fin_plazo: true
+    dependencias: [T02]
 ```
 
-Para instalar desde `requirements.txt` en otro equipo:
+**Notas:**
+- Los códigos en `partidas` deben coincidir exactamente con los del BC3.
+- Los códigos en `recursos` deben coincidir con los recursos MO del BC3.
+- La tarea con `es_fin_plazo: true` define el hito de fin de contrato.
+- Puede haber varios escenarios para comparar diferentes intensidades de recurso.
 
-```bash
-pip install -r requirements.txt
+---
+
+## Añadir un proyecto nuevo
+
+1. Crear la carpeta `projects/<NombreProyecto>/input/`
+2. Copiar el archivo `.bc3` dentro
+3. Copiar `config.yaml` de un proyecto existente y ajustar los valores
+4. Ejecutar: `python main.py <NombreProyecto>`
+
+Los resultados aparecen en `projects/<NombreProyecto>/output/`.
+
+---
+
+## Adaptar la identidad visual (otro cliente)
+
+Los colores, fuentes y paleta de gráficos están centralizados en:
+
 ```
+gantt/reporting/palette.py
+```
+
+Cambiar `FONT_PRES` para usar otra fuente corporativa.
+Cambiar `GRIS_OSCURO` / `AZUL_OSCURO` para adaptar la paleta a otro cliente.
+El cambio se propaga automáticamente a todos los documentos generados.
+
+---
+
+## Solución de problemas frecuentes
+
+**"No se encontró ningún .bc3 en projects/..."**
+El nombre del proyecto en el comando no coincide con el nombre de la carpeta en `projects/`.
+
+**"Múltiples .bc3 en ..."**
+Especificar el archivo: `python main.py NombreProyecto archivo.bc3`
+
+**Los documentos usan Arial en lugar de UIBSans**
+Instalar la fuente UIBSans en el sistema operativo y reiniciar el terminal.
+
+**Los archivos Excel están bloqueados (PermissionError)**
+Cerrar los archivos abiertos en Excel y volver a ejecutar.
+
+**Los gráficos de horas MO están vacíos o a cero**
+Verificar que el BC3 tiene recursos MO con horas definidas en los descompuestos.
+El sistema clasifica MO por el campo `tipo=1` del BC3, o por prefijo `MO-`, o por
+unidad `h` (en ese orden de prioridad).
+
+**El campo `numero_expediente` del yaml no aparece en los documentos**
+El campo aparece en el encabezado justo antes de la línea "ANEXO ECONÓMICO".
+Si no se ve, verificar que no está vacío en `config.yaml`.
 
 ---
 
 ## Normas de programación
 
-Este proyecto sigue las convenciones definidas en `Formato-de-programación.txt`.
+Convenciones definidas en `Formato-de-programación.txt`:
 
-Resumen de las normas principales:
-
-- **Idioma del código:** inglés (nombres de variables, funciones, clases).
-- **Idioma de comentarios y docstrings:** castellano.
-- **Modelos de datos:** siempre con Pydantic, sin dataclasses ni dicts desnudos.
-- **Funciones públicas:** sin prefijo `_`. Solo se usan prefijos privados cuando la función
-  es un detalle de implementación sin valor fuera de su módulo.
-- **Constantes de estilo centralizadas:** toda la paleta, fonts y formatos de Excel
-  están en `gantt/reporting/styles.py`. No hardcodear colores en otros módulos.
-- **Imports al inicio del módulo:** nunca dentro de funciones, salvo en bloques `__main__`.
-- **Sin referencias hardcodeadas a IDs de tareas:** usar campos semánticos del modelo
-  (`es_fin_plazo`, `tipo`, etc.) en lugar de comparar `t.id == 'H11'`.
-- **Sin abstracciones prematuras:** no crear clases artificiales para envolver funciones simples.
-- **Responsabilidad única por módulo:** cada archivo tiene un propósito claro y acotado.
-- **Sin try/except profiláctico:** solo capturar excepciones cuando se sabe qué hacer con ellas.
-- **Constructores simples:** sin lógica pesada en `__init__`.
+- Código en inglés; comentarios y docstrings en castellano.
+- Modelos de datos con Pydantic.
+- Sin prefijo `_` en funciones (todas públicas).
+- Paleta visual centralizada en `palette.py`; ningún módulo define colores propios.
+- Sin `try/except` profiláctico.
+- Sin abstracciones prematuras.

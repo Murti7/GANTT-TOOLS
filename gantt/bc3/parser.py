@@ -268,7 +268,7 @@ def parse_bc3(filepath: Path) -> Presupuesto:
                 descripcion=datos['descripcion'],
                 precio_hora=float(datos['precio_str'] or '0'),
             )
-        elif codigo.startswith('MT-') or codigo.startswith('%MT'):
+        elif codigo.startswith('MT-'):
             recursos_mt[codigo] = RecursoElemental(
                 codigo=codigo,
                 descripcion=datos['descripcion'],
@@ -341,6 +341,20 @@ def parse_bc3(filepath: Path) -> Presupuesto:
                 unidad=unidad,
                 precio_unidad=float(datos['precio_str'] or '0'),
             )
+
+    # Auxiliares mal clasificados: recursos en MT/MQ que tienen descompuesto propio
+    # y no son partidas directas → reclasificar como PA (unidades auxiliares)
+    for banco in (recursos_mt, recursos_mq):
+        for codigo in list(banco.keys()):
+            if codigo in descompuestos and codigo not in partidas_directas:
+                datos = conceptos[codigo]
+                recursos_pa[codigo] = RecursoElemental(
+                    codigo=codigo,
+                    descripcion=datos['descripcion'],
+                    unidad=datos['unidad'],
+                    precio_unidad=float(datos['precio_str'] or '0'),
+                )
+                del banco[codigo]
 
     todos_recursos = set(recursos_mo) | set(recursos_mt) | set(recursos_mq)
     mo_codigos   = set(recursos_mo)

@@ -242,6 +242,12 @@ def recursos_expandidos(codigo: str, presupuesto: Presupuesto) -> dict[str, floa
     )
 
 
+def recursos_para_display(codigo: str, presupuesto: Presupuesto) -> dict[str, float]:
+    """Retorna recursos del descompuesto sin expandir auxiliares (PAs).
+    Uso exclusivo para documentos: los auxiliares aparecen como línea única 'AUX'."""
+    return expandir_descompuesto(codigo, presupuesto.descompuestos_raw, set())
+
+
 def tipo_recurso(codigo: str, presupuesto: Presupuesto) -> str:
     """
     Clasifica un código en MO, MT, MQ, PA, % o '?' (no reconocido).
@@ -249,6 +255,8 @@ def tipo_recurso(codigo: str, presupuesto: Presupuesto) -> str:
     Los costes indirectos se detectan por el código antes del fallback '?',
     para que recursos genuinamente desconocidos no contaminen cálculos de coste.
     """
+    if codigo.startswith('%'):
+        return '%'
     if codigo in presupuesto.recursos_mo:
         return 'MO'
     if codigo in presupuesto.recursos_mt:
@@ -257,8 +265,6 @@ def tipo_recurso(codigo: str, presupuesto: Presupuesto) -> str:
         return 'MQ'
     if codigo in presupuesto.recursos_pa:
         return 'PA'
-    if codigo.startswith('%'):
-        return '%'
     return '?'
 
 
@@ -960,7 +966,7 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
             max_height_points=300.0,
         )
 
-        recursos = recursos_expandidos(partida.codigo, presupuesto)
+        recursos = recursos_para_display(partida.codigo, presupuesto)
 
         if not recursos:
             # Partida de precio alzado
@@ -973,14 +979,15 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
             cel_eur(ws, r, 7, partida.precio_unitario, font=PRES_FDE)
             ws.cell(r, 7).fill = PRES_FD
         else:
-            # Expandir PAs y agrupar por tipo
-            grupos = {'MO': [], 'MQ': [], 'MT': [], '%': [], '?': []}
+            # Agrupar por tipo sin expandir auxiliares (PA)
+            grupos = {'MO': [], 'MQ': [], 'MT': [], 'PA': [], '%': [], '?': []}
             for cod_rec, cant in recursos.items():
                 grupos[tipo_recurso(cod_rec, presupuesto)].append((cod_rec, cant))
 
             suma_directos = 0.0
             for tipo, label in [('MO', 'Mano de obra'), ('MQ', 'Maquinaria'),
-                                ('MT', 'Materiales'), ('?', 'Sin clasificar')]:
+                                ('MT', 'Materiales'), ('PA', 'Unidades auxiliares'),
+                                ('?', 'Sin clasificar')]:
                 if not grupos[tipo]:
                     continue
                 # Subtítulo del grupo
@@ -998,7 +1005,8 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                     coste = round(cant * precio, 4)
                     suma_directos += coste
                     fill = PRES_FB
-                    ws.append([tipo, cod_rec, desc, unidad, cant, precio, coste])
+                    col_tipo = 'AUX' if tipo == 'PA' else tipo
+                    ws.append([col_tipo, cod_rec, desc, unidad, cant, precio, coste])
                     r = ws.max_row
                     for c in range(1, N + 1):
                         ws.cell(r, c).fill = fill
@@ -1036,14 +1044,16 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                                               bold=True, color=GRIS_TEXTO)
                     ws.cell(r, c).border = PRES_BORDE_FINO
 
+                base_aux = suma_directos  # base acumulada: cada % se aplica sobre directos + anteriores %
                 for cod_rec, cant in grupos['%']:
                     desc, unidad, _precio = get_recurso_info(cod_rec, presupuesto)
                     porcentaje = cant / 100 if abs(cant) > 1 else cant
-                    importe_auxiliar = round(suma_directos * porcentaje, 4)
+                    importe_auxiliar = round(base_aux * porcentaje, 4)
                     total_auxiliares += importe_auxiliar
                     unidad_aux = '%' if not unidad or unidad == '-' else unidad
                     ws.append(['%', cod_rec, desc, unidad_aux,
-                               porcentaje, suma_directos, importe_auxiliar])
+                               porcentaje, base_aux, importe_auxiliar])
+                    base_aux += importe_auxiliar
                     r = ws.max_row
                     for c in range(1, N + 1):
                         ws.cell(r, c).fill = PRES_FB
@@ -1158,21 +1168,22 @@ def generar_descompuesto_doc(
                 font=PRES_FN, fill=PRES_FB, max_height_points=300.0,
             )
 
-            recursos = recursos_expandidos(partida.codigo, presupuesto)
+            recursos = recursos_para_display(partida.codigo, presupuesto)
             if recursos:
-                grupos = {'MO': [], 'MQ': [], 'MT': [], '%': [], '?': []}
+                grupos = {'MO': [], 'MQ': [], 'MT': [], 'PA': [], '%': [], '?': []}
                 for cod_rec, cant in recursos.items():
                     grupos[tipo_recurso(cod_rec, presupuesto)].append((cod_rec, cant))
 
                 suma_directos_local = 0.0
                 if mostrar_precios:
-                    for tipo_d in ['MO', 'MQ', 'MT']:
+                    for tipo_d in ['MO', 'MQ', 'MT', 'PA']:
                         for cod_tmp, cant_tmp in grupos[tipo_d]:
                             _, _, precio_tmp = get_recurso_info(cod_tmp, presupuesto)
                             suma_directos_local += round(cant_tmp * precio_tmp, 4)
+                base_aux_local = suma_directos_local  # base acumulada para % en cascada
 
                 for tipo, _ in [('MO', None), ('MQ', None), ('MT', None),
-                                 ('%', None), ('?', None)]:
+                                 ('PA', None), ('%', None), ('?', None)]:
                     if not grupos[tipo]:
                         continue
                     for cod_rec, cant in grupos[tipo]:
@@ -1181,16 +1192,19 @@ def generar_descompuesto_doc(
                             cant = cant / 100 if abs(cant) > 1 else cant
                             unidad_r = '%'
                             if mostrar_precios:
-                                precio_r = suma_directos_local
+                                precio_r = base_aux_local
 
+                        col_tipo = 'AUX' if tipo == 'PA' else tipo
                         if mostrar_precios:
-                            coste = round(suma_directos_local * cant, 4) if tipo == '%' \
+                            coste = round(base_aux_local * cant, 4) if tipo == '%' \
                                     else round(cant * precio_r, 4)
-                            ws.append([tipo, f'{cod_rec} — {desc_r}',
+                            ws.append([col_tipo, f'{cod_rec} — {desc_r}',
                                        unidad_r, cant, precio_r, coste])
+                            if tipo == '%':
+                                base_aux_local += coste
                         else:
                             cant_visible = '' if tipo == 'MO' else cant
-                            ws.append([tipo, f'{cod_rec} — {desc_r}', unidad_r, cant_visible])
+                            ws.append([col_tipo, f'{cod_rec} — {desc_r}', unidad_r, cant_visible])
 
                         r_r = ws.max_row
                         for c in range(1, N + 1):
@@ -1387,7 +1401,7 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     vec      = pec + importe_gr + liq_max
     iva_obra = pec * presupuesto.config.iva_obra
     iva_gr   = importe_gr * presupuesto.config.iva_gr
-    pgl      = vec + iva_obra + iva_gr
+    pgl      = pec + importe_gr + iva_obra + iva_gr
 
     # ── BLOQUE 1: VEC ─────────────────────────────────────────────────────────
     aplicar_encabezado_documental(

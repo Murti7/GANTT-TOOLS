@@ -1,0 +1,309 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\2\2\3\2\2\2\2\EUR\|0\0\0\\10|2\2\\3\2\\2\2\2\-9\2\2\2\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|SUSTVEXCOMPLEX##||EDIFICIO COMPLEX PARC BIT|8398.55|010725|0|
+~D|SUSTVEXCOMPLEX##
+|C001#\\1
+\GESRED#\\1
+\|
+~C|C001#||SUSTITUCIÓN VASOS DE EXPANSIÓN|7823.55|161025|0|
+~T|C001#|CAPÍTULO 1|
+~D|C001#
+|VACIC\\4
+\DIC040\\4
+\ICS040b\\1
+\ICS040c\\1
+\ICS040d\\2
+\IHM120b\\60
+\ICS075\\4
+\VALVESFDN20\\8
+\PURGAIR12DN200\\8
+\LLENIC\\4
+\|
+~C|VACIC|Ud|Vaciado de instalación de climatización.|218.28|180526|0|
+~T|VACIC|Vaciado de la instalación de climatización, en local de Sala de Máquinas Planta Sótano; con medios manuales.
+Criterio de valoración económica. El precio incluye las siguientes tareas:
+Coordinación y sectorización previa de circuitos por planta para un vaciado escalonado.
+Conexión de mangueras reforzadas desde las válvulas de descarga de puntos bajos hasta el desagüe autorizado.
+Apertura secuencial de purgadores de aire en la planta superior para romper el vacío y acelerar el flujo.
+Vigilancia continua de la presión de descarga y del correcto funcionamiento de la red de evacuación para evitar inundaciones.
+Evacuación completa de fluido acumulados en las columnas y ramales de distribución.
+Mano de obra cualificada con equipo de oficiales instaladores y ayudantes.
+Medios técnicos, herramientas, mangueras de gran caudal, bombas auxiliares de achique si fueran necesarias y limpieza de las zonas afectadas.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente desmontadas según especificaciones de Proyecto.|
+~D|VACIC
+|mo103\\4
+\mo113\\4
+\%\\0.02
+\|
+~C|mo103|h|Ayudante calefactor.|26.75|240725|1|
+~C|mo113|h|Peón ordinario construcción.|26.75||1|
+~T|mo113|Peón ordinario construcción.|
+~C|%|%|Costes directos complementarios|0||%|
+~C|DIC040|Ud|Desmontaje de vaso de expansión pequeño y válvula de seguridad existentes en la instalación.|60.42|180526|0|
+~T|DIC040|Desmontaje de vaso de expansión pequeño de 50 kg de peso máximo y válvula de seguridad existentes en la instalación, con medios manuales, y carga manual sobre camión o contenedor.
+Criterio de valoración económica: El precio incluye el desmontaje de los accesorios y de los soportes de fijación y la obturación de las conducciones conectadas al elemento.
+Incluye: Desmontaje del elemento. Obturación de las conducciones conectadas al elemento. Retirada y acopio del material desmontado. Limpieza de los restos de obra. Carga manual del material desmontado y restos de obra sobre camión o contenedor.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente desmontadas según especificaciones de Proyecto.|
+~D|DIC040
+|mo004\\1.027
+\mo103\\1.027
+\%\\0.02
+\|
+~C|mo004|h|Oficial 1ª calefactor.|30.93|240725|1|
+~C|ICS040b|Ud|Vaso de expansión para circuito de calefacción 200l.|549.98|180526|0|
+~T|ICS040b|Vaso de expansión, capacidad 200 l, de 1075 mm de altura y 550 mm de diámetro, con rosca de 1 1/4" de diámetro y 10 bar de presión. Incluso manómetro y elementos de montaje y conexión necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexión a la red de distribución. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|ICS040b
+|mt38vex010p\\1
+\mt42www040\\1
+\mo004\\1.316
+\mo103\\1.316
+\%\\0.02
+\|
+~C|mt38vex010p|Ud|Vaso de expansión, capacidad 200 l, de 1075 mm de altura y 550 mm de diámetro, con rosca de 1 1/4" de diámetro y 10 bar de presión.|420.01|180526|3|
+~C|mt42www040|Ud|Manómetro con baño de glicerina y diámetro de esfera de 100 mm, con toma vertical, para montaje roscado de 1/2", escala de presión de 0 a 5 bar.|43.29|130825|3|
+~C|ICS040c|Ud|Vaso de expansión para circuito de calefacción 250l.|616.27|180526|0|
+~T|ICS040c|Vaso de expansión, capacidad 250 l, de 1075 mm de altura y 550 mm de diámetro, con rosca de 1 1/4" de diámetro y 10 bar de presión. Incluso manómetro y elementos de montaje y conexión necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexión a la red de distribución. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|ICS040c
+|mt38vex010r\\1
+\mt42www040\\1
+\mo004\\1.316
+\mo103\\1.316
+\%\\0.02
+\|
+~C|mt38vex010r|Ud|Vaso de expansión, capacidad 250 l, de 1075 mm de altura y 550 mm de diámetro, con rosca de 1 1/4" de diámetro y 10 bar de presión.|485|180526|3|
+~C|ICS040d|Ud|Vaso de expansión para circuito de calefacción 400l.|721.93|180526|0|
+~T|ICS040d|Vaso de expansión, capacidad 400 l, de 1980 mm de altura y 485 mm de diámetro, con rosca de 1 1/2" de diámetro y 10 bar de presión. Incluso manómetro y elementos de montaje y conexión necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexión a la red de distribución. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|ICS040d
+|mt38vex010u\\1
+\mt42www040\\1
+\mo004\\1.43
+\mo103\\1.43
+\%\\0.02
+\|
+~C|mt38vex010u|Ud|Vaso de expansión, capacidad 400 l, de 1980 mm de altura y 485 mm de diámetro, con rosca de 1 1/2" de diámetro y 10 bar de presión.|582|180526|3|
+~C|IHM120b|m|Tubería multicapa de polietileno reticulado/aluminio/polietileno reticulado (PE-X/Al/PE-X) de 32 mm.|11.63|180526|0|
+~T|IHM120b|Tubería formada por tubo multicapa de polietileno reticulado/aluminio/polietileno reticulado de alta densidad (PE-X/Al/PE-X), de 32 mm de diámetro y 3 mm de espesor, temperatura máxima de funcionamiento 95°C. Instalación en superficie. Incluso material auxiliar para montaje y sujeción a la obra, accesorios y piezas especiales.
+Incluye: Replanteo. Colocación y fijación de tubos, accesorios y piezas especiales.
+Criterio de medición de proyecto: Longitud medida según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá la longitud realmente ejecutada según especificaciones de Proyecto.|
+~D|IHM120b
+|mt37tco400gd\\1
+\mt37tco010gdg\\1
+\mo008\\0.069
+\mo107\\0.069
+\%\\0.02
+\|
+~C|mt37tco400gd|Ud|Material auxiliar para montaje y sujeción a la obra de las tuberías multicapa de polietileno reticulado/aluminio/polietileno reticulado de alta densidad (PE-X/Al/PE-X), con barrera de oxígeno, de 32 mm de diámetro exterior.|0.27|180526|3|
+~C|mt37tco010gdg|m|Tubo multicapa de polietileno reticulado/aluminio/polietileno reticulado de alta densidad (PE-X/Al/PE-X), de 32 mm de diámetro y 3 mm de espesor, temperatura máxima de funcionamiento 95°C, según UNE-EN ISO 21003-1, con el precio incrementado el 30% en concepto de accesorios y piezas especiales.|7.15|180526|3|
+~C|mo008|h|Oficial 1ª fontanero.|30.93|180526|1|
+~C|mo107|h|Ayudante fontanero.|26.75|130825|1|
+~C|ICS075|Ud|Válvula de seguridad de 3/4" 3 Bar.|15.59|180526|0|
+~T|ICS075|Válvula de seguridad, de latón, con rosca de 3/4" de diámetro, tarada a 3 bar de presión. Incluso elementos de montaje y accesorios necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexionado. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|ICS075
+|mt37svs010g\\1
+\mt38www012\\0.1
+\mo004\\0.114
+\mo103\\0.114
+\%\\0.02
+\|
+~C|mt37svs010g|Ud|Válvula de seguridad, de latón, con rosca de 3/4" de diámetro, tarada a 3 bar de presión.|8.49|180526|3|
+~C|mt38www012|Ud|Material auxiliar para instalaciones de calefacción y A.C.S.|2.1|180526|3|
+~C|VALVESFDN20|Ud|Válvula de esfera de latón CW617N acabado cromado, de 3/4", para roscar.|24.07|140825|0|
+~T|VALVESFDN20|Válvula de esfera de latón CW617N acabado cromado, de 3/4", para roscar, PN=50 bar y temperatura de servicio desde -20°C (excluyendo congelación) hasta 140°C. Incluso elementos de montaje y accesorios necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexionado. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|VALVESFDN20
+|mt37ava010d\\1
+\%MATAUXVALBOL\\0.25
+\mt38www012\\0.1
+\mo004\\0.114
+\mo103\\0.114
+\%\\0.02
+\|
+~C|mt37ava010d|Ud|Válvula de esfera, de 3/4", para roscar según UNE-EN ISO 228-1, PN=50 bar y temperatura de servicio desde -20°C (excluyendo congelación) hasta 140°C, formada por cuerpo de latón CW617N acabado cromado según UNE-EN 12165, mando de acero inoxidable AISI 403, asientos del obturador y sistema de tuerca de prensa de PTFE que permite el reapriete, según UNE-EN 13828.|13.45|140825|3|
+~C|%MATAUXVALBOL|%|Material Auxiliar Válvula de Esfera|0|180825|%|
+~T|%MATAUXVALBOL|Material Auxiliar Válvula de Esfera|
+~C|PURGAIR12DN200|Ud|Purgador aire automático de gran capacidad de 1/2"|174.96|230425|0|
+~T|PURGAIR12DN200|Purgador automático de gran capacidad de ø 1/2" de alta eficiencia, latón:
+- Conexión con rosca G 1/2".
+- Temperatura máxima del fluido 110ºC y presión máxima PN10bar.
+- Equipado con válvula de purga sin fugas con diseño antibloqueo.
+- Material del cuerpo de Latón y material del flotador de PP.
+- Construcción sólida para una larga duración, libre de mantenimiento y apta para funcionamiento continuo.
+- La instalación de este equipo debe realizarse siempre en vertical con una altura libre de montaje mínima de 112mm.
+Se incluyen 2 llaves de bola de ø 1/2".
+De las dos válvulas de 1/2" a instalar, una es para el aislamiento del conjunto, con una T de latón que conectará al purgador(en vertical) y la toma secundaria en horizontal para purgado manual a instalar en la pared o punto fijo a la altura de la cintura más próximo del punto de purga. Esta válvula estará conducida mediante tubería tipo MULTICAPA 16 mm. La longitud prevista es de 5 m.
+Todo ello según documentación de proyecto
+Completamente instalado y probado; i/p.p. de pequeño material y medios auxiliares. Conforme a RITE y CTE DB HE, HS y HR.
+Incluye: Montaje, conexionado y pruebas de funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~D|PURGAIR12DN200
+|mt37wpura001e\\1
+\UUVALVESFDN15\\2
+\mt37wppra009e\\1
+\TUBPEXALPEX16\\5
+\mo002\\0.15
+\mo001\\0.15
+\%0200001\\0.02
+\%1000.02\\0.01
+\%2000.02\\0.01
+\|
+~C|mt37wpura001e|ud|Purgador automático de aire para alta instalación, rosca macho 1/2", cuerpo de latón, resistente a la suciedad y sin mantenimiento. Modelo SPIROTOP o similar.|76.5|230325|3|
+~T|mt37wpura001e|Válvula automática de purga de aire para instalaciones hidráulicas de calefacción o refrigeración, diseñada para su colocación en puntos altos del sistema. Conexión roscada macho de 3/4", fabricada en latón sólido, con cámara interna de aire y mecanismo de purga de alta fiabilidad.
+Diseñada para eliminar de forma continua burbujas de aire libres durante la puesta en marcha, el llenado o el vaciado del sistema, evitando bloqueos de aire y mejorando la eficiencia hidráulica.
+
+Características técnicas:
+- Conexión superior auxiliar roscada de 1/2" para pruebas de presión o ventilación remota.
+- Presión máxima de trabajo: 10 bar 
+- Temperatura máxima de servicio: 132 °C 
+- Diseño compacto y bajo perfil (altura 120 mm, diámetro 67 mm aprox.)
+- Válvula interior protegida contra suciedad y golpes de presión
+- Mecanismo interno de alta compresión, sin posibilidad de cierre accidental
+- Totalmente libre de mantenimiento
+
+Adecuada para instalaciones residenciales, comerciales o industriales. Se recomienda su instalación en colectores, depósitos, unidades terminales o tramos elevados de tubería.|
+~C|UUVALVESFDN15|Ud|Válvula de esfera de latón CW617N acabado cromado, de 1/2", para roscar.|21.98|140825|3|
+~T|UUVALVESFDN15|Válvula de esfera de latón CW617N acabado cromado, de 1/2", para roscar, PN=50 bar y temperatura de servicio desde -20°C (excluyendo congelación) hasta 140°C. Incluso elementos de montaje y accesorios necesarios para su correcto funcionamiento.
+Incluye: Replanteo. Colocación. Conexionado. Comprobación de su correcto funcionamiento.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente ejecutadas según especificaciones de Proyecto.|
+~C|mt37wppra009e|ud|Derivación rosca tubería a 1/2"H|14.34|230325|3|
+~T|mt37wppra009e|Derivación rosca hembra PPR DN200 x 3/4"|
+~C|TUBPEXALPEX16|m|Tubería multicapa de polietileno reticulado/aluminio/polietileno reticulado (PE-X/Al/PE-X) 16mm.|4.94|250825|3|
+~T|TUBPEXALPEX16|Tubería formada por tubo multicapa de polietileno reticulado/aluminio/polietileno reticulado (PE-X/Al/PE-X), de 16 mm de diámetro exterior y 2,0 mm de espesor, color blanco, AL-COBRAPEX 0660 "TIEMME", suministrado en rollos. Instalación en superficie. Incluso material auxiliar para montaje y sujeción a la obra, accesorios y piezas especiales.
+Incluye: Replanteo. Colocación y fijación de tubos, accesorios y piezas especiales.
+Criterio de medición de proyecto: Longitud medida según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá la longitud realmente ejecutada según especificaciones de Proyecto.|
+~C|mo002|h|Ayudante instalador de climatización.|26.75|230325|1|
+~C|mo001|h|Oficial 1ª instalador de climatización.|30.93|230325|1|
+~C|%0200001|%|Medios auxiliares...(s/total)|0|170325|%|
+~C|%1000.02|%|Pequeño material|0|220125|%|
+~C|%2000.02|%|Costes indirectos|0|190325|%|
+~C|LLENIC|Ud|Llenado y purgado de instalación de climatización.|436.56|180526|0|
+~T|LLENIC|Llenado y purgado completo de la instalación de climatización, en local de Sala de Máquinas Planta Sótano; con medios manuales.
+Criterio de valoración económica. El precio incluye las siguientes tareas:
+Inspección visual previa y cierre de todas las válvulas de vaciado y elementos desmontados.
+Conexión a la red de suministro de agua mediante desconector hidráulico para evitar retornos de contaminación.
+Llenado lento y progresivo del sistema desde el punto más bajo para facilitar la expulsión natural del aire.
+Purgado manual y secuencial de aire acumulado en fancoils, climatizadores, radiadores y puntos altos de las 3 plantas de forma ascendente.
+Presurización controlada del circuito hasta alcanzar la presión nominal de trabajo del edificio.
+Verificación de estanqueidad en todas las uniones, llaves y purgadores manipulados durante la intervención.
+Mano de obra cualificada con equipo de oficiales instaladores y ayudantes.
+Medios técnicos, herramientas manuales, llaves de purga y equipos de control de presión.
+Criterio de medición de proyecto: Número de unidades previstas, según documentación gráfica de Proyecto.
+Criterio de medición de obra: Se medirá el número de unidades realmente desmontadas según especificaciones de Proyecto.|
+~D|LLENIC
+|mo103\\8
+\mo113\\8
+\%\\0.02
+\|
+~C|GESRED#||GESTIÓN DE RESIDUOS|575||0|
+~T|GESRED#|Gestión integral de los residuos generados durante la ejecución de la reforma del sistema de climatización, incluyendo su identificación, segregación en origen, almacenamiento temporal en condiciones seguras dentro de un edificio en uso, retirada periódica y entrega a gestor autorizado, garantizando la trazabilidad completa del proceso y minimizando afecciones sobre la actividad del edificio.
+
+Incluye:
+- Elaboración y aplicación del Plan de Gestión de Residuos.
+- Identificación y clasificación de las diferentes fracciones de residuos.
+- Segregación selectiva en origen de materiales (metales, eléctricos, plásticos, aislamientos, inertes).
+- Manipulación segura de residuos potencialmente peligrosos.
+- Suministro y disposición de contenedores adecuados y señalizados.
+- Almacenamiento temporal en zonas autorizadas y acondicionadas.
+- Protección frente a derrames, polvo y dispersión de residuos.
+- Retirada periódica de residuos y transporte a gestor autorizado.
+- Limpieza de zonas de trabajo y retirada de restos al finalizar cada jornada.
+- Registro documental de gestión y trazabilidad de residuos cuando sea exigible.
+
+Trabajos previos necesarios:
+- Identificación de las tipologías de residuos previstas en función de las actuaciones.
+- Definición de zonas de acopio autorizadas dentro del edificio.
+- Aprobación del Plan de Gestión de Residuos antes del inicio de la obra.
+
+Criterio de medición en proyecto: ud por gestión global de residuos generados durante la totalidad de la obra.
+
+Criterio de medición en obra: ud ejecutada cuando se haya realizado la correcta gestión de todos los residuos generados, incluyendo su retirada, tratamiento y acreditación documental conforme a lo exigido en el pliego.
+
+Condiciones especiales de ejecución:
+- Actuación en edificio en uso, requiriendo retirada frecuente de residuos y prohibición de acumulación en zonas de tránsito o evacuación.
+- Obligación de garantizar la trazabilidad completa y la correcta gestión de residuos potencialmente peligrosos mediante gestor autorizado.|
+~D|GESRED#
+|13.01\\1
+\13.02\\1
+\13.03\\1
+\13.04\\1
+\13.05\\1
+\|
+~C|13.01|ud|Gestión de residuos metálicos|70||0|
+~D|13.01
+|MT-RES-CONT-MET\\1
+\MT-RES-TRANS-MET\\1
+\MT-RES-TRAT-MET\\1
+\|
+~C|MT-RES-CONT-MET|lote|Contenedor o big-bag para residuos metálicos|15||3|
+~C|MT-RES-TRANS-MET|lote|Transporte a gestor de residuos metálicos|45||3|
+~C|MT-RES-TRAT-MET|lote|Tratamiento y valorización de residuos metálicos|10||3|
+~C|13.02|ud|Gestión de residuos plásticos y aislamientos|95||0|
+~D|13.02
+|MT-RES-BB-PLA\\1
+\MT-RES-TRANS-PLA\\1
+\MT-RES-TRAT-PLA\\1
+\|
+~C|MT-RES-BB-PLA|lote|Big-bag o contenedor para plásticos y aislamientos|15||3|
+~C|MT-RES-TRANS-PLA|lote|Transporte a gestor de plásticos y aislamientos|45||3|
+~C|MT-RES-TRAT-PLA|lote|Tratamiento de residuos plásticos y aislamientos|35||3|
+~C|13.03|ud|Gestión de residuos de equipos de climatización|160||0|
+~D|13.03
+|MT-RES-ACOPI-RAEE\\1
+\MT-RES-TRANS-RAEE\\1
+\MT-RES-TRAT-RAEE\\1
+\|
+~C|MT-RES-ACOPI-RAEE|lote|Acopio y embalaje de equipos y componentes|25||3|
+~C|MT-RES-TRANS-RAEE|lote|Transporte a gestor especializado de equipos|75||3|
+~C|MT-RES-TRAT-RAEE|lote|Tratamiento específico de equipos y RAEE|60||3|
+~C|13.04|ud|Gestión de envases y residuos auxiliares|65||0|
+~D|13.04
+|MT-RES-SAC-ENV\\1
+\MT-RES-TRANS-ENV\\1
+\MT-RES-TRAT-ENV\\1
+\|
+~C|MT-RES-SAC-ENV|lote|Sacos o contenedores para envases y auxiliares|15||3|
+~C|MT-RES-TRANS-ENV|lote|Transporte a gestor de envases y auxiliares|35||3|
+~C|MT-RES-TRAT-ENV|lote|Tratamiento de envases y residuos auxiliares|15||3|
+~C|13.05|ud|Gestión de residuos especiales asociados|185||0|
+~D|13.05
+|MT-RES-CONT-ESP\\1
+\MT-RES-TRANS-ESP\\1
+\MT-RES-TRAT-ESP\\1
+\|
+~C|MT-RES-CONT-ESP|lote|Contenedor etiquetado para residuos especiales|20||3|
+~C|MT-RES-TRANS-ESP|lote|Transporte a gestor autorizado de residuos especiales|90||3|
+~C|MT-RES-TRAT-ESP|lote|Tratamiento específico de residuos especiales|75||3|
+~L||SC00000\Especificación
+\SC00001\Características técnicas
+\SC00002\Condiciones previas
+\SC00003\Ejecución
+\SC00004\Medición
+\SC00005\Control
+\SC00006\Seguridad y salud
+\SC00007\Gestión ambiental
+\SC00008\Normas de aplicación
+\SC00009\Mantenimiento
+\SC00010\Varios
+\SC00011\Texto sin faceta
+\|
+~E|BUZONESORTEGA|||C\\\\\\\\\|\\\|

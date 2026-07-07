@@ -1,11 +1,11 @@
 ~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
 ~K|-9\3\3\3\2\2\2\2\EUR\|3\13\6\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
 ~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
-~C|4T_2T_SOTANO_COMPLEX##||Importado desde ficheros CSV|1700.45|050326|0|
+~C|4T_2T_SOTANO_COMPLEX##||Importado desde ficheros CSV|1603.83|050326|0|
 ~D|4T_2T_SOTANO_COMPLEX##
 |01#\\1
 \|
-~C|01#||Control automático cambio verano/invierno, empalme circuito 4t a 2t Complexe Balear de Recerca|1700.45||0|
+~C|01#||Control automático cambio verano/invierno, empalme circuito 4t a 2t Complexe Balear de Recerca|1603.83||0|
 ~T|01#|Capítulo correspondiente a los trabajos de ejecución de instalaciones de fontanería necesarias para la dotación de un nuevo punto de consumo de agua fría sanitaria (AFS) y agua caliente sanitaria (ACS) en dependencia interior del edificio Complex I+D+i, en la planta primera módulo M2, Ofice 101, incluyendo las operaciones de derivación desde rede existente, conducción de tuberías, instalación de elementos de regulación y conexión final a los equipos de consumo.
 
 Los trabajos comprendidos en este capítulo incluyen la ejecución de las derivaciones desde la red existente, instalación de conducciones en falso techo, colocación de válvulas de corte y elementos auxiliares, así como la conexión final a los aparatos sanitarios o equipamiento previsto.
@@ -19,7 +19,7 @@ Se prestará especial atención a la estanqueidad de las uniones, protección mecán
 |01.01\\1
 \01.02\\1
 \|
-~C|01.01|ud|Cuadro eléctrico mural de fuerza y control|608.52||0|
+~C|01.01|ud|Cuadro eléctrico mural de fuerza y control|647.21||0|
 ~T|01.01|Suministro, montaje, conexionado y puesta en servicio de cuadro eléctrico mural destinado al control manual del sistema de conmutación frío/calor de la red de climatización a dos tubos de la planta sótano del Complex I+D+i, permitiendo la selección funcional entre modo verano y modo invierno mediante actuación sobre las válvulas motorizadas existentes de impulsión y retorno de agua fría y caliente. La actuación comprende la fabricación, equipamiento, cableado interior, identificación, verificación y pruebas funcionales del conjunto completo de maniobra y protección.
 
 Incluye:
@@ -33,6 +33,7 @@ Dos pilotos LED verdes de señalización de presencia de tensión sobre las bobinas
 Bornes de potencia, neutro, protección y señales de control.
 Cableado interior mediante conductor flexible de cobre de sección adecuada para los circuitos de mando y protección.
 Prensaestopas, terminales, marcadores, etiquetado y pequeño material auxiliar.
+Incluye la adecuación del cuadro Q-PSU existente mediante instalación de protección magnetotérmica dedicada para la alimentación del nuevo cuadro.
 Esquema eléctrico unifilar y funcional colocado en el interior del cuadro.
 Montaje, fijación, conexionado, comprobaciones eléctricas y pruebas funcionales.
 
@@ -42,7 +43,7 @@ Criterio de medición en obra: ud realmente ejecutada, instalada, cableada, ident
 ~D|01.01
 |MT-Valv1\\1
 \MT-P35amc100ec\\1
-\MT-P35amc022cc\\1
+\MT-P35amc022cc\\2
 \MT-D35amc510BB\\1
 \MT-RAC-MC-C90-16\\1
 \MT-RAC-MC-ADP-16-12\\2
@@ -69,8 +70,8 @@ Criterio de medición en obra: ud realmente ejecutada, instalada, cableada, ident
 ~T|MT-MT-MAT-AUX-FONT|Conjunto de materiales auxiliares destinados a la ejecución, terminación y correcta identificación de instalaciones eléctricas de baja tensión en trabajos de montaje, modificación o ampliación de circuitos.|
 ~C|MO-mo001|h|Oficial 1ª electricista.|30||1|
 ~C|MO-mo102|h|Ayudante electricista.|27.49||1|
-~C|01.02|ud|Cable multipolar apantallado 18G1,5 mm² para control de válvulas motorizadas|1042.4|040626|0|
-~T|01.02|Suministro e instalación de cable multipolar apantallado de control, configuración mínima 18G1,5 mm², destinado a la interconexión entre el cuadro eléctrico de maniobra ubicado en la sala de máquinas y los actuadores motorizados del sistema de conmutación hidráulica frío/calor de la red de climatización a dos tubos. La actuación comprende el tendido completo del cableado, la ejecución de los trabajos auxiliares necesarios para su instalación, el conexionado final de los actuadores existentes y la verificación funcional integral del sistema.
+~C|01.02|ud|Red de control para actuadores motorizados del sistema de conmutación frío/calor, mediante cable multipolar apantallado 18G1,5 mm²|909.9|040626|0|
+~T|01.02|Suministro e instalación de cable multipolar apantallado de control, configuración mínima 18G1,5 mm², destinado a la interconexión entre el cuadro eléctrico de maniobra ubicado en la sala de máquinas y los actuadores motorizados del sistema de conmutación hidráulica frío/calor de la red de climatización a dos tubos. La actuación comprende el tendido completo del cableado de control, la ejecución de los trabajos auxiliares necesarios para su instalación, la implantación de un punto centralizado de distribución de señales en las proximidades de las válvulas motorizadas, el conexionado completo de los actuadores existentes y la realización de las verificaciones funcionales necesarias para garantizar el correcto funcionamiento del sistema de conmutación definido en los planos de la actuación.
 
 Incluye:
 
@@ -78,6 +79,10 @@ Cable multipolar apantallado de 18 conductores de cobre de sección mínima 1,5 mm
 Tensión asignada mínima 300/500 V.
 Cubierta exterior apta para instalación fija en interiores.
 Conductor de protección y reserva de hilos para futuras actuaciones.
+Caja de derivación y distribución de señales de control para montaje superficial, grado de protección mínimo IP65.
+Carril DIN interior, bornes de distribución, borne de protección, elementos de identificación, prensaestopas y pequeño material auxiliar.
+Conexionado de la manguera multipolar en cuadro eléctrico y caja de distribución.
+
 Conexionado de las señales de apertura, cierre y neutro de los cuatro actuadores motorizados existentes.
 Tendido sobre bandejas eléctricas existentes.
 Fijación, ordenación y agrupación del cableado.
@@ -89,21 +94,26 @@ Levantado y reposición de placas o elementos desmontables de falso techo.
 Ejecución de cuatro pasamuros para acceso al patinillo de instalaciones.
 Sellado y remate de los pasos ejecutados.
 Pequeñas ayudas de albañilería asociadas.
-Conexionado completo de los cuatro actuadores motorizados existentes.
-Conexionado de señales de apertura, cierre y neutro.
+Conexionado de la manguera multipolar en cuadro eléctrico y caja de distribución.
+Conexionado de señales de apertura, cierre y neutro d elas cuatro válvulas.
 Verificación de continuidad e identificación de circuitos.
 Ajustes y corrección de posibles incidencias de cableado.
 Limpieza final de las zonas de trabajo.
 
-Criterio de medición en proyecto: m de cable multipolar instalado según recorrido previsto, medido sobre plano por el eje de la instalación, incluyendo reservas, entradas, conexionado, trabajos auxiliares y puesta en servicio.
+Criterio de medición en proyecto: metro de red de control ejecutada mediante cable multipolar apantallado, medido sobre plano según el recorrido previsto, incluyendo caja de distribución, reservas de cable, entradas, conexionados, trabajos auxiliares, verificaciones funcionales y puesta en servicio completa de la instalación.
 
-Criterio de medición en obra: m realmente instalado y aceptado por la dirección facultativa, incluyendo todos los trabajos auxiliares, conexionados y verificaciones funcionales definidos en la presente partida.|
+Criterio de medición en obra: metro realmente instalado y aceptado por la dirección facultativa, incluyendo la totalidad de materiales, conexionados, caja de distribución, trabajos auxiliares, verificaciones funcionales y actuaciones necesarias para dejar el sistema completamente operativo de acuerdo con los planos y documentación técnica del proyecto.|
 ~D|01.02
 |MT-CBL-3G15\\50
+\MT-CCAJ-DERIV\\1
+\MT-CBL-G15\\15
 \MT-MAT-AUX\\1
 \MO-mo001\\10
 \MO-mo102\\10
 \|
-~C|MT-CBL-3G15|m|Cable multipolar apantallado 18G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos|8.85||3|
-~T|MT-CBL-3G15|Cable de control apantallado 18G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos, baja emisión de humos, no propagador de la llama, con pantalla global y conductor verde/amarillo incluido.|
+~C|MT-CBL-3G15|m|Cable multipolar apantallado 12G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos|3.5||3|
+~T|MT-CBL-3G15|Cable de control apantallado 12G1,5 mm², Cu flexible clase 5, 300/500 V, cubierta LSZH/libre de halógenos, baja emisión de humos, no propagador de la llama, con pantalla global y conductor verde/amarillo incluido.|
+~C|MT-CCAJ-DERIV|m|Caja de derivación y distribución IP65 para señales de control.|82.5|050626|3|
+~T|MT-CCAJ-DERIV|Caja de derivación para instalaciones de control y automatización, fabricada en material aislante de alta resistencia, apta para montaje superficial en interiores, grado de protección mínimo IP65, dimensiones aproximadas 200x200x120 mm, equipada con carril DIN, borneros de distribución, borne de protección, elementos de identificación, prensaestopas y pequeño material auxiliar, destinada a la distribución ordenada de señales de mando, neutro y protección hacia actuadores motorizados de válvula.|
+~C|MT-CBL-G15|m|Cable flexible libre halógenos 1,5 mm², Cu 750V|3.5|050626|3|
 ~C|MT-MAT-AUX|lote|Material auxiliar|25||3|

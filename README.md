@@ -263,7 +263,7 @@ Convenciones definidas en `Formato-de-programación.txt`:
 
 - Código en inglés; comentarios y docstrings en castellano.
 - Modelos de datos con Pydantic.
-- Sin prefijo `_` en funciones (todas públicas).
+- Funciones todas públicas
 - Paleta visual centralizada en `palette.py`; ningún módulo define colores propios.
 - Sin `try/except` profiláctico.
 - Sin abstracciones prematuras.

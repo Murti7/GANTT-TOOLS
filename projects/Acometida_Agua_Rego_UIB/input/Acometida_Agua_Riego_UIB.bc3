@@ -1,0 +1,410 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\3\3\3\2\2\2\2\EUR\|0\13\6\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|ACOMETIDA_AGUA_RIEGO_UIB##||Importado desde ficheros CSV|21878.34|030726|0|
+~D|ACOMETIDA_AGUA_RIEGO_UIB##
+|01#\\1
+\02#\\1
+\03#\\1
+\04#\\1
+\|
+~C|01#||Trabajos previos, replanteo y demoliciones necesarias para la implantación de la nueva acometida de agua de riego y adecuación inicial de la zona de actuación.|375.19||0|
+~D|01#
+|01.01\\1
+\01.02\\1
+\|
+~C|01.01|ud|Replanteo y preparación de zona|238.69||0|
+~T|01.01|Unidad de obra correspondiente al replanteo completo del nuevo trazado de acometida de agua de riego, incluyendo la definición geométrica de alineaciones, cotas, pendientes, ubicación de registros y puntos singulares, así como la comprobación previa de interferencias con servicios existentes, instalaciones fotovoltaicas, canalizaciones enterradas y otros elementos presentes en la zona de actuación. Comprende igualmente la preparación inicial de la zona de trabajo, delimitación física del ámbito de intervención y acondicionamiento básico para inicio de obra.
+
+Incluye:
+
+Replanteo topográfico y marcado del trazado.
+Identificación de alineaciones, pendientes y cotas de ejecución.
+Comprobación visual y técnica de interferencias con instalaciones existentes.
+Delimitación y balizamiento básico de la zona de trabajo.
+Localización y señalización de la zanja fotovoltaica existente y de la infraestructura enterrada asociada (strings DC y comunicaciones)
+Coordinación inicial de accesos y secuencia de ejecución.
+Mano de obra técnica y medios auxiliares.
+Herramientas manuales y material auxiliar.
+Limpieza inicial de la zona afectada.
+
+Criterio de medición en proyecto:
+Unidad global por replanteo completo del ámbito de actuación.
+
+Criterio de medición en obra:
+Unidad ejecutada una vez finalizado el replanteo completo y validado el trazado definitivo para inicio de obra.|
+~D|01.01
+|MO-JOBRA\\4
+\MO-AUX-GEN\\4
+\MT-CINT-BALIZ\\20
+\%0500\\0.05
+\|
+~C|MO-JOBRA|h|Jefe de obra / encargado|33.33||1|
+~C|MO-AUX-GEN|h|Peón ordinario / apoyo general|22.75||1|
+~C|MT-CINT-BALIZ|m|Cinta de balizamiento|0.15||3|
+~C|%0500|%|Medios auxiliares|0|290623|%|
+~C|01.02|ud|Demolición de arqueta existente|136.5||0|
+~T|01.02|Unidad de obra correspondiente a la demolición manual o mecánica ligera de arqueta existente de pequeñas dimensiones que interfiere con la nueva solución proyectada, incluyendo levantado de elementos superficiales, rotura de cuerpo de hormigón, extracción de restos, carga, acopio temporal y limpieza del hueco resultante, dejando la zona preparada para la ejecución del nuevo elemento de registro proyectado.
+
+Incluye:
+
+Demolición parcial o total de arqueta existente.
+Corte y fragmentación del cuerpo de hormigón.
+Carga manual de escombros.
+Carga sobre contenedor o camión y transporte a gestor autorizado
+Transporte interior y acopio temporal.
+Retirada de restos y limpieza de la zona.
+Medios manuales y herramienta auxiliar.
+EPIs y protecciones de seguridad.
+
+Criterio de medición en proyecto:
+Unidad por demolición completa de arqueta existente.
+
+Criterio de medición en obra:
+Unidad completamente ejecutada una vez retirado el elemento y acondicionada la zona para la nueva ejecución.|
+~D|01.02
+|MO-AUX-GEN\\6
+\|
+~C|02#||Movimiento de tierras y rellenos|4158.94||0|
+~D|02#
+|02.01\\45
+\02.02\\3
+\02.03\\2.5
+\02.04\\5
+\|
+~C|02.01|m3|Excavación mecánica en zanja|47.31||0|
+~T|02.01|Unidad de obra correspondiente a la excavación mecánica mediante zanjadora ligera para formación de zanja destinada al alojamiento de conducciones enterradas de agua de riego, en terreno clasificado como tierra blanda, con anchura y profundidad adaptadas a la geometría del trazado y diámetros proyectados.
+
+Incluye:
+
+Excavación mecánica mediante mini retroexcavadora de cadenas o ruedas
+Formación de zanja con sección útil.
+Perfilado y regularización de fondo.
+Acopio lateral de tierras reutilizables.
+Retirada de excedentes puntuales.
+Mano de obra de apoyo.
+Control geométrico de cotas y profundidad.
+
+Criterio de medición en proyecto:
+Metro cúbico de excavación teórica según dimensiones de proyecto.
+
+Criterio de medición en obra:
+Metro cúbico realmente ejecutado y aceptado.|
+~D|02.01
+|mo020\\0.5
+\mo113\\0.5
+\EQ-ZANJAD\\0.5
+\|
+~C|mo020|h|Oficial 1ª construcción.|27.49|290623|1|
+~C|mo113|h|Peón ordinario construcción.|22.12|290623|1|
+~C|EQ-ZANJAD|h|Mini excavadora|45||2|
+~C|02.02|m3|Excavación manual bajo infraestructura fotovoltaica|396.88||0|
+~T|02.02|Unidad de obra correspondiente a la excavación manual localizada para ejecución del cruce singular bajo infraestructura fotovoltaica existente, con objeto de permitir el paso conjunto de la tubería principal y secundaria sin afectar la integridad de las instalaciones implantadas.
+
+Incluye:
+
+Excavación manual localizada.
+Perfilado y consolidación de sección.
+Protección de instalaciones existentes.
+Medios manuales y herramientas auxiliares.
+Mano de obra especializada.
+Limpieza inmediata de la zona.
+
+Criterio de medición en proyecto:
+m3 de excavación
+
+Criterio de medición en obra:
+m3 de excavación|
+~D|02.02
+|mo020\\8
+\mo113\\8
+\|
+~C|02.03|m3|Excavación puntual para registros y pozo drenante|288.44||0|
+~T|02.03|Unidad de obra correspondiente a excavaciones puntuales y localizadas necesarias para la formación de registros tipo tramex ejecutados in situ y del pozo drenante final proyectado, incluyendo conformación geométrica, regularización y adecuación de la base.
+
+Incluye:
+
+Excavación puntual manual o mecánica ligera.
+Perfilado de geometrías singulares.
+Formación de base de apoyo.
+Retirada y acopio de tierras.
+Medios auxiliares de excavación.
+Limpieza y preparación.
+
+Criterio de medición en proyecto:
+Unidad por conjunto de excavaciones singulares previstas.
+
+Criterio de medición en obra:
+Unidad ejecutada y completamente preparada para la fase constructiva posterior.|
+~D|02.03
+|mo020\\4
+\mo113\\4
+\EQ-ZANJAD\\2
+\|
+~C|02.04|m3|Relleno y compactación con tierras propias|23.65||0|
+~T|02.04|Unidad de obra correspondiente al relleno posterior de zanjas y excavaciones mediante reutilización de tierras procedentes de la propia obra, previamente seleccionadas, incluyendo extendido por tongadas sucesivas, humectación si fuese necesaria y compactación mecánica hasta alcanzar condiciones adecuadas de estabilidad y acabado.
+
+Incluye:
+
+Selección de tierras reutilizables.
+Extendido por tongadas.
+Compactación mecánica.
+Regularización superficial.
+Mano de obra de apoyo.
+Maquinaria ligera de compactación.
+Limpieza final superficial.
+
+Criterio de medición en proyecto:
+Metro cúbico teórico de relleno previsto.
+
+Criterio de medición en obra:
+Metro cúbico efectivamente colocado, compactado y aceptado.|
+~D|02.04
+|mo020\\0.25
+\mo113\\0.25
+\EQ-Compacta\\0.75
+\|
+~C|EQ-Compacta|h|Compactadora|15|030726|2|
+~C|03#||Conducciones hidráulicas y accesorios|6396.17||0|
+~D|03#
+|03.01\\1
+\03.02\\1
+\03.04\\1
+\|
+~C|03.01|ud|Instalación de tubería PVC presión Ø200 mm|4708.7||0|
+~T|03.01|Unidad de obra correspondiente al suministro, montaje e instalación de conducción principal de PVC presión de diámetro nominal 200 mm para la restitución de la red principal de abastecimiento de agua de riego del campus, conectando el punto de entrada de caudal procedente de la Síquia d’en Baster con el sistema general de almacenamiento del aljibe descubierto. La conducción discurre enterrada a lo largo del nuevo trazado definido, incluyendo su paso por zonas afectadas por la implantación fotovoltaica y su adaptación a infraestructuras hidráulicas reaprovechadas.
+
+Incluye:
+
+Suministro de tubería de PVC presión Ø200 mm.
+Descarga, acopio y manipulación en obra.
+Colocación en zanja ejecutada
+Colocación con pendiente continua mínima 0,5 %
+Alineación, nivelación y ajuste geométrico.
+Formación de uniones estancas.
+Adaptación a cotas y pendientes proyectadas.
+Conexión con registros y puntos singulares.
+Mano de obra especializada.
+Medios auxiliares de instalación.
+Limpieza y retirada de restos.
+
+Criterio de medición en proyecto:
+Metro lineal de conducción proyectada, medido sobre eje.
+
+Criterio de medición en obra:
+Metro lineal efectivamente instalado, conexionado y funcionalmente comprobado.|
+~D|03.01
+|MT-PVC200\\55
+\MO-mo003\\12
+\MO-mo102\\12
+\MT-ACCES-HID\\1
+\%0500\\0.05
+\|
+~C|MT-PVC200|m|Tubería PVC presión Ø200 mm|65||3|
+~C|MO-mo003|h|Oficial 1ª fontanero|33.3||1|
+~C|MO-mo102|h|Ayudante de fontanero|27.49||1|
+~C|MT-ACCES-HID|lote|Accesorios hidráulicos y uniones|180||3|
+~C|03.02|ud|Instalación de tubería polietileno flexible Ø75 mm|1560.64||0|
+~T|03.02|Unidad de obra correspondiente al suministro, montaje e instalación de conducción secundaria de polietileno flexible de diámetro nominal 75 mm, destinada a integrar y restituir la aportación hidráulica procedente de la Síquia de Penyaflor, permitiendo su incorporación al nuevo esquema general de abastecimiento hacia el aljibe principal de riego. La conducción discurre enterrada de forma paralela y coordinada con la red principal, compartiendo parte del trazado y pasos singulares.
+
+Incluye:
+
+Suministro de tubería de polietileno flexible Ø75 mm.
+Descarga y manipulación en obra.
+Tendido y colocación en zanja.
+Colocación con pendiente continua mínima 0,5 %
+Ejecución de uniones y empalmes.
+Adaptación geométrica al trazado.
+Conexión con red existente y nueva red proyectada.
+Mano de obra especializada.
+Medios auxiliares.
+Limpieza de la zona de actuación.
+
+Criterio de medición en proyecto:
+Metro lineal de conducción proyectada.
+
+Criterio de medición en obra:
+Metro lineal realmente instalado y operativo.|
+~D|03.02
+|MT-PE75\\55
+\MT-Filtro_Cesto\\1
+\MT-ACCES-HID\\1
+\MO-mo003\\8
+\MO-mo102\\8
+\%0500\\0.05
+\|
+~C|MT-PE75|m|Tubería polietileno flexible Ø75 mm|12||3|
+~C|MT-Filtro_Cesto|ud|Filtro de Cesta|160|030726|3|
+~C|03.04|ud|Instalación de T de registro con tapa|126.83||0|
+~T|03.04|Unidad de obra correspondiente al suministro e instalación de accesorio registrable en T sobre la nueva conducción principal de PVC Ø200 mm, situado en punto estratégico del trazado entre las aportaciones de las síquias y el aljibe general descubierto, destinado a facilitar futuras labores de inspección, limpieza interior y extracción de sedimentos acumulados en la red.
+
+Incluye:
+
+Suministro de accesorio en T de PVC.
+Tapa registrable estanca.
+Conexionado con conducción principal.
+Ajuste y alineación.
+Sellado y fijación.
+Mano de obra especializada.
+Medios auxiliares de montaje.
+Comprobación final de accesibilidad.
+
+Criterio de medición en proyecto:
+Unidad prevista según definición en plano.
+
+Criterio de medición en obra:
+Unidad completamente instalada, accesible y operativa.|
+~D|03.04
+|MT-TREG-PVC\\1
+\MO-mo003\\1
+\MO-mo102\\1
+\%0500\\0.05
+\|
+~C|MT-TREG-PVC|ud|T de registro PVC con tapa|60||3|
+~C|04#||Canalización mediante canal prefabricada y registros|10948.04||0|
+~D|04#
+|04.01\\1
+\04.02\\1
+\04.03\\1
+\04.04\\1
+\04.05\\1
+\|
+~C|04.01|ud|Ejecución de solera de hormigón bajo canal|476||0|
+~T|04.01|Unidad de obra correspondiente a la ejecución de base continua de hormigón de regularización y apoyo para la implantación del tramo de protección superior de la nueva acometida hidráulica, formada por una solera de 10 cm de espesor y anchura adaptada a la geometría de la canal prefabricada de sección 0,665 × 0,58 m, a lo largo de una longitud total aproximada de 35 m, con volumen estimado de 2,33 m³. La solera se ejecutará sobre terreno previamente excavado y nivelado, garantizando una superficie uniforme, estable y con la pendiente longitudinal mínima del 0,5 % definida en proyecto.
+
+Incluye:
+
+Replanteo de cotas y pendientes.
+Preparación y regularización del fondo de excavación.
+Suministro y vertido de hormigón.
+Extendido, nivelación y acabado superficial.
+Formación continua de pendiente longitudinal.
+Mano de obra especializada.
+Medios auxiliares de hormigonado.
+Limpieza inmediata de restos.
+
+
+Criterio de medición en proyecto:
+Metro cúbico teórico de hormigón según dimensiones definidas en planos.
+
+Criterio de medición en obra:
+Metro cúbico efectivamente ejecutado, extendido y aceptado.|
+~D|04.01
+|MT-HM20\\2.03
+\mo020\\3
+\mo113\\3
+\%0500\\0.05
+\|
+~C|MT-HM20|m3|Hormigón HM-20|150||3|
+~C|04.02|ud|Suministro e instalación de canal prefabricada con rejilla|8040.06||0|
+~T|04.02|Unidad de obra correspondiente al suministro, colocación y ajuste de 35 módulos de canal prefabricada con rejilla superior registrable, de dimensiones aproximadas 0,665 m de anchura y 0,58 m de altura, formando una línea continua de protección mecánica de aproximadamente 35 m de longitud, situada sobre la nueva acometida hidráulica de riego en el tramo principal de conexión entre las síquias y el aljibe general. La instalación deberá garantizar continuidad geométrica, alineación, estabilidad estructural y pendiente mínima continua del 0,5 %, permitiendo registro y mantenimiento futuro del sistema.
+
+Incluye:
+
+Suministro de módulos prefabricados.
+Suministro y montaje de rejillas superiores.
+Descarga, acopio y manipulación.
+Colocación y alineación sobre solera.
+Ajuste de encuentros entre módulos.
+Verificación de pendiente longitudinal.
+Mano de obra de colocación.
+Herramienta y medios auxiliares.
+Limpieza final del tramo ejecutado.
+
+Criterio de medición en proyecto:
+Metro lineal de canal prefabricada definido en documentación gráfica.
+
+Criterio de medición en obra:
+Metro lineal realmente instalado, alineado y operativo.|
+~D|04.02
+|MT-CANAL-PREF\\35
+\mo020\\20
+\mo113\\20
+\EQ-CGru\\4
+\EQ-ZANJAD\\16
+\%0500\\0.05
+\|
+~C|MT-CANAL-PREF|ud|Canal prefabricada con rejilla|159||3|
+~C|EQ-CGru|h|Camión Grua|95|030726|2|
+~C|04.03|lote|Formación de registro de hormigón in situ|1510.11||0|
+~T|04.03|Unidad de obra correspondiente a la ejecución de registros de inspección y mantenimiento integrados en el trazado protegido de la nueva acometida hidráulica, formados mediante encofrado y hormigonado in situ, ubicados en puntos singulares del sistema para facilitar acceso técnico, inspección interior y control de las conexiones entre la Síquia d’en Baster, la Síquia de Penyaflor y el aljibe general. Los registros se ejecutarán adaptándose geométricamente a las conducciones y al sistema de canal superior.
+
+Incluye:
+
+Replanteo y definición geométrica del registro.
+Excavación puntual de ajuste.
+Encofrado lateral y base.
+Vertido y conformación de hormigón.
+Formación de hueco para encastre de tapa metálica.
+Ajuste con conducciones y canal prefabricada.
+Mano de obra especializada.
+Medios auxiliares y herramienta.
+
+
+Criterio de medición en proyecto:
+Unidad de registro completo según definición de proyecto.
+
+Criterio de medición en obra:
+Unidad completamente ejecutada, integrada y preparada para recibir tapa registrable.|
+~D|04.03
+|mo020\\20
+\mo113\\20
+\MT-HM20\\2.6
+\MT-ENCOF-REG\\2
+\%0500\\0.05
+\|
+~C|MT-ENCOF-REG|m2|Encofrado para registro de hormigón|28||3|
+~C|04.04|lote|Colocación de tapa metálica tipo tramex|785.86||0|
+~T|04.04|Unidad de obra correspondiente al suministro y colocación de tapa metálica tipo rejilla tramex, fabricada a medida para adaptación a los registros ejecutados in situ sobre el trazado protegido de la nueva acometida hidráulica. Las tapas permitirán acceso técnico periódico para inspección, limpieza y mantenimiento de conducciones, garantizando resistencia mecánica, estabilidad de apoyo y facilidad de apertura.
+
+Incluye:
+
+Fabricación a medida de tapa tipo tramex.
+Transporte y suministro en obra.
+Ajuste dimensional y encastre.
+Colocación y nivelación final.
+Comprobación de estabilidad.
+Medios auxiliares de montaje.
+Mano de obra especializada.
+Limpieza y remate de encuentros.
+
+Criterio de medición en proyecto:
+Unidad prevista según número de registros definidos.
+
+Criterio de medición en obra:
+Unidad completamente suministrada, instalada y funcional para apertura y mantenimiento.|
+~D|04.04
+|MT-TRAMEX-TAPA\\2
+\mo020\\4
+\mo113\\4
+\%0500\\0.05
+\|
+~C|MT-TRAMEX-TAPA|ud|Tapa metálica tipo tramex a medida|275||3|
+~C|04.05|ud|Ejecución de pozo drenante con geotextil y grava|136.01||0|
+~T|04.05|Unidad de obra correspondiente a la ejecución del elemento final de drenaje del sistema de protección asociado a la nueva acometida hidráulica de riego del campus, ubicado en la cota inferior del tramo final de la línea de canal prefabricada de protección, con objeto de recoger y disipar las escorrentías, excedentes o infiltraciones procedentes del tramo protegido comprendido entre la conexión de las aportaciones de la Síquia d’en Baster, la Síquia de Penyaflor y el aljibe general descubierto de agua de riego. El pozo se ejecutará mediante excavación puntual de dimensiones aproximadas 0,50 × 0,50 × 0,40 m, revestido interiormente con geotextil separador y relleno con grava drenante de granulometría adecuada, garantizando una pendiente local de evacuación aproximada del 2 % respecto al tramo final de canal.
+
+Incluye:
+
+Excavación puntual y conformación geométrica.
+Perfilado y regularización de fondo.
+Suministro y colocación de geotextil perimetral.
+Suministro y vertido de grava drenante.
+Formación de pendiente de descarga.
+Ajuste con salida final de canal prefabricada.
+Mano de obra y medios auxiliares.
+Limpieza y remate final.
+
+Criterio de medición en proyecto:
+Unidad completa de pozo drenante ejecutado según dimensiones definidas en proyecto.
+
+Criterio de medición en obra:
+Unidad totalmente ejecutada, conectada al sistema de canal y operativa para drenaje efectivo.|
+~D|04.05
+|MT-GEOTEXT\\1.5
+\MT-GRAVA-DREN\\0.1
+\MO-mo003\\2
+\MO-mo102\\2
+\%0500\\0.05
+\|
+~C|MT-GEOTEXT|m2|Geotextil drenante 150 g/m²|2.5||3|
+~C|MT-GRAVA-DREN|m3|Grava drenante 20/40 mm|42||3|

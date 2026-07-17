@@ -19,6 +19,7 @@ from openpyxl.utils import get_column_letter
 
 from gantt.bc3.models import Capitulo, Presupuesto, RecursoMO
 from gantt.planning.analyser import (
+    calcular_carga_semanal_recursos,
     calcular_holguras,
     calcular_recomendacion,
     calcular_sensibilidad,
@@ -441,6 +442,90 @@ def write_ms_project_sheet(
     ws.column_dimensions['B'].width = max(ws.column_dimensions['B'].width, 60)
 
 
+def write_carga_recursos(
+    ws, presupuesto: Presupuesto, planificacion: PlanificacionProyecto
+) -> None:
+    """
+    Escribe la hoja 'Carga recursos': histograma semanal de horas de mano de
+    obra por perfil (Sección A, pivote semana x recurso) y detalle de las
+    tareas que aportan horas a cada semana/recurso (Sección B).
+    """
+    filas = calcular_carga_semanal_recursos(planificacion, presupuesto)
+
+    if not filas:
+        ws.append(['Sin horas de mano de obra planificadas para mostrar.'])
+        return
+
+    recursos_codigos = sorted({f['recurso_codigo'] for f in filas})
+    recursos_nombres = {f['recurso_codigo']: f['recurso_nombre'] for f in filas}
+    semanas = sorted({(f['semana_inicio'], f['semana_iso']) for f in filas})
+    valores = {(f['semana_inicio'], f['recurso_codigo']): f['horas_semana'] for f in filas}
+
+    # ── SECCIÓN A: HISTOGRAMA SEMANAL (pivote semana x recurso) ──────────────
+    n_cols = 2 + len(recursos_codigos) + 1
+    ws.append(['HISTOGRAMA SEMANAL DE CARGA DE RECURSOS'])
+    r = ws.max_row
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=n_cols)
+    ws.cell(r, 1).fill = GANTT_FILL_HEADER
+    ws.cell(r, 1).font = GANTT_FONT_HEADER
+    ws.cell(r, 1).alignment = Alignment(horizontal='center')
+
+    headers = (
+        ['Semana (lunes)', 'Semana ISO']
+        + [recursos_nombres[codigo] for codigo in recursos_codigos]
+        + ['Total semana']
+    )
+    ws.append(headers)
+    for cell in ws[ws.max_row]:
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
+        cell.alignment = Alignment(horizontal='center')
+
+    for i, (semana_inicio, semana_iso_str) in enumerate(semanas):
+        horas_por_recurso = [valores.get((semana_inicio, c), 0.0) for c in recursos_codigos]
+        ws.append(
+            [semana_inicio.strftime('%d/%m/%Y'), semana_iso_str]
+            + horas_por_recurso
+            + [sum(horas_por_recurso)]
+        )
+        row = ws[ws.max_row]
+        fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
+        for cell in row:
+            cell.fill = fill
+        for cell in row[2:]:
+            cell.number_format = '#,##0.0'
+
+    # ── SECCIÓN B: DETALLE POR TAREA, SEMANA Y RECURSO ────────────────────────
+    ws.append([])
+    ws.append([])
+    ws.append(['DETALLE DE TAREAS POR SEMANA Y RECURSO'])
+    r = ws.max_row
+    ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=5)
+    ws.cell(r, 1).fill = GANTT_FILL_HEADER
+    ws.cell(r, 1).font = GANTT_FONT_HEADER
+    ws.cell(r, 1).alignment = Alignment(horizontal='center')
+
+    ws.append(['Semana ISO', 'Recurso', 'Descripción', 'Horas semana', 'Tareas incluidas'])
+    for cell in ws[ws.max_row]:
+        cell.fill = GANTT_FILL_HEADER
+        cell.font = GANTT_FONT_HEADER
+        cell.alignment = Alignment(horizontal='center')
+
+    for i, fila in enumerate(filas):
+        ws.append([
+            fila['semana_iso'],
+            fila['recurso_codigo'],
+            fila['recurso_nombre'],
+            fila['horas_semana'],
+            ', '.join(fila['tareas_incluidas']),
+        ])
+        row = ws[ws.max_row]
+        fill = GANTT_FILL_ALT if i % 2 == 0 else GANTT_FILL_WHITE
+        for cell in row:
+            cell.fill = fill
+        row[3].number_format = '#,##0.0'
+
+    adjust_col_widths(ws)
 
 
 def write_dashboard(
@@ -780,8 +865,8 @@ def exportar_analisis(
         Ruta del archivo .xlsx a generar o sobreescribir.
     planificaciones : list[PlanificacionProyecto] | None
         Lista de planificaciones calculadas (una por escenario). Si se proporciona,
-        se generan también la hoja 'Simulador de cuadrillas' y una hoja
-        'MSProject_{escenario}' por cada escenario.
+        se generan también la hoja 'Simulador de cuadrillas', 'Carga recursos'
+        y una hoja 'MSProject_{escenario}' por cada escenario.
     """
     recursos = list(presupuesto.recursos_mo.values())
     wb = Workbook()
@@ -796,6 +881,9 @@ def exportar_analisis(
     if planificaciones:
         ws3 = wb.create_sheet('Simulador de cuadrillas')
         write_simulador(ws3, presupuesto, planificaciones)
+
+        ws_carga = wb.create_sheet('Carga recursos')
+        write_carga_recursos(ws_carga, presupuesto, planificaciones[-1])
 
         for plan in planificaciones:
             sheet_name = f'MSProject_{plan.escenario.nombre}'
@@ -842,9 +930,9 @@ if __name__ == '__main__':
     planificaciones = None
     yaml_path = input_dir / 'planificacion.yaml'
     if yaml_path.exists():
-        parametros, escenarios, tareas = cargar_planificacion_yaml(yaml_path)
+        parametros, escenarios, tareas, bandas = cargar_planificacion_yaml(yaml_path)
         planificaciones = [
-            calcular_planificacion(presupuesto, parametros, tareas, escenario)
+            calcular_planificacion(presupuesto, parametros, tareas, escenario, bandas)
             for escenario in escenarios
         ]
         print(f'Planificaciones calculadas: {[p.escenario.nombre for p in planificaciones]}')

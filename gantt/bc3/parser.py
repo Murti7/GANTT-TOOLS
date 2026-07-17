@@ -289,7 +289,12 @@ def parse_bc3(filepath: Path) -> Presupuesto:
 
     # Partidas directas (hijos de capítulos): no son recursos ni PAs
     partidas_directas: set[str] = set()
-    codigo_raiz = next((c for c in conceptos if c.endswith('##')), '')
+    codigo_raiz = next((c for c in conceptos if c.endswith('##')), None)
+    if codigo_raiz is None:
+        raise ValueError(
+            f'No se encontró un código raíz de presupuesto (registro ~C terminado en'
+            f' "##") en {filepath}. El archivo no parece ser un BC3 válido.'
+        )
 
     def recoger_hijos_capitulo(cod: str) -> None:
         for cod_hijo, _ in descompuestos.get(cod, []):

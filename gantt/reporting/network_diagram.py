@@ -4,6 +4,12 @@ Generación del diagrama temporal de implantación por bandas operativas.
 El módulo mantiene la función pública generar_diagrama_red(planificacion)
 para no romper el pipeline existente, aunque la representación ya no es una
 red PERT clásica, sino un diagrama temporal por bandas.
+
+Las bandas se definen en la sección 'bandas' de planificacion.yaml
+(PlanificacionProyecto.bandas). Si el yaml no la define, se usa BANDAS_DEFAULT
+como compatibilidad temporal con proyectos existentes. Una tarea cuyo
+grupo_visual no coincide con ninguna banda no se descarta: se agrupa en la
+banda automática "Otros" y se emite un aviso por consola.
 """
 
 import io
@@ -20,7 +26,7 @@ import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch
 
 from gantt.planning.analyser import calcular_holguras, dias_habiles_entre
-from gantt.planning.models import PlanificacionProyecto, TareaGantt
+from gantt.planning.models import BandaVisual, PlanificacionProyecto, TareaGantt
 
 
 COLOR_CRITICO = "#FFD6D6"
@@ -43,68 +49,92 @@ ANCHO_PANEL: float = 20.0
 # Unidades de datos reservadas para el panel de títulos (izquierda).
 # La línea H1 (día 0) queda siempre en x = ANCHO_PANEL.
 
-BANDAS = [
-    (
-        "Inicio / documentación contractual",
-        "INICIO / DOCUMENTACIÓN\nCONTRACTUAL",
-        "\nDocumentación previa al inicio de la obra,\nPSS, PGR, CAE, etc.",
-        "#EAF4FF",
+# Bandas por defecto: compatibilidad temporal con proyectos existentes cuyo
+# planificacion.yaml no define la sección 'bandas'. No usar para proyectos
+# nuevos: cada proyecto debe declarar sus propias bandas en el yaml.
+BANDAS_DEFAULT: list[BandaVisual] = [
+    BandaVisual(
+        id="Inicio / documentación contractual",
+        titulo="INICIO / DOCUMENTACIÓN\nCONTRACTUAL",
+        descripcion="\nDocumentación previa al inicio de la obra,\nPSS, PGR, CAE, etc.",
+        color="#EAF4FF",
     ),
-    (
-        "Auditorías técnicas",
-        "AUDITORÍAS TÉCNICAS",
-        "\nCaracterización inicial de UTs\ny deteccción de deficiencias",
-        "#F3FAEA",
+    BandaVisual(
+        id="Auditorías técnicas",
+        titulo="AUDITORÍAS TÉCNICAS",
+        descripcion="\nCaracterización inicial de UTs\ny deteccción de deficiencias",
+        color="#F3FAEA",
     ),
-    (
-        "Validación de inventarios y tipologías",
-        "VALIDACIÓN DE INVENTARIOS\nY TIPOLOGÍAS",
-        "\nRevisión STI de los inventarios técnicos de auditoría\n y autorización técnica de actuaciones de corrección propuestas.",
-        "#FFF6DD",
+    BandaVisual(
+        id="Validación de inventarios y tipologías",
+        titulo="VALIDACIÓN DE INVENTARIOS\nY TIPOLOGÍAS",
+        descripcion="\nRevisión STI de los inventarios técnicos de auditoría\n y autorización técnica de actuaciones de corrección propuestas.",
+        color="#FFF6DD",
     ),
-    (
-        "Actuaciones habilitadoras sistémicas",
-        "ACTUACIONES HABILITADORAS\nSISTÉMICAS",
-        "\nPurgadores y sectorización vertical\n, adecuación de la sala de máquinas de clima",
-        "#F4E9FF",
+    BandaVisual(
+        id="Actuaciones habilitadoras sistémicas",
+        titulo="ACTUACIONES HABILITADORAS\nSISTÉMICAS",
+        descripcion="\nPurgadores y sectorización vertical\n, adecuación de la sala de máquinas de clima",
+        color="#F4E9FF",
     ),
-    (
-        "Ejecución correctiva por bloques",
-        "EJECUCIÓN CORRECTIVA\nPOR BLOQUES",
-        "\nCorrecciones principales de control,\nventilación, hidráulica y accesos.",
-        "#FFF0E6",
+    BandaVisual(
+        id="Ejecución correctiva por bloques",
+        titulo="EJECUCIÓN CORRECTIVA\nPOR BLOQUES",
+        descripcion="\nCorrecciones principales de control,\nventilación, hidráulica y accesos.",
+        color="#FFF0E6",
     ),
-    (
-        "Validación funcional por bloques",
-        "VALIDACIÓN FUNCIONAL\nPOR BLOQUES",
-        "\nComprobación funcional de cada\nbloque antes de puesta en servicio.",
-        "#ECF8EE",
+    BandaVisual(
+        id="Validación funcional por bloques",
+        titulo="VALIDACIÓN FUNCIONAL\nPOR BLOQUES",
+        descripcion="\nComprobación funcional de cada\nbloque antes de puesta en servicio.",
+        color="#ECF8EE",
     ),
-    (
-        "Puesta en servicio funcional",
-        "PUESTA EN SERVICIO\nFUNCIONAL",
-        "\nPruebas integradas y verificación\noperativa del sistema reformado.",
-        "#E9F5FF",
+    BandaVisual(
+        id="Puesta en servicio funcional",
+        titulo="PUESTA EN SERVICIO\nFUNCIONAL",
+        descripcion="\nPruebas integradas y verificación\noperativa del sistema reformado.",
+        color="#E9F5FF",
     ),
-    (
-        "Cierre contractual",
-        "CIERRE CONTRACTUAL",
-        "\nRecepción operativa y fin del\nplazo de ejecución de las actuaciones de reforma.",
-        "#FFF7D8",
+    BandaVisual(
+        id="Cierre contractual",
+        titulo="CIERRE CONTRACTUAL",
+        descripcion="\nRecepción operativa y fin del\nplazo de ejecución de las actuaciones de reforma.",
+        color="#FFF7D8",
     ),
-    (
-        "Validaciones estacionales diferidas",
-        "VALIDACIONES ESTACIONALES\nDIFERIDAS",
-        "\nEnsayos térmicos en régimen real\nde calefacción y refrigeración.",
-        "#F2F2F2",
+    BandaVisual(
+        id="Validaciones estacionales diferidas",
+        titulo="VALIDACIONES ESTACIONALES\nDIFERIDAS",
+        descripcion="\nEnsayos térmicos en régimen real\nde calefacción y refrigeración.",
+        color="#F2F2F2",
     ),
-    (
-        "Proyecto As Built",
-        "PROYECTO AS BUILT",
-        "\nDocumentación final, planos\nactualizados y cierre documental.",
-        "#F7F7F7",
+    BandaVisual(
+        id="Proyecto As Built",
+        titulo="PROYECTO AS BUILT",
+        descripcion="\nDocumentación final, planos\nactualizados y cierre documental.",
+        color="#F7F7F7",
     ),
 ]
+
+BANDA_OTROS_ID = "Otros"
+COLOR_BANDA_DEFECTO = "#F2F2F2"
+
+
+def resolver_bandas(bandas_yaml: list[BandaVisual]) -> list[BandaVisual]:
+    """
+    Devuelve las bandas a usar en el diagrama: las definidas en planificacion.yaml
+    si existen, o BANDAS_DEFAULT si el yaml no incluye la sección 'bandas'.
+    """
+    return list(bandas_yaml) if bandas_yaml else BANDAS_DEFAULT
+
+
+def banda_otros() -> BandaVisual:
+    """Banda automática para tareas cuyo grupo_visual no coincide con ninguna banda."""
+    return BandaVisual(
+        id=BANDA_OTROS_ID,
+        titulo="OTROS",
+        descripcion="\nTareas cuyo grupo_visual no coincide\ncon ninguna banda definida.",
+        color=COLOR_BANDA_DEFECTO,
+    )
 
 
 def fecha_base(tareas: list[TareaGantt]) -> date:
@@ -139,11 +169,28 @@ def grupo(tarea: TareaGantt) -> str:
     return "Inicio / documentación contractual"
 
 
-def agrupar_tareas(tareas: list[TareaGantt]) -> dict[str, list[TareaGantt]]:
+def agrupar_tareas(
+    tareas: list[TareaGantt], bandas_ids: set[str]
+) -> dict[str, list[TareaGantt]]:
+    """
+    Agrupa tareas por banda. Una tarea cuyo grupo (grupo_visual o valor por
+    defecto) no coincide con ninguna banda_id nunca se descarta: se reasigna
+    a la banda automática "Otros" y se avisa una vez por cada grupo desconocido.
+    """
     grupos: dict[str, list[TareaGantt]] = defaultdict(list)
+    grupos_desconocidos_avisados: set[str] = set()
 
     for tarea in tareas:
-        grupos[grupo(tarea)].append(tarea)
+        candidato = grupo(tarea)
+        if candidato not in bandas_ids:
+            if candidato not in grupos_desconocidos_avisados:
+                print(
+                    f'AVISO: grupo_visual "{candidato}" no coincide con ninguna banda '
+                    f'definida — las tareas afectadas se agrupan en "{BANDA_OTROS_ID}".'
+                )
+                grupos_desconocidos_avisados.add(candidato)
+            candidato = BANDA_OTROS_ID
+        grupos[candidato].append(tarea)
 
     for tareasgrupo in grupos.values():
         tareasgrupo.sort(
@@ -157,24 +204,38 @@ def agrupar_tareas(tareas: list[TareaGantt]) -> dict[str, list[TareaGantt]]:
     return grupos
 
 
-def calcular_y(tareas: list[TareaGantt]) -> tuple[dict[str, float], dict[str, tuple[float, float]]]:
-    grupos = agrupar_tareas(tareas)
+def calcular_y(
+    tareas: list[TareaGantt], bandas: list[BandaVisual]
+) -> tuple[dict[str, float], dict[str, tuple[float, float]], list[BandaVisual]]:
+    """
+    Calcula la posición Y de cada tarea y de cada banda.
+
+    Devuelve también la lista de bandas efectivamente renderizadas: las
+    bandas indicadas más la banda "Otros" al final, solo si se ha usado.
+    """
+    bandas_ids = {b.id for b in bandas}
+    grupos = agrupar_tareas(tareas, bandas_ids)
+
+    bandas_render = list(bandas)
+    if grupos.get(BANDA_OTROS_ID) and BANDA_OTROS_ID not in bandas_ids:
+        bandas_render.append(banda_otros())
+
     y_tareas: dict[str, float] = {}
-    bandas: dict[str, tuple[float, float]] = {}
+    bandas_y: dict[str, tuple[float, float]] = {}
 
     y_actual = 0.0
     alto_min_banda = 1.85
     separacion_fila = 1
     separacion_banda = 0.22
 
-    for nombre_banda, *_ in BANDAS:
-        tareas_banda = grupos.get(nombre_banda, [])
+    for banda in bandas_render:
+        tareas_banda = grupos.get(banda.id, [])
         num_filas = max(len(tareas_banda), 1)
         alto_banda = max(alto_min_banda, num_filas * separacion_fila + 0.65)
 
         y_sup = y_actual
         y_inf = y_actual - alto_banda
-        bandas[nombre_banda] = (y_inf, y_sup)
+        bandas_y[banda.id] = (y_inf, y_sup)
 
         if tareas_banda:
             if len(tareas_banda) == 1:
@@ -187,7 +248,7 @@ def calcular_y(tareas: list[TareaGantt]) -> tuple[dict[str, float], dict[str, tu
 
         y_actual = y_inf - separacion_banda
 
-    return y_tareas, bandas
+    return y_tareas, bandas_y, bandas_render
 
 
 def nodos_post_plazo(tareas: list[TareaGantt]) -> set[str]:
@@ -241,29 +302,33 @@ def wrap(texto: str, ancho: int) -> str:
 
 
 def dibujar_fondo_bandas(
-    ax, bandas: dict[str, tuple[float, float]], x_min: float, x_max: float
+    ax, bandas: list[BandaVisual], bandas_y: dict[str, tuple[float, float]],
+    x_min: float, x_max: float,
 ) -> None:
     """
     Dibuja los fondos de color de las bandas en toda la zona temporal.
     Solo fondos y separadores horizontales, sin texto.
     """
-    for clave, _, _, color in BANDAS:
-        y_inf, y_sup = bandas[clave]
+    for banda in bandas:
+        y_inf, y_sup = bandas_y[banda.id]
+        color = banda.color or COLOR_BANDA_DEFECTO
         ax.axhspan(y_inf, y_sup, xmin=0, xmax=1, color=color, zorder=0)
         ax.plot([x_min, x_max], [y_inf, y_inf], color="#BDBDBD", lw=0.7, zorder=1)
 
 
 def dibujar_panel_bandas(
-    ax, bandas: dict[str, tuple[float, float]]
+    ax, bandas: list[BandaVisual], bandas_y: dict[str, tuple[float, float]]
 ) -> None:
     """
     Dibuja el panel izquierdo fijo: número, título y descripción de cada banda.
     Todo el contenido se posiciona entre x=0 y x=ANCHO_PANEL.
     Sin eje temporal, sin grid, sin flechas.
     """
-    for idx, (clave, titulo, descripcion, _) in enumerate(BANDAS, start=1):
-        y_inf, y_sup = bandas[clave]
+    for idx, banda in enumerate(bandas, start=1):
+        y_inf, y_sup = bandas_y[banda.id]
         y_centro = (y_inf + y_sup) / 2
+        titulo = banda.titulo
+        descripcion = banda.descripcion
 
         ax.text(
             1.2,
@@ -672,20 +737,21 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
     holguras = calcular_holguras(tareas)
     post = nodos_post_plazo(tareas)
 
-    y_tareas, bandas = calcular_y(tareas)
+    bandas = resolver_bandas(planificacion.bandas)
+    y_tareas, bandas_y, bandas_render = calcular_y(tareas, bandas)
 
     x_max_tareas = max(x_plot(t.fecha_fin, base) for t in tareas if t.fecha_fin)
     x_min_tareas = min(x_plot(t.fecha_inicio, base) for t in tareas if t.fecha_inicio)
     x_min = min(x_min_tareas - 2.0, ANCHO_PANEL - 20.0)
     x_max = x_max_tareas + 18.0
 
-    y_min = min(y_inf for y_inf, _ in bandas.values()) - 0.6
-    y_max = max(y_sup for _, y_sup in bandas.values()) + 0.6
+    y_min = min(y_inf for y_inf, _ in bandas_y.values()) - 0.6
+    y_max = max(y_sup for _, y_sup in bandas_y.values()) + 0.6
 
     fig, ax = plt.subplots(figsize=(24, 14))
 
-    dibujar_fondo_bandas(ax, bandas, x_min, x_max)
-    dibujar_panel_bandas(ax, bandas)
+    dibujar_fondo_bandas(ax, bandas_render, bandas_y, x_min, x_max)
+    dibujar_panel_bandas(ax, bandas_render, bandas_y)
     dibujar_eje(ax, x_min, x_max, y_min)
     dibujar_dependencias(ax, tareas, y_tareas, base, holguras)
 

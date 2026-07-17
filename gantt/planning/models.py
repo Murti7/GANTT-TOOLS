@@ -35,6 +35,22 @@ class EscenarioRecursos(BaseModel):
     operarios_por_recurso: dict[str, int]  # clave: codigo MO, valor: operarios
 
 
+class BandaVisual(BaseModel):
+    """
+    Banda visual del diagrama de red: agrupa tareas por fase operativa.
+
+    Se define en la sección opcional 'bandas' de planificacion.yaml. El campo
+    id es el valor que debe coincidir con TareaGantt.grupo_visual para que una
+    tarea se dibuje en esa banda. Si el yaml no define 'bandas', network_diagram
+    usa un conjunto por defecto para mantener compatibilidad con proyectos existentes.
+    """
+
+    id: str
+    titulo: str
+    descripcion: str = ''
+    color: str = ''   # color hex opcional; vacío usa el color por defecto del diagrama
+
+
 class TareaGantt(BaseModel):
     """
     Tarea o hito del cronograma del proyecto.
@@ -88,6 +104,7 @@ class PlanificacionProyecto(BaseModel):
     escenario: EscenarioRecursos
     tareas: list[TareaGantt]
     tareas_originales: list[TareaGantt] = Field(default_factory=list)
+    bandas: list[BandaVisual] = Field(default_factory=list)
 
 
 # Loader que preserva como string los escalares YAML con cero inicial (ej: 07, 08).
@@ -110,10 +127,14 @@ _StrPreservingLoader.add_constructor(
 
 def cargar_planificacion_yaml(
     yaml_path: Path,
-) -> tuple[ParametrosProyecto, list[EscenarioRecursos], list[TareaGantt]]:
+) -> tuple[ParametrosProyecto, list[EscenarioRecursos], list[TareaGantt], list[BandaVisual]]:
     """
     Lee el archivo planificacion.yaml y construye los objetos de planificación.
     Usa un loader personalizado para preservar claves con cero inicial (ej: '07').
+
+    La sección 'bandas' es opcional: si no está presente, se devuelve una lista
+    vacía y network_diagram.generar_diagrama_red aplica sus bandas por defecto
+    para mantener compatibilidad con proyectos existentes.
 
     Parámetros
     ----------
@@ -122,8 +143,8 @@ def cargar_planificacion_yaml(
 
     Retorna
     -------
-    tuple[ParametrosProyecto, list[EscenarioRecursos], list[TareaGantt]]
-        Parámetros del proyecto, lista de escenarios y lista de tareas.
+    tuple[ParametrosProyecto, list[EscenarioRecursos], list[TareaGantt], list[BandaVisual]]
+        Parámetros del proyecto, lista de escenarios, lista de tareas y bandas visuales.
     """
     with open(yaml_path, encoding='utf-8') as f:
         data = yaml.load(f, Loader=_StrPreservingLoader)
@@ -163,7 +184,17 @@ def cargar_planificacion_yaml(
         for tarea_id, tarea_data in tareas_raw.items()
     ]
 
-    return parametros, escenarios, tareas
+    bandas = [
+        BandaVisual(
+            id=str(banda_data['id']),
+            titulo=banda_data['titulo'],
+            descripcion=banda_data.get('descripcion', ''),
+            color=banda_data.get('color', ''),
+        )
+        for banda_data in data.get('bandas', [])
+    ]
+
+    return parametros, escenarios, tareas, bandas
 
 
 if __name__ == '__main__':
@@ -177,9 +208,10 @@ if __name__ == '__main__':
     if not yaml_files:
         raise FileNotFoundError(f'No se encontró planificacion.yaml en {input_dir}')
 
-    parametros, escenarios, tareas = cargar_planificacion_yaml(yaml_files[0])
+    parametros, escenarios, tareas, bandas = cargar_planificacion_yaml(yaml_files[0])
 
     print(f'Proyecto: {parametros.nombre}')
+    print(f'Bandas definidas en yaml: {len(bandas)}')
     print(f'Fecha inicio: {parametros.fecha_inicio}')
     print(f'Plazo contractual: {parametros.plazo_contractual_dias} días hábiles')
     print(f'Escenarios: {[e.nombre for e in escenarios]}')

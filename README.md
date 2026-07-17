@@ -167,41 +167,51 @@ Si no existe este archivo, el sistema genera igualmente todos los documentos
 de presupuesto.
 
 ```yaml
-parametros:
+proyecto:
   nombre:                  NombreProyecto
-  fecha_inicio:            2025-06-01    # formato AAAA-MM-DD
+  fecha_inicio:            '2025-06-01'   # formato AAAA-MM-DD, entre comillas
   horas_dia:               8
-  dias_semana:             5
+  dias_semana:             5              # días laborables por semana (L-V = 5)
   plazo_contractual_dias:  120
 
+# Cada escenario mapea código de recurso MO -> nº de operarios asignados
 escenarios:
-  - nombre: base
-    recursos:
-      MO-mo001: 1.0      # dedicación diaria en unidades del recurso
-      MO-mo102: 0.5
-  - nombre: optimizado
-    recursos:
-      MO-mo001: 1.5
-      MO-mo102: 1.0
+  base:
+    MO-mo001: 1
+    MO-mo102: 1
+  optimizado:
+    MO-mo001: 2
+    MO-mo102: 1
 
+# Diccionario de tareas indexado por ID (no una lista)
 tareas:
-  - id: T01
+  T01:
     nombre: Instalación cuadro eléctrico
-    partidas: [01.01]
+    tipo: tarea
+    capitulos_bc3: ['01.01']
     dependencias: []
-  - id: T02
+  T02:
     nombre: Tendido de cable
-    partidas: [01.02]
+    tipo: tarea
+    capitulos_bc3: ['01.02']
     dependencias: [T01]
-  - id: FIN
+  FIN:
     nombre: Entrega
-    es_fin_plazo: true
+    tipo: hito
+    capitulos_bc3: []
+    duracion_dias_fija: 0
     dependencias: [T02]
+    es_fin_plazo: true
 ```
 
 **Notas:**
-- Los códigos en `partidas` deben coincidir exactamente con los del BC3.
-- Los códigos en `recursos` deben coincidir con los recursos MO del BC3.
+- `tareas` es un diccionario indexado por ID de tarea, no una lista.
+- `tipo` es obligatorio en cada tarea: `tarea` o `hito`.
+- Los códigos en `capitulos_bc3` deben coincidir exactamente con los del BC3
+  (código de partida, o código de capítulo terminado en `#` para sumar todas
+  sus partidas).
+- Los códigos en cada escenario deben coincidir con los recursos MO del BC3,
+  y su valor es el número de operarios asignados a ese recurso.
 - La tarea con `es_fin_plazo: true` define el hito de fin de contrato.
 - Puede haber varios escenarios para comparar diferentes intensidades de recurso.
 

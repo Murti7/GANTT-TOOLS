@@ -40,6 +40,9 @@ PRES_FT  = Font(name=FONT_PRES, size=12, bold=True, color=BLANCO)   # título se
 PRES_FCF = Font(name=FONT_PRES, size=10, bold=True, color=NEGRO)    # capítulo / negrita
 PRES_FN  = Font(name=FONT_PRES, size=10,            color=NEGRO)    # normal
 PRES_FDE = Font(name=FONT_PRES, size=9,             color=GRIS_TEXTO)  # detalle
+PRES_FI  = Font(name=FONT_PRES, size=10, italic=True, color=NEGRO)  # nota editable
+PRES_FDEI = Font(name=FONT_PRES, size=9, italic=True, color=NEGRO)  # nota detalle editable
+PRES_FDEB = Font(name=FONT_PRES, size=9, bold=True, color=GRIS_TEXTO)  # detalle destacado
 PRES_FTO = Font(name=FONT_PRES, size=10, bold=True, color=NEGRO)    # total
 
 # ── Presupuesto — Alineaciones ────────────────────────────────────────────────

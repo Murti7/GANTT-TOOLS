@@ -26,12 +26,13 @@ def verificar_entorno() -> None:
     try:
         from matplotlib.font_manager import findfont, FontProperties
         from gantt.reporting.palette import FONT_PRES
-        if FONT_PRES and 'DejaVu' in findfont(FontProperties(family=FONT_PRES)):
-            print(f'AVISO: fuente "{FONT_PRES}" no encontrada — los documentos de presupuesto'
-                  f' usarán la fuente por defecto del sistema. Instala {FONT_PRES} para'
-                  f' obtener el formato corporativo correcto.')
-    except Exception:
-        pass
+    except ImportError:
+        return
+
+    if FONT_PRES and 'DejaVu' in findfont(FontProperties(family=FONT_PRES)):
+        print(f'AVISO: fuente "{FONT_PRES}" no encontrada — los documentos de presupuesto'
+              f' usarán la fuente por defecto del sistema. Instala {FONT_PRES} para'
+              f' obtener el formato corporativo correcto.')
 from gantt.planning.calculator import calcular_planificacion
 from gantt.planning.models import cargar_planificacion_yaml
 from gantt.reporting.analysis_charts import AnalysisChartsReport
@@ -112,12 +113,12 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
         return
 
     print('[4/4] Calculando planificación y exportando...')
-    parametros, escenarios, tareas = cargar_planificacion_yaml(yaml_path)
+    parametros, escenarios, tareas, bandas = cargar_planificacion_yaml(yaml_path)
 
     planificaciones = []
     for escenario in escenarios:
         planificacion = calcular_planificacion(
-            presupuesto, parametros, tareas, escenario
+            presupuesto, parametros, tareas, escenario, bandas
         )
         planificaciones.append(planificacion)
         print(f'      Escenario "{escenario.nombre}" calculado')

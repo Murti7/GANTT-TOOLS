@@ -10,7 +10,7 @@ footer_org:         Complexe Balear de Recerca
 footer_exp:         Expediente de licitación
 
 # ── Parámetros financieros del contrato ───────────────────────────────────────
-porcentaje_gg:          0.13   # Gastos Generales (13 %)
+porcentaje_gg:          0.17   # Gastos Generales (17 %)
 porcentaje_bi:          0.06   # Beneficio Industrial (6 %)
 iva_obra:               0.21   # IVA general obra (21 %)
 iva_gr:                 0.10   # IVA gestión de residuos (10 %)

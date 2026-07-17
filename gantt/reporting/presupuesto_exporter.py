@@ -12,7 +12,7 @@ import textwrap
 from weakref import WeakKeyDictionary
 
 from openpyxl import Workbook
-from openpyxl.styles import Alignment, Border, Font, Side  # usados inline en helpers de layout
+from openpyxl.styles import Alignment, Border, Side  # usados inline en helpers de layout
 from openpyxl.utils import get_column_letter
 
 from gantt.bc3.models import Capitulo, Partida, Presupuesto, ProjectConfig
@@ -21,12 +21,12 @@ from gantt.bc3.parser import expandir_descompuesto
 
 from gantt.reporting.styles import (
     PRES_FC, PRES_FCP, PRES_FSC, PRES_FD, PRES_FB, PRES_FA,
-    PRES_FT, PRES_FCF, PRES_FN, PRES_FDE, PRES_FTO,
+    PRES_FT, PRES_FCF, PRES_FN, PRES_FDE, PRES_FI, PRES_FDEI, PRES_FDEB, PRES_FTO,
     PRES_AD, PRES_AN, PRES_ANC, PRES_AC, PRES_AT, PRES_ALC,
     PRES_FE, PRES_FQ, PRES_FU, PRES_FP,
     PRES_BORDE_FINO, PRES_BORDE_TABLA, PRES_BORDE_TOTAL,
 )
-from gantt.reporting.palette import FONT_PRES, GRIS_LINEA, GRIS_TEXTO
+from gantt.reporting.palette import GRIS_LINEA
 
 
 # ── Tablas para conversión numérica ──────────────────────────────────────────
@@ -172,11 +172,7 @@ def aplicar_encabezado_documental(
         cell = ws.cell(fila, 1)
         cell.alignment = PRES_AC
         cell.fill = PRES_FC if es_titulo else PRES_FB
-        cell.font = (
-            Font(name=FONT_PRES, size=12, bold=True, color='FFFFFF')
-            if es_titulo else
-            Font(name=FONT_PRES, size=10, bold=True, color='000000')
-        )
+        cell.font = PRES_FT if es_titulo else PRES_FCF
         ws.row_dimensions[fila].height = 18
         registrar_altura_manual(ws, fila)
 
@@ -190,7 +186,7 @@ def configurar_impresion(
     """Configura pie de página, márgenes e impresión ajustada a ancho."""
     for row in ws.iter_rows():
         for cell in row:
-            if cell.value is not None and cell.font.name in (None, 'Calibri', FONT_PRES):
+            if cell.value is not None and cell.font.name in (None, 'Calibri'):
                 cell.font = PRES_FN
     ws.oddFooter.left.text   = config.footer_org if config else ''
     ws.oddFooter.center.text = config.footer_exp if config else ''
@@ -799,7 +795,7 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
     r2 = ws.max_row
     ws.merge_cells(start_row=r2, start_column=1, end_row=r2, end_column=N)
     ws.cell(r2, 1).fill      = PRES_FA
-    ws.cell(r2, 1).font      = Font(name=FONT_PRES, size=10, italic=True, color='000000')
+    ws.cell(r2, 1).font      = PRES_FI
     ws.cell(r2, 1).alignment = PRES_AC
     ws.row_dimensions[r2].height = 16
 
@@ -996,8 +992,7 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                 ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=N)
                 for c in range(1, N + 1):
                     ws.cell(r, c).fill = PRES_FD
-                    ws.cell(r, c).font = Font(name=FONT_PRES, size=9,
-                                              bold=True, color=GRIS_TEXTO)
+                    ws.cell(r, c).font = PRES_FDEB
                     ws.cell(r, c).border = PRES_BORDE_TABLA
 
                 for cod_rec, cant in grupos[tipo]:
@@ -1040,8 +1035,7 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
                 ws.merge_cells(start_row=r, start_column=2, end_row=r, end_column=N)
                 for c in range(1, N + 1):
                     ws.cell(r, c).fill = PRES_FB
-                    ws.cell(r, c).font = Font(name=FONT_PRES, size=9,
-                                              bold=True, color=GRIS_TEXTO)
+                    ws.cell(r, c).font = PRES_FDEB
                     ws.cell(r, c).border = PRES_BORDE_FINO
 
                 base_aux = suma_directos  # base acumulada: cada % se aplica sobre directos + anteriores %
@@ -1450,7 +1444,7 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     r = ws.max_row
     ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N3)
     ws.cell(r, 1).fill      = PRES_FA
-    ws.cell(r, 1).font      = Font(name=FONT_PRES, size=9, italic=True, color='000000')
+    ws.cell(r, 1).font      = PRES_FDEI
     ws.cell(r, 1).alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
     ws.cell(r, 1).border    = PRES_BORDE_TABLA
     ws.row_dimensions[r].height = 40

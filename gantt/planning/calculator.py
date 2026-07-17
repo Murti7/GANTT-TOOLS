@@ -12,6 +12,7 @@ from datetime import date, timedelta
 
 from gantt.bc3.models import Capitulo, Partida, Presupuesto
 from gantt.planning.models import (
+    BandaVisual,
     EscenarioRecursos,
     ParametrosProyecto,
     PlanificacionProyecto,
@@ -119,11 +120,16 @@ def calcular_planificacion(
     parametros: ParametrosProyecto,
     tareas: list[TareaGantt],
     escenario: EscenarioRecursos,
+    bandas: list[BandaVisual] | None = None,
 ) -> PlanificacionProyecto:
     """
     Calcula la planificación temporal del proyecto para un escenario dado.
     Ejecuta horas MO, duraciones y forward pass en orden topológico.
     No muta los objetos de entrada.
+
+    bandas son las bandas visuales del diagrama de red definidas en
+    planificacion.yaml; se adjuntan a la PlanificacionProyecto resultante
+    sin intervenir en el cálculo. Si no se indican, queda una lista vacía.
     """
     # --- PASOS 1 + 2: horas MO y duración por tarea ---
     tareas_con_duracion: list[TareaGantt] = []
@@ -203,6 +209,7 @@ def calcular_planificacion(
         escenario=escenario,
         tareas=resultado,
         tareas_originales=tareas,
+        bandas=bandas or [],
     )
 
 
@@ -224,7 +231,7 @@ if __name__ == '__main__':
         raise FileNotFoundError(f'No se encontró planificacion.yaml en {input_dir}')
 
     presupuesto = parse_bc3(bc3_files[0])
-    parametros, escenarios, tareas = cargar_planificacion_yaml(yaml_path)
+    parametros, escenarios, tareas, bandas = cargar_planificacion_yaml(yaml_path)
 
     print(f'Proyecto: {parametros.nombre}')
     print(f'Plazo contractual: {parametros.plazo_contractual_dias} días hábiles')
@@ -232,7 +239,7 @@ if __name__ == '__main__':
 
     for escenario in escenarios:
         planificacion = calcular_planificacion(
-            presupuesto, parametros, tareas, escenario
+            presupuesto, parametros, tareas, escenario, bandas
         )
         print(f'=== ESCENARIO: {escenario.nombre} ===')
         print(f'{"ID":<12} {"Nombre":<45} {"Días":>6} {"Inicio":<12} '

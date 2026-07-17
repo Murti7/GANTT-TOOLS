@@ -6,6 +6,7 @@ de recursos y recomendaciones de optimización a partir de una
 PlanificacionProyecto ya calculada.
 """
 
+import math
 from collections import deque
 from datetime import date, timedelta
 
@@ -336,3 +337,88 @@ def calcular_sobredimensionados(
             })
 
     return resultado
+
+
+def dias_trabajados_tarea(tarea: TareaGantt, dias_semana: int) -> list[date]:
+    """
+    Devuelve los días hábiles que ocupa una tarea: los ceil(duracion_dias)
+    días hábiles a partir de fecha_inicio (incluida).
+
+    Este recuento reproduce exactamente el que usa calculator.sumar_dias_habiles
+    para llegar a fecha_fin, así que los días de tareas encadenadas nunca se
+    solapan ni dejan huecos: fecha_fin de una tarea es siempre el primer día
+    hábil fuera del rango devuelto aquí.
+    """
+    if not tarea.fecha_inicio or not tarea.duracion_dias:
+        return []
+
+    dias_objetivo = math.ceil(tarea.duracion_dias)
+    dias: list[date] = []
+    fecha = tarea.fecha_inicio
+    while len(dias) < dias_objetivo:
+        if fecha.weekday() < dias_semana:
+            dias.append(fecha)
+        fecha += timedelta(days=1)
+    return dias
+
+
+def semana_iso(fecha: date) -> tuple[date, str]:
+    """Retorna (lunes de la semana ISO, 'AAAA-Www') para una fecha dada."""
+    lunes = fecha - timedelta(days=fecha.isoweekday() - 1)
+    iso_year, iso_week, _ = fecha.isocalendar()
+    return lunes, f'{iso_year}-W{iso_week:02d}'
+
+
+def calcular_carga_semanal_recursos(
+    planificacion: PlanificacionProyecto,
+    presupuesto: Presupuesto,
+) -> list[dict]:
+    """
+    Reparte linealmente las horas MO de cada tarea entre sus días hábiles
+    y agrega el resultado por semana ISO y recurso.
+
+    Cada fila del resultado contiene: semana_inicio (lunes de la semana ISO),
+    semana_iso ('AAAA-Www'), recurso_codigo, recurso_nombre, horas_semana y
+    tareas_incluidas (IDs de las tareas que aportan horas a ese recurso en
+    esa semana). Las tareas sin horas de mano de obra o sin fechas calculadas
+    se ignoran. No muta planificacion ni presupuesto.
+    """
+    dias_semana = planificacion.parametros.dias_semana
+    acumulado: dict[tuple[str, date], dict] = {}
+
+    for tarea in planificacion.tareas:
+        if not tarea.horas_por_recurso:
+            continue
+
+        dias = dias_trabajados_tarea(tarea, dias_semana)
+        if not dias:
+            continue
+
+        for codigo, horas_totales in tarea.horas_por_recurso.items():
+            if horas_totales <= 0:
+                continue
+            horas_por_dia = horas_totales / len(dias)
+
+            for dia in dias:
+                lunes, etiqueta_iso = semana_iso(dia)
+                clave = (codigo, lunes)
+                if clave not in acumulado:
+                    recurso = presupuesto.recursos_mo.get(codigo)
+                    acumulado[clave] = {
+                        'semana_inicio':    lunes,
+                        'semana_iso':       etiqueta_iso,
+                        'recurso_codigo':   codigo,
+                        'recurso_nombre':   recurso.descripcion if recurso else codigo,
+                        'horas_semana':     0.0,
+                        'tareas_incluidas': [],
+                    }
+                fila = acumulado[clave]
+                fila['horas_semana'] += horas_por_dia
+                if tarea.id not in fila['tareas_incluidas']:
+                    fila['tareas_incluidas'].append(tarea.id)
+
+    filas = list(acumulado.values())
+    for fila in filas:
+        fila['horas_semana'] = round(fila['horas_semana'], 4)
+    filas.sort(key=lambda f: (f['semana_inicio'], f['recurso_codigo']))
+    return filas

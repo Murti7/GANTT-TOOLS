@@ -4,7 +4,8 @@
       "PowerShell(python -m gantt.reporting.excel_exporter Complexe-Balear 2>&1)",
       "PowerShell(python main.py Complexe-Balear 2>&1)",
       "PowerShell(python main.py Complexe-Balear PPT_Complex_V06_Unidades_Referencia.bc3 2>&1)",
-      "Bash(./.venv/Scripts/python.exe -m pytest tests/ -v)"
+      "Bash(./.venv/Scripts/python.exe -m pytest tests/ -v)",
+      "Bash(python main.py Complexe-Balear PPT_Complex_VFinal.bc3)"
     ]
   }
 }

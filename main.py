@@ -18,7 +18,10 @@ import sys
 import yaml
 from pathlib import Path
 
+from gantt.bc3.models import cargar_company
 from gantt.bc3.parser import parse_bc3
+from gantt.planning.analyser import duracion_total_proyecto
+from gantt.reporting.styles import build_palette
 
 
 def verificar_entorno() -> None:
@@ -83,15 +86,26 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
           f'{len(presupuesto.recursos_mt)} recursos MT')
 
     config_path = input_dir / 'config.yaml'
+    project_config: dict = {}
     if config_path.exists():
-        overrides = yaml.safe_load(config_path.read_text(encoding='utf-8')) or {}
+        project_config = yaml.safe_load(config_path.read_text(encoding='utf-8')) or {}
         presupuesto = presupuesto.model_copy(
-            update={'config': presupuesto.config.model_copy(update=overrides)}
+            update={'config': presupuesto.config.model_copy(update=project_config)}
         )
         print(f'      config.yaml cargado')
 
+    companies_dir = Path('companies')
+    empresa_slug = project_config.get('empresa')
+    if empresa_slug and companies_dir.exists():
+        presupuesto.company = cargar_company(empresa_slug, companies_dir)
+        print(f'      Empresa: {presupuesto.company.nombre} ({presupuesto.company.idioma})')
+    else:
+        print('      Sin empresa configurada — documentos sin branding')
+
+    palette = build_palette(presupuesto.company)
+
     print(f'[2/{total}] Generando documentos de presupuesto...')
-    rutas = generar_todos(presupuesto, output_dir)
+    rutas = generar_todos(presupuesto, output_dir, palette=palette)
     for ruta in rutas:
         print(f'      {ruta.name}')
 
@@ -121,7 +135,16 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
             presupuesto, parametros, tareas, escenario, bandas
         )
         planificaciones.append(planificacion)
-        print(f'      Escenario "{escenario.nombre}" calculado')
+        dias_totales = duracion_total_proyecto(planificacion)
+        cumple = (
+            'CUMPLE'
+            if dias_totales <= parametros.plazo_contractual_dias
+            else 'NO CUMPLE'
+        )
+        print(
+            f'      Escenario "{escenario.nombre}" calculado: '
+            f'{dias_totales} dias habiles - {cumple}'
+        )
 
     exportar_analisis(presupuesto, output_path, planificaciones)
     print(f'      {output_path.name} (actualizado con planificación)')

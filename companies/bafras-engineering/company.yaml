@@ -1,0 +1,42 @@
+# BAFRAS Engineering — Configuración de empresa para gantt-tools
+# Actualizar NIF/CIF cuando esté disponible
+
+identitat:
+  nombre: "BAFRAS Engineering S.L."
+  tipo_entidad: sl               # sl | autonomo | cb | sc | sa
+  nif_cif: "PENDIENTE"           # actualizar cuando esté disponible
+  direccion_fiscal: "PENDIENTE"
+  telefono: "PENDIENTE"
+  email: "PENDIENTE"
+  web: "PENDIENTE"
+
+fiscal:
+  tipo_entidad: sl
+  irpf_tipo: 0.0                 # sl → siempre 0.0, sin retención
+  iva_tipo: 0.21
+  irpf_inicio_actividad: false
+  nota_irpf: ""                  # texto legal adicional si aplica
+
+bancari:
+  iban: "PENDIENTE"
+  bic_swift: "PENDIENTE"
+  entitat_bancaria: "PENDIENTE"
+  titular_compte: "BAFRAS Engineering S.L."
+  termini_pagament_dies: 30
+  forma_pagament: transferencia  # transferencia | xec | domiciliacio
+
+branding:
+  color_primario: "#0E2B25"      # deep_green — cabeceras principales
+  color_secundario: "#1A7A5A"    # bafras_green — cabeceras secundarias
+  color_acento: "#4F7B6E"        # stone_green — elementos de acento
+  color_texto: "#1A1C1E"         # graphite — texto principal
+  color_fondo_alt: "#E6E6E6"     # light_gray — filas alternas
+  color_blanco: "#FFFFFF"
+  fuente_principal: "Aptos"      # fuente corporativa
+  fuente_fallback: "Calibri"     # fallback si Aptos no disponible
+  logo: "logo.png"               # ruta relativa a esta carpeta
+
+facturacio:
+  serie_factura: "A"             # prefijo serie (A2025-001)
+  moneda: "EUR"
+  idioma: "es"                   # es | ca | en

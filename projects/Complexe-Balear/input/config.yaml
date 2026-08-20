@@ -1,6 +1,9 @@
 # Configuración del proyecto — Complexe Balear de Recerca
 # Modifica este archivo para adaptar los documentos generados.
 
+# ── Empresa emisora (branding) ─────────────────────────────────────────────────
+empresa:            bafras-engineering
+
 # ── Metadatos documentales ────────────────────────────────────────────────────
 entidad:            UNIVERSITAT DE LES ILLES BALEARS
 proyecto:           REFORMA DEL SISTEMA DE CLIMATIZACIÓN
@@ -8,6 +11,7 @@ edificio:           COMPLEXE BALEAR DE RECERCA
 numero_expediente:  ''
 footer_org:         Complexe Balear de Recerca
 footer_exp:         Expediente de licitación
+revision:           "00"
 
 # ── Parámetros financieros del contrato ───────────────────────────────────────
 porcentaje_gg:          0.17   # Gastos Generales (17 %)

@@ -1,0 +1,46 @@
+# Murti Autònom — Configuración de empresa para gantt-tools
+# Misma identidad visual que BAFRAS Engineering
+# Campos fiscales de autónomo individual
+
+identitat:
+  nombre: "David Murti"          # nombre completo del autónomo
+  tipo_entidad: autonomo
+  nif_cif: "PENDIENTE"           # DNI/NIE — actualizar
+  direccion_fiscal: "PENDIENTE"
+  telefono: "PENDIENTE"
+  email: "PENDIENTE"
+  web: "PENDIENTE"
+
+fiscal:
+  tipo_entidad: autonomo
+  irpf_tipo: 0.15                # 0.15 general | 0.07 inicio actividad
+  iva_tipo: 0.21
+  irpf_inicio_actividad: false   # cambiar a true si < 3 años actividad
+  nota_irpf: ""                  # si irpf_inicio_actividad=true, añadir:
+                                 # "Retención reducida 7% aplicable durante
+                                 #  los primeros 3 años de actividad
+                                 #  (art. 86.1 RIRPF)"
+
+bancari:
+  iban: "PENDIENTE"
+  bic_swift: "PENDIENTE"
+  entitat_bancaria: "PENDIENTE"
+  titular_compte: "David Murti"
+  termini_pagament_dies: 30
+  forma_pagament: transferencia
+
+branding:
+  color_primario: "#0E2B25"      # misma paleta que BAFRAS Engineering
+  color_secundario: "#1A7A5A"
+  color_acento: "#4F7B6E"
+  color_texto: "#1A1C1E"
+  color_fondo_alt: "#E6E6E6"
+  color_blanco: "#FFFFFF"
+  fuente_principal: "Aptos"
+  fuente_fallback: "Calibri"
+  logo: "logo.png"
+
+facturacio:
+  serie_factura: "A"
+  moneda: "EUR"
+  idioma: "es"

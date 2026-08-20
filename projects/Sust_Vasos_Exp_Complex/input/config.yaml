@@ -8,6 +8,7 @@ edificio:           EDIFICIO COMPLEX PARC BIT
 numero_expediente:  ''
 footer_org:         Complex Parc Bit
 footer_exp:         Expedient de licitació
+revision:           "00"
 
 # ── Parámetros financieros del contrato ───────────────────────────────────────
 porcentaje_gg:          0.13   # Gastos Generales (13 %)

@@ -25,6 +25,7 @@ from gantt.reporting.styles import (
     PRES_AD, PRES_AN, PRES_ANC, PRES_AC, PRES_AT, PRES_ALC,
     PRES_FE, PRES_FQ, PRES_FU, PRES_FP,
     PRES_BORDE_FINO, PRES_BORDE_TABLA, PRES_BORDE_TOTAL,
+    DocumentPalette, build_palette, inserir_cabecera, inserir_peu,
 )
 from gantt.reporting.palette import GRIS_LINEA
 
@@ -100,13 +101,15 @@ def numero_a_letras(importe: float) -> str:
 
 # ── Helpers de estilo ─────────────────────────────────────────────────────────
 
-def aplicar_estilo_cabecera(ws, fila: int, n_cols: int) -> None:
-    """Aplica estilo de cabecera (azul oscuro, texto blanco) a una fila fusionada."""
+def aplicar_estilo_cabecera(
+    ws, fila: int, n_cols: int, pal: DocumentPalette | None = None
+) -> None:
+    """Aplica estilo de cabecera (color primario de empresa, texto blanco) a una fila fusionada."""
     if n_cols > 1:
         ws.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=n_cols)
     cell = ws.cell(fila, 1)
-    cell.fill      = PRES_FC
-    cell.font      = PRES_FT
+    cell.fill      = pal.fill_header if pal else PRES_FC
+    cell.font      = pal.font_header if pal else PRES_FT
     cell.alignment = PRES_AC
     for c in range(1, n_cols + 1):
         ws.cell(fila, c).border = PRES_BORDE_TABLA
@@ -114,11 +117,15 @@ def aplicar_estilo_cabecera(ws, fila: int, n_cols: int) -> None:
     registrar_altura_manual(ws, fila)
 
 
-def aplicar_estilo_capitulo(ws, fila: int, n_cols: int) -> None:
-    """Aplica estilo de capítulo (azul claro, negrita) a las celdas de una fila."""
+def aplicar_estilo_capitulo(
+    ws, fila: int, n_cols: int, pal: DocumentPalette | None = None
+) -> None:
+    """Aplica estilo de capítulo (color secundario de empresa, negrita) a las celdas de una fila."""
+    fill = pal.fill_subhead if pal else PRES_FCP
+    font = pal.font_subhead if pal else PRES_FCF
     for c in range(1, n_cols + 1):
-        ws.cell(fila, c).fill = PRES_FCP
-        ws.cell(fila, c).font = PRES_FCF
+        ws.cell(fila, c).fill = fill
+        ws.cell(fila, c).font = font
         ws.cell(fila, c).border = PRES_BORDE_TABLA
 
 
@@ -151,9 +158,13 @@ def ajustar_columnas(ws, config: dict[str, int]) -> None:
 
 
 def aplicar_encabezado_documental(
-    ws, config: ProjectConfig, anexo: str, titulo: str, n_cols: int
+    ws, config: ProjectConfig, anexo: str, titulo: str, n_cols: int,
+    pal: DocumentPalette | None = None,
 ) -> None:
-    """Escribe el encabezado documental. Las líneas vacías del config se omiten."""
+    """
+    Escribe el encabezado documental (entidad contratante, proyecto, expediente,
+    título del documento). Las líneas vacías del config se omiten.
+    """
     exp = f'Nº Exp.: {config.numero_expediente}' if config.numero_expediente else ''
     candidatas = [
         config.entidad,
@@ -164,6 +175,8 @@ def aplicar_encabezado_documental(
         titulo,
     ]
     filas = [f for f in candidatas if f]
+    fill_titulo = pal.fill_header if pal else PRES_FC
+    font_titulo = pal.font_header if pal else PRES_FT
     for i, texto in enumerate(filas):
         es_titulo = (i == len(filas) - 1)
         ws.append([texto] + [''] * (n_cols - 1))
@@ -171,8 +184,8 @@ def aplicar_encabezado_documental(
         ws.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=n_cols)
         cell = ws.cell(fila, 1)
         cell.alignment = PRES_AC
-        cell.fill = PRES_FC if es_titulo else PRES_FB
-        cell.font = PRES_FT if es_titulo else PRES_FCF
+        cell.fill = fill_titulo if es_titulo else PRES_FB
+        cell.font = font_titulo if es_titulo else PRES_FCF
         ws.row_dimensions[fila].height = 18
         registrar_altura_manual(ws, fila)
 
@@ -690,13 +703,15 @@ def append_fila_cuadro_precios_1(
         ws.row_dimensions[fila].height = altura_por_lineas(lineas)
         registrar_altura_manual(ws, fila)
 
-def cabecera_tabla(ws, headers: list[str]) -> None:
+def cabecera_tabla(ws, headers: list[str], pal: DocumentPalette | None = None) -> None:
     """Escribe una fila de cabecera de tabla con estilo de cabecera."""
+    fill = pal.fill_subhead if pal else PRES_FCP
+    font = pal.font_subhead if pal else PRES_FCF
     ws.append(headers)
     r = ws.max_row
     for c, _ in enumerate(headers, 1):
-        ws.cell(r, c).fill      = PRES_FCP
-        ws.cell(r, c).font      = PRES_FCF
+        ws.cell(r, c).fill      = fill
+        ws.cell(r, c).font      = font
         ws.cell(r, c).alignment = PRES_AC
         ws.cell(r, c).border    = PRES_BORDE_TABLA
     ws.row_dimensions[r].height = 22.0
@@ -779,8 +794,13 @@ def fmt_numero_texto(valor: float, decimales: int = 3) -> str:
 
 # ── PRES.01 — Cuadro de Oferta ───────────────────────────────────────────────
 
-def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres01(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el Cuadro de Oferta con columnas amarillas para el licitador."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'Cuadro de Oferta'
@@ -788,7 +808,14 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 16, 'B': 55, 'C': 6, 'D': 12,
                           'E': 16, 'F': 16, 'G': 18, 'H': 18})
 
-    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.01', 'CUADRO DE OFERTA', N)
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='CUADRO DE OFERTA',
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.01', 'CUADRO DE OFERTA', N, pal=pal)
 
     ws.append(['Rellene las columnas en amarillo con su precio unitario ofertado']
               + [''] * (N - 1))
@@ -803,9 +830,9 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
         'Código', 'Descripción', 'Ud.', 'Cantidad',
         'P. Unit. ref. (€)', 'Importe ref. (€)',
         'P. Unit. ofertado (€)', 'Importe ofertado (€)',
-    ])
+    ], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A8'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     current_cap = None
     current_sub = None
@@ -818,7 +845,7 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
             ws.append([capitulo_limpio(cap.codigo), cap.descripcion]
                       + [''] * (N - 2))
             r = ws.max_row
-            aplicar_estilo_capitulo(ws, r, N)
+            aplicar_estilo_capitulo(ws, r, N, pal=pal)
             cel_desc(ws, r, 2, cap.descripcion, font=PRES_FCF, width_chars=55)
 
         if sub is not current_sub:
@@ -867,24 +894,39 @@ def generar_pres01(presupuesto: Presupuesto, filepath: Path) -> None:
                           'E': 16, 'F': 16, 'G': 18, 'H': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
     configurar_impresion(ws, 'landscape', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
     wb.save(filepath)
 
 
 # ── PRES.02.01 — Cuadro de Precios n.º 1 ─────────────────────────────────────
 
-def generar_pres0201(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres0201(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el Cuadro de Precios n.º 1 con el precio unitario en letra."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'Cuadro de Precios 1'
     N = 3
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
 
-    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.01', 'CUADRO DE PRECIOS N.º 1', N)
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='CUADRO DE PRECIOS N.º 1',
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(
+        ws, presupuesto.config, 'PRES.02.01', 'CUADRO DE PRECIOS N.º 1', N, pal=pal
+    )
 
-    cabecera_tabla(ws, ['Código', 'Descripción del precio', 'Precio unit. (€)'])
+    cabecera_tabla(ws, ['Código', 'Descripción del precio', 'Precio unit. (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
 
     # Recopilar partidas con sus capítulos
@@ -895,7 +937,7 @@ def generar_pres0201(presupuesto: Presupuesto, filepath: Path) -> None:
             ws.append([capitulo_limpio(cap.codigo), cap.descripcion, ''])
             r = ws.max_row
             ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N)
-            aplicar_estilo_capitulo(ws, r, N)
+            aplicar_estilo_capitulo(ws, r, N, pal=pal)
             cel_desc(ws, r, 1,
                       f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}',
                       font=PRES_FCF)
@@ -914,25 +956,40 @@ def generar_pres0201(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
     configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
     wb.save(filepath)
 
 
 # ── PRES.02.02 — Cuadro de Precios n.º 2 ─────────────────────────────────────
 
-def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres0202(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el Cuadro de Precios n.º 2 con descomposición de cada partida."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'Cuadro de Precios 2'
     N = 7
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
 
-    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.02', 'CUADRO DE PRECIOS N.º 2', N)
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='CUADRO DE PRECIOS N.º 2',
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(
+        ws, presupuesto.config, 'PRES.02.02', 'CUADRO DE PRECIOS N.º 2', N, pal=pal
+    )
 
     cabecera_tabla(ws, ['Tipo', 'Código', 'Descripción',
-                         'Ud.', 'Cant./ud', 'P. unit./Base (€)', 'Coste (€)'])
+                         'Ud.', 'Cant./ud', 'P. unit./Base (€)', 'Coste (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
 
     for cap, sub, partida in iter_todas_partidas(presupuesto):
@@ -940,7 +997,7 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
         ws.append([partida.codigo, partida.descripcion, partida.unidad,
                    '', '', '', ''])
         r = ws.max_row
-        aplicar_estilo_capitulo(ws, r, N)
+        aplicar_estilo_capitulo(ws, r, N, pal=pal)
         cel_desc(ws, r, 2, partida.descripcion, font=PRES_FCF, width_chars=38, max_height=80.0)
         ws.cell(r, 2).fill = PRES_FCP
         for c in (1, 3, 4, 5, 6, 7):
@@ -1091,6 +1148,7 @@ def generar_pres0202(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
     configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
     wb.save(filepath)
 
 
@@ -1100,12 +1158,16 @@ def generar_descompuesto_doc(
     presupuesto: Presupuesto,
     filepath: Path,
     mostrar_precios: bool,
+    palette: DocumentPalette | None = None,
 ) -> None:
     """
     Generador compartido para PRES.02.03 (con precios) y PRES.03 (mediciones ciegas).
     Con mostrar_precios=True: 6 columnas, precios, importes, horas MO visibles, PEM final.
     Con mostrar_precios=False: 4 columnas, sin precios, sin importes, horas MO ocultas.
     """
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     N          = 6 if mostrar_precios else 4
     col_widths = {'A': 8, 'B': 55, 'C': 6, 'D': 12, 'E': 16, 'F': 16} if mostrar_precios \
                  else {'A': 8, 'B': 55, 'C': 6, 'D': 12}
@@ -1118,10 +1180,17 @@ def generar_descompuesto_doc(
     ws = wb.active
     ws.title = 'Presupuesto Descompuesto' if mostrar_precios else 'Mediciones Ciegas'
     ajustar_columnas(ws, col_widths)
-    aplicar_encabezado_documental(ws, presupuesto.config, anexo, titulo, N)
-    cabecera_tabla(ws, headers)
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document=titulo,
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(ws, presupuesto.config, anexo, titulo, N, pal=pal)
+    cabecera_tabla(ws, headers, pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, col_widths)
 
     def escribir_partidas_de(nodo: Capitulo) -> None:
@@ -1229,10 +1298,10 @@ def generar_descompuesto_doc(
         ws.append([f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}']
                   + [''] * (N - 1))
         r = ws.max_row
-        aplicar_estilo_cabecera(ws, r, N)
+        aplicar_estilo_cabecera(ws, r, N, pal=pal)
         cel_desc(ws, r, 1,
-                  f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}', font=PRES_FT)
-        ws.cell(r, 1).fill = PRES_FC
+                  f'CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}', font=pal.font_header)
+        ws.cell(r, 1).fill = pal.fill_header
         ws.row_dimensions[r].height = 18
         registrar_altura_manual(ws, r)
         escribir_partidas_de(cap)
@@ -1246,13 +1315,13 @@ def generar_descompuesto_doc(
                       + [''] * (N - 1))
         r_tc = ws.max_row
         for c in range(1, N + 1):
-            ws.cell(r_tc, c).fill = PRES_FCP
-            ws.cell(r_tc, c).font = PRES_FCF
+            ws.cell(r_tc, c).fill = pal.fill_subhead
+            ws.cell(r_tc, c).font = pal.font_subhead
             ws.cell(r_tc, c).border = PRES_BORDE_TABLA
         if mostrar_precios:
             ws.merge_cells(start_row=r_tc, start_column=1, end_row=r_tc, end_column=5)
-            cel_eur(ws, r_tc, 6, cap.importe_total, font=PRES_FCF)
-            ws.cell(r_tc, 6).fill = PRES_FCP
+            cel_eur(ws, r_tc, 6, cap.importe_total, font=pal.font_subhead)
+            ws.cell(r_tc, 6).fill = pal.fill_subhead
         else:
             ws.merge_cells(start_row=r_tc, start_column=1, end_row=r_tc, end_column=N)
         registrar_altura_manual(ws, r_tc)
@@ -1270,23 +1339,33 @@ def generar_descompuesto_doc(
     ajustar_columnas(ws, col_widths)
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
     configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
     wb.save(filepath)
 
 
-def generar_pres0203(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres0203(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el Presupuesto Descompuesto y Mediciones por capítulos."""
-    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=True)
+    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=True, palette=palette)
 
 
-def generar_pres03_mediciones(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres03_mediciones(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera las Mediciones ciegas: descripción y unidades sin precios ni horas MO."""
-    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=False)
+    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=False, palette=palette)
 
 
 # ── PRES.02.04 — Resumen por Capítulos ───────────────────────────────────────
 
-def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres0204(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el Resumen por Capítulos con cascada financiera PEM → PGL."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'Resumen Capítulos'
@@ -1304,11 +1383,20 @@ def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
     pgl      = pec + importe_gr + iva_obra + iva_gr
 
     # ── Sección 1: tabla por capítulos ────────────────────────────────────────
-    aplicar_encabezado_documental(ws, presupuesto.config, 'PRES.02.04', 'RESUMEN POR CAPÍTULOS', N3)
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='RESUMEN POR CAPÍTULOS',
+        num_columnes=N3,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(
+        ws, presupuesto.config, 'PRES.02.04', 'RESUMEN POR CAPÍTULOS', N3, pal=pal
+    )
 
-    cabecera_tabla(ws, ['Capítulo', 'Descripción', 'Importe (€)'])
+    cabecera_tabla(ws, ['Capítulo', 'Descripción', 'Importe (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     for i, cap in enumerate(presupuesto.capitulos):
         ws.append([capitulo_limpio(cap.codigo), cap.descripcion, cap.importe_total])
@@ -1337,11 +1425,11 @@ def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
     # ── Sección 2: cascada general ────────────────────────────────────────────
     ws.append(['RESUMEN GENERAL DEL PRESUPUESTO'] + [''] * (N3 - 1))
     r = ws.max_row
-    aplicar_estilo_cabecera(ws, r, N3)
+    aplicar_estilo_cabecera(ws, r, N3, pal=pal)
     ws.row_dimensions[r].height = 22
     registrar_altura_manual(ws, r)
 
-    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
+    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'], pal=pal)
 
     filas = [
         ('PEM (sin residuos)',        '—',   pem_sin_gr, False),
@@ -1361,13 +1449,19 @@ def generar_pres0204(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 52, 'B': 14, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N3)
     configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N3)
     wb.save(filepath)
 
 
 # ── PRES.05 — VEC y Liquidación ──────────────────────────────────────────────
 
-def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_pres05(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """Genera el VEC y Liquidación — Bloque 1 (VEC) primero, Bloque 2 después."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'VEC y Liquidación'
@@ -1398,17 +1492,25 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     pgl      = pec + importe_gr + iva_obra + iva_gr
 
     # ── BLOQUE 1: VEC ─────────────────────────────────────────────────────────
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='VALOR ESTIMADO DEL CONTRATO (VEC) Y LIQUIDACIÓN',
+        num_columnes=N3,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
     aplicar_encabezado_documental(
         ws,
         presupuesto.config,
         'PRES.05',
         'VALOR ESTIMADO DEL CONTRATO (VEC) Y LIQUIDACIÓN',
         N3,
+        pal=pal,
     )
 
-    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'])
+    cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     filas_b1 = [
         ('PEM (sin residuos)',                       '—',  pem_sin_gr, False),
@@ -1434,7 +1536,7 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     # ── BLOQUE 2: Base de liquidación ─────────────────────────────────────────
     ws.append(['BLOQUE 2 — BASE DE CÁLCULO DE LA LIQUIDACIÓN MÁXIMA'] + [''] * (N3 - 1))
     r = ws.max_row
-    aplicar_estilo_cabecera(ws, r, N3)
+    aplicar_estilo_cabecera(ws, r, N3, pal=pal)
     ws.row_dimensions[r].height = 22
 
     nota = ('Base de liquidación: partidas con mano de obra y material simultáneos. '
@@ -1451,7 +1553,7 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     registrar_altura_manual(ws, r)
     sep_vacia(ws, 6.0, N3)
 
-    cabecera_tabla(ws, ['Código', 'Descripción', 'Importe (€)'])
+    cabecera_tabla(ws, ['Código', 'Descripción', 'Importe (€)'], pal=pal)
 
     alt = True
     for cap, sub, partida in iter_todas_partidas(presupuesto):
@@ -1474,11 +1576,11 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     ws.append(['', 'TOTAL BASE IMPONIBLE LIQUIDACIÓN', pem_liq])
     r = ws.max_row
     for c in range(1, N3 + 1):
-        ws.cell(r, c).fill = PRES_FCP
-        ws.cell(r, c).font = PRES_FCF
+        ws.cell(r, c).fill = pal.fill_subhead
+        ws.cell(r, c).font = pal.font_subhead
         ws.cell(r, c).border = PRES_BORDE_TABLA
-    cel_eur(ws, r, 3, pem_liq, font=PRES_FCF)
-    ws.cell(r, 3).fill = PRES_FCP
+    cel_eur(ws, r, 3, pem_liq, font=pal.font_subhead)
+    ws.cell(r, 3).fill = pal.fill_subhead
     registrar_altura_manual(ws, r)
     sep_vacia(ws, 6.0, N3)
 
@@ -1497,29 +1599,44 @@ def generar_pres05(presupuesto: Presupuesto, filepath: Path) -> None:
     ajustar_columnas(ws, {'A': 55, 'B': 14, 'C': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N3)
     configurar_impresion(ws, 'portrait', fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N3)
     wb.save(filepath)
 
 
 # ── JUST_PRECIOS — Justificación de Precios ───────────────────────────────────
 
-def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
+def generar_just_precios(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
     """
     Genera la Justificación de Precios con cantidades totales de cada recurso.
     """
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
     wb  = Workbook()
     ws  = wb.active
     ws.title = 'Justificación de Precios'
     N = 6
     ajustar_columnas(ws, {'A': 18, 'B': 55, 'C': 8, 'D': 14, 'E': 18, 'F': 18})
 
+    inserir_cabecera(
+        ws, pal, company,
+        titol_document='JUSTIFICACIÓN DE PRECIOS',
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
     aplicar_encabezado_documental(
         ws,
         presupuesto.config,
         'JUST_PRECIOS',
         'JUSTIFICACIÓN DE PRECIOS — RECURSOS EMPLEADOS EN EL PROYECTO',
         N,
+        pal=pal,
     )
-    ws.freeze_panes = 'A7'
+    ws.freeze_panes = f'A{ws.max_row + 1}'
+    fila_cabecera_repetir = None
 
     # Acumular cantidades totales por recurso
     mo_tot: dict[str, float] = {}
@@ -1539,16 +1656,19 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
 
     def escribir_seccion(titulo: str, recursos_map, totales: dict[str, float],
                          label_total: str) -> None:
+        nonlocal fila_cabecera_repetir
         ws.append([titulo] + [''] * (N - 1))
         r = ws.max_row
         ws.merge_cells(start_row=r, start_column=1, end_row=r, end_column=N)
         for c in range(1, N + 1):
-            ws.cell(r, c).fill = PRES_FCP
-            ws.cell(r, c).font = PRES_FCF
+            ws.cell(r, c).fill = pal.fill_subhead
+            ws.cell(r, c).font = pal.font_subhead
         ws.cell(r, 1).alignment = PRES_AT
 
         cabecera_tabla(ws, ['Código', 'Descripción', 'Ud.',
-                             'P. unit. (€)', 'Cant. total proyecto', 'Coste total (€)'])
+                             'P. unit. (€)', 'Cant. total proyecto', 'Coste total (€)'], pal=pal)
+        if fila_cabecera_repetir is None:
+            fila_cabecera_repetir = ws.max_row
 
         coste_total_seccion = 0.0
         recursos_ordenados  = sorted(
@@ -1591,17 +1711,21 @@ def generar_just_precios(presupuesto: Presupuesto, filepath: Path) -> None:
 
     ajustar_columnas(ws, {'A': 18, 'B': 55, 'C': 8, 'D': 14, 'E': 18, 'F': 18})
     ajustar_alturas_filas_por_contenido(ws, max_col=N)
-    configurar_impresion(ws, 'portrait', 7, presupuesto.config)
+    configurar_impresion(ws, 'portrait', fila_cabecera_repetir, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
     wb.save(filepath)
 
 
 # ── Punto de entrada ─────────────────────────────────────────────────────────
 
-def generar_todos(presupuesto: Presupuesto, output_dir: Path) -> list[Path]:
+def generar_todos(
+    presupuesto: Presupuesto, output_dir: Path, palette: DocumentPalette | None = None
+) -> list[Path]:
     """
     Genera los ocho documentos de presupuesto en output_dir.
     Retorna lista de rutas de los ficheros generados.
     """
+    pal = palette or build_palette(None)
     output_dir.mkdir(parents=True, exist_ok=True)
     documentos = [
         ('PRES.01_Cuadro_Oferta.xlsx',               generar_pres01),
@@ -1616,6 +1740,6 @@ def generar_todos(presupuesto: Presupuesto, output_dir: Path) -> list[Path]:
     rutas: list[Path] = []
     for nombre, funcion in documentos:
         ruta = output_dir / nombre
-        funcion(presupuesto, ruta)
+        funcion(presupuesto, ruta, palette=pal)
         rutas.append(ruta)
     return rutas

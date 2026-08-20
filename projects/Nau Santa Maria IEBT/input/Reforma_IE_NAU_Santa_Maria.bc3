@@ -1,0 +1,564 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\3\3\3\2\2\2\2\EUR\|3\13\6\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|REFORMA_IE_NAU_SANTA_MARIA##||Importado desde ficheros CSV|14259.58|030826|0|
+~D|REFORMA_IE_NAU_SANTA_MARIA##
+|01#\\1
+\02#\\1
+\03#\\1
+\04#\\1
+\|
+~C|01#||ACTUACIONES PREVIAS|1074.48||0|
+~T|01#|Capítulo correspondiente a los trabajos previos necesarios para la ejecución de la reforma de la instalación eléctrica de baja tensión, incluyendo las operaciones de replanteo, identificación de instalaciones existentes, desmontaje de elementos eléctricos afectados por la actuación, retirada selectiva de materiales y gestión de los residuos generados, dejando las zonas de intervención en condiciones ade|
+~D|01#
+|01.01\\1
+\01.02\\1
+\01.03\\1
+\01.04\\1
+\01.05\\1
+\01.06\\1
+\01.07\\1
+\|
+~C|01.01|ud|Replanteo de la instalación|66.6||0|
+~T|01.01|Servicio de replanteo previo de la reforma de la instalación eléctrica, destinado a verificar sobre la instalación existente la ubicación de cuadros eléctricos, recorridos de canalizaciones, circuitos afectados, equipos a sustituir y condicionantes de ejecución, estableciendo la planificación necesaria para el correcto desarrollo de los trabajos posteriores.
+
+Incluye:
+
+Inspección visual de la instalación existente.
+Identificación de cuadros, líneas y equipos afectados.
+Comprobación de recorridos previstos.
+Verificación de interferencias con otras instalaciones.
+Marcado de actuaciones y zonas de intervención.
+Medios manuales, herramientas y elementos auxiliares necesarios.
+
+Criterio de medición en proyecto: ud por replanteo completo de la actuación.
+
+Criterio de medición en obra: ud ejecutada cuando se haya realizado la totalidad del replanteo previo de la instalación objeto del proyecto.|
+~D|01.01
+|MO-OF1\\2
+\|
+~C|MO-OF1|h|Oficial 1ª electricista|33.3||1|
+~C|01.02|ud|Desmontaje de la derivación individual existente.|121.58||0|
+~T|01.02|Desmontaje completo de la derivación individual existente que alimenta el cuadro general de baja tensión, incluyendo la desconexión segura de la instalación, retirada de conductores y elementos asociados que deban ser sustituidos, dejando la instalación preparada para la posterior ejecución de la nueva derivación individual prevista en el proyecto.
+
+Incluye:
+
+Verificación previa de ausencia de tensión.
+Desconexión de la derivación individual existente.
+Retirada de conductores y elementos asociados.
+Desmontaje de soportes y fijaciones afectados.
+Acopio temporal del material retirado.
+Medios manuales, herramientas y elementos auxiliares necesarios.
+Limpieza de la zona de trabajo.
+
+Criterio de medición en proyecto: ud por desmontaje completo de la derivación individual.
+
+Criterio de medición en obra: ud ejecutada cuando se haya completado el desmontaje de la derivación individual prevista, incluyendo todas las operaciones descritas.|
+~D|01.02
+|MO-OF1\\2
+\MO-AY1\\2
+\|
+~C|MO-AY1|h|Ayudante electricista|27.49||1|
+~C|01.03|ud|Desmontaje del cuadro general de baja tensión Q01 existente.|243.16||0|
+~T|01.03|Desmontaje completo del cuadro general de baja tensión existente Q01, incluyendo la desconexión de todos los circuitos asociados, desmontaje de la envolvente, retirada de la aparamenta existente y preparación de la zona para la posterior instalación del nuevo cuadro definido en el proyecto.
+
+Incluye:
+
+Consignación eléctrica del cuadro.
+Identificación de circuitos existentes.
+Desconexión de conductores.
+Desmontaje de la envolvente y de la aparamenta.
+Retirada de fijaciones.
+Acopio temporal del material desmontado.
+Medios manuales, herramientas y elementos auxiliares.
+Limpieza de la zona de actuación.
+
+Criterio de medición en proyecto: ud por desmontaje completo del cuadro general Q01.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro existente haya sido completamente desmontado y retirada la totalidad de los elementos incluidos en la actuación.|
+~D|01.03
+|MO-OF1\\4
+\MO-AY1\\4
+\|
+~C|01.04|ud|Desmontaje subcuadro oficinas planta baja Q02|121.58||0|
+~T|01.04|Desmontaje completo del subcuadro eléctrico Q02 correspondiente a las oficinas de planta baja, incluyendo la desconexión de los circuitos asociados, retirada de la envolvente y de la aparamenta existente, dejando la zona preparada para la posterior instalación del nuevo cuadro proyectado.
+
+Incluye:
+
+Identificación de circuitos.
+Desconexión de conductores.
+Desmontaje del cuadro y elementos asociados.
+Retirada de fijaciones.
+Acopio temporal del material desmontado.
+Medios manuales, herramientas y elementos auxiliares.
+Limpieza de la zona de actuación.
+
+Criterio de medición en proyecto: ud por desmontaje completo del subcuadro Q02.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completamente desmontado y retirada la totalidad de los elementos previstos.|
+~D|01.04
+|MO-OF1\\2
+\MO-AY1\\2
+\|
+~C|01.05|ud|Desmontaje subcuadro oficinas planta primera Q03|121.58||0|
+~T|01.05|Desmontaje completo del subcuadro eléctrico Q03 correspondiente a las oficinas de planta primera, incluyendo la desconexión de los circuitos asociados, retirada de la envolvente y de la aparamenta existente, dejando la instalación preparada para la ejecución de los trabajos definidos en el proyecto.
+
+Incluye:
+
+Identificación de circuitos.
+Desconexión de conductores.
+Desmontaje de la envolvente y de la aparamenta.
+Retirada de fijaciones.
+Acopio temporal del material desmontado.
+Medios manuales, herramientas y elementos auxiliares.
+Limpieza de la zona de trabajo.
+
+Criterio de medición en proyecto: ud por desmontaje completo del subcuadro Q03.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completamente desmontado y retirada la totalidad de los elementos incluidos en la actuación.|
+~D|01.05
+|MO-OF1\\2
+\MO-AY1\\2
+\|
+~C|01.06|ud|Desmontaje de pequeño material eléctrico|91.19||0|
+~T|01.06|Desmontaje selectivo de canalizaciones, cajas, mecanismos, fijaciones y demás elementos auxiliares de la instalación eléctrica existente que resulten incompatibles con la solución proyectada o deban retirarse para permitir la correcta ejecución de la reforma.
+
+Incluye:
+
+Desmontaje de canalizaciones y cajas.
+Retirada de mecanismos eléctricos.
+Retirada de soportes y fijaciones.
+Clasificación y acopio temporal del material desmontado.
+Medios manuales, herramientas y elementos auxiliares.
+Limpieza de la zona de actuación.
+
+Criterio de medición en proyecto: ud por conjunto de trabajos de desmontaje de pequeño material eléctrico.
+
+Criterio de medición en obra: ud ejecutada cuando se hayan completado todos los desmontajes previstos dentro del alcance de la partida.|
+~D|01.06
+|MO-OF1\\1.5
+\MO-AY1\\1.5
+\|
+~C|01.07|ud|Gestión de residuos|277.49||0|
+~T|01.07|Gestión integral de los residuos generados durante la ejecución de la reforma eléctrica, incluyendo su clasificación, acopio temporal, carga, transporte y entrega a gestor autorizado, garantizando la correcta segregación de los distintos materiales retirados durante la obra.
+
+Incluye:
+
+Clasificación de residuos.
+Acopio temporal ordenado.
+Carga y transporte.
+Entrega a gestor autorizado.
+Documentación acreditativa de la correcta gestión de los residuos.
+Limpieza final de las zonas afectadas.
+
+Criterio de medición en proyecto: ud por gestión completa de los residuos generados por la reforma eléctrica.
+
+Criterio de medición en obra: ud ejecutada cuando se haya completado la retirada y correcta gestión de la totalidad de los residuos incluidos en el alcance de la actuación.|
+~D|01.07
+|MT-RS1\\1
+\MO-AY1\\1
+\|
+~C|MT-RS1|ud|Gestión completa de residuos de instalación eléctrica|250||3|
+~C|02#||CUADROS ELÉCTRICOS|7637.75||0|
+~T|02#|Capítulo correspondiente al suministro, montaje y puesta en servicio de los cuadros eléctricos de baja tensión incluidos en la reforma de la instalación, comprendiendo el cuadro general y los subcuadros de distribución previstos en el proyecto. Incluye el suministro de envolventes y de la totalidad de la aparamenta de protección y maniobra definida en los esquemas unifilares, así como el montaje, cableado interior, identificación, comprobaciones funcionales y preparación para su posterior conexión a las líneas de alimentación y distribución definidas en el proyecto.|
+~D|02#
+|02.01\\1
+\02.02\\1
+\02.03\\1
+\|
+~C|02.01|ud|Cuadro general Q01|3798.99||0|
+~T|02.01|Suministro, montaje y puesta en servicio del cuadro general de baja tensión Q01 destinado a la distribución principal de la instalación eléctrica objeto del proyecto, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, capacidad suficiente para alojar la totalidad de la aparamenta proyectada y reserva para futuras ampliaciones, completamente equipado con un interruptor general automático bipolar de 100 A, curva C y poder de corte mínimo de 10 kA, un protector contra sobretensiones transitorias bipolar tipo II, un interruptor diferencial bipolar tipo A de 40 A y sensibilidad de 30 mA, cinco interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 10 kA, dos interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 10 kA, dos interruptores automáticos magnetotérmicos bipolares de 25 A, curva C y poder de corte mínimo de 10 kA y un interruptor automático magnetotérmico bipolar de 50 A, curva C y poder de corte mínimo de 10 kA.
+
+Incluye:
+
+Suministro de la envolvente modular y de la totalidad de la aparamenta de protección y maniobra descrita.
+Montaje mecánico del cuadro y fijación al soporte.
+Embarrados de distribución, barras de neutro y protección, peines de distribución, bornes, terminales, cableado interior, fijaciones y pequeño material de montaje.
+Conexionado interior completo de la aparamenta y de los circuitos asociados.
+Identificación permanente de protecciones y circuitos.
+Colocación del esquema unifilar en el interior del cuadro.
+Comprobación del apriete de conexiones, verificación funcional del conjunto y preparación para su puesta en servicio.
+Medios manuales, herramientas, elementos auxiliares y limpieza final de la zona de actuación.
+
+Criterio de medición en proyecto: ud por cuadro general de baja tensión completamente definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completamente suministrado, montado, cableado interiormente, identificado, comprobado y preparado para la conexión de todos los circuitos previstos.|
+~D|02.01
+|MO-OF1\\6
+\MO-AY1\\5
+\MT-CU1\\1
+\MT-PR1\\1
+\MT-PR2\\1
+\MT-PR3\\1
+\MT-PR4-10\\5
+\MT-PR5-10\\2
+\MT-PR6-10\\2
+\MT-PR7-10\\1
+\MT-ET1\\1
+\%MT-Elec\\0.05
+\|
+~C|MT-CU1|ud|Envolvente modular mural IP40/IK07, tapa transparente, 3 filas de 13 módulos DIN, tipo PrismaSet XS o equivalente (Cuadro General Q01)|205.71||3|
+~C|MT-PR1|ud|Interruptor general automático 2P 100 A, curva C, PdC 10 kA|984.75||3|
+~C|MT-PR2|ud|Protector contra sobretensiones transitorias tipo II, 2P|147.95||3|
+~C|MT-PR3|ud|Interruptor diferencial 2P, tipo A, 40 A, 30 mA|384.24||3|
+~C|MT-PR4-10|ud|Interruptor magnetotérmico 2P 10 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|128.84||3|
+~C|MT-PR5-10|ud|Interruptor magnetotérmico 2P 16 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|131.17||3|
+~C|MT-PR6-10|ud|Interruptor magnetotérmico 2P 25 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|137.8||3|
+~C|MT-PR7-10|ud|Interruptor magnetotérmico 2P 50 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|351.05||3|
+~C|MT-ET1|ud|Rótulos identificativos y esquema unifilar para cuadro eléctrico|25||3|
+~C|%MT-Elec|%|Material eléctrico auxiliar|0|260326|%|
+~T|%MT-Elec|Material eléctrico auxiliar|
+~C|02.02|ud|Subcuadro oficinas planta baja Q02|1960.83||0|
+~T|02.02|Suministro, montaje y puesta en servicio del subcuadro eléctrico de distribución Q02 destinado a la alimentación y protección de los circuitos eléctricos de las oficinas de planta baja, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, completamente equipado con un interruptor automático magnetotérmico general bipolar de 50 A, curva C y poder de corte mínimo de 6 kA, dos interruptores diferenciales bipolares tipo A de 40 A y sensibilidad de 30 mA, seis interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 6 kA y tres interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 6 kA.
+
+Incluye:
+
+Suministro de la envolvente modular y de la totalidad de la aparamenta de protección y maniobra descrita.
+Montaje mecánico del cuadro y fijación al soporte.
+Embarrados de distribución, barras de neutro y protección, peines de distribución, bornes, terminales, cableado interior, fijaciones y pequeño material de montaje.
+Conexionado interior completo de la aparamenta y de los circuitos asociados.
+Identificación permanente de protecciones y circuitos.
+Colocación del esquema unifilar en el interior del cuadro.
+Comprobación del apriete de conexiones, verificación funcional del conjunto y preparación para su puesta en servicio.
+Medios manuales, herramientas, elementos auxiliares y limpieza final de la zona de actuación.
+
+Criterio de medición en proyecto: ud por subcuadro de distribución Q02 completamente definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completamente suministrado, montado, cableado interiormente, identificado, comprobado y preparado para la conexión de todos los circuitos previstos.|
+~D|02.02
+|MO-OF1\\5
+\MO-AY1\\4
+\MT-CU2\\1
+\MT-PR7-6\\1
+\MT-PR3\\2
+\MT-PR4-6\\5
+\MT-PR5-6\\3
+\MT-ET1\\1
+\%MT-Elec\\0.05
+\|
+~C|MT-CU2|ud|Envolvente modular mural IP40/IK07, tapa opaca, 2 filas de 13 módulos DIN, tipo PrismaSet XS o equivalente (Subcuadros Q02/Q03)|145||3|
+~C|MT-PR7-6|ud|Interruptor magnetotérmico 2P 50 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|260.52||3|
+~C|MT-PR4-6|ud|Interruptor magnetotérmico 2P 10 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|48.7||3|
+~C|MT-PR5-6|ud|Interruptor magnetotérmico 2P 16 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|49.5||3|
+~C|02.03|ud|Subcuadro oficinas planta primera Q03|1655.48||0|
+~T|02.03|Suministro, montaje y puesta en servicio del subcuadro eléctrico de distribución Q03 destinado a la alimentación y protección de los circuitos eléctricos de las oficinas de planta primera, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, completamente equipado con un interruptor automático magnetotérmico general bipolar de 25 A, curva C y poder de corte mínimo de 6 kA, dos interruptores diferenciales bipolares tipo A de 40 A y sensibilidad de 30 mA, cinco interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 6 kA y tres interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 6 kA.
+
+Incluye:
+
+Suministro de la envolvente modular y de la totalidad de la aparamenta de protección y maniobra descrita.
+Montaje mecánico del cuadro y fijación al soporte.
+Embarrados de distribución, barras de neutro y protección, peines de distribución, bornes, terminales, cableado interior, fijaciones y pequeño material de montaje.
+Conexionado interior completo de la aparamenta y de los circuitos asociados.
+Identificación permanente de protecciones y circuitos.
+Colocación del esquema unifilar en el interior del cuadro.
+Comprobación del apriete de conexiones, verificación funcional del conjunto y preparación para su puesta en servicio.
+Medios manuales, herramientas, elementos auxiliares y limpieza final de la zona de actuación.
+
+Criterio de medición en proyecto: ud por subcuadro de distribución Q03 completamente definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completamente suministrado, montado, cableado interiormente, identificado, comprobado y preparado para la conexión de todos los circuitos previstos.|
+~D|02.03
+|MO-OF1\\4.5
+\MO-AY1\\3.5
+\MT-CU2\\1
+\MT-PR6-6\\1
+\MT-PR3\\2
+\MT-PR4-6\\3
+\MT-PR5-6\\4
+\MT-ET1\\1
+\%MT-Elec\\0.05
+\|
+~C|MT-PR6-6|ud|Interruptor magnetotérmico 2P 25 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|48||3|
+~C|03#||INSTALACIÓN ELÉCTRICA|5181.88||0|
+~T|03#|Capítulo correspondiente a la ejecución de las líneas eléctricas de alimentación y distribución previstas en la reforma de la instalación de baja tensión, comprendiendo la instalación de derivaciones individuales, líneas de alimentación entre cuadros, alimentación de equipos de climatización, ventilación mecánica, alumbrado de emergencia y demás circuitos definidos en el proyecto, incluyendo el suministro e instalación de canalizaciones, conductores, cajas de derivación, conexionado, identificación y comprobaciones necesarias para dejar la instalación completamente ejecutada y preparada para su puesta en servicio.|
+~D|03#
+|03.01\\1
+\03.02\\1
+\03.03\\1
+\03.04\\1
+\03.05\\1
+\03.06\\1
+\03.07\\1
+\03.08\\1
+\03.09\\1
+\03.10\\1
+\|
+~C|03.01|ud|Derivación individual|296.16||0|
+~T|03.01|Ejecución de la derivación individual de baja tensión destinada a la alimentación del cuadro general Q01, constituida por canalización mediante tubo rígido de PVC de diámetro adecuado y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase y neutro (F+N) de sección 1×25 mm² y conductor de protección (T) de sección 1×16 mm², incluyendo el suministro e instalación de todos los materiales necesarios, conexionado completo en ambos extremos, identificación del circuito y preparación para su puesta en servicio.
+
+Incluye:
+
+Tubo de protección para derivación individual.
+Conductores de cobre RZ1-K (AS) 0,6/1 kV de 2x25 mm² y conductor de protección de 16 mm².
+Caja de derivación, cuando resulte necesaria.
+Conexionado completo en origen y destino.
+Identificación permanente de la línea.
+Fijaciones, accesorios, pequeño material y elementos auxiliares de montaje.
+Medios manuales, herramientas y limpieza derivada de la ejecución.
+
+Criterio de medición en proyecto: m de derivación individual definida en la documentación del proyecto.
+
+Criterio de medición en obra: m realmente ejecutado y completamente instalado, conexionado e identificado.|
+~D|03.01
+|MO-OF1\\4
+\MO-AY1\\4
+\MT-TB4\\2
+\MT-CB6\\2
+\%MT-Elec\\0.05
+\|
+~C|MT-TB4|m|Tubo de PVC rígido Ø50 mm, instalación tipo B1|4.6||3|
+~C|MT-CB6|m|Manguera libre de halógenos, Cu RZ1-K(AS) 0,6/1 kV, 3G25mm2, (F+N+T)|14.85||3|
+~C|03.02|ud|Línea de alimentación subcuadro oficinas planta baja Q02|415.14||0|
+~T|03.02|Ejecución de la línea de alimentación eléctrica entre el cuadro general de baja tensión Q01 y el subcuadro Q02, constituida por canalización mediante tubo de protección y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase y neutro (F+N) de sección 1×10 mm² y conductor de protección (T) de sección 1×10 mm², incluyendo suministro, instalación, conexionado completo, identificación permanente del circuito y preparación para su puesta en servicio.
+
+Incluye:
+
+Canalización eléctrica.
+Conductores RZ1-K (AS) de 10 mm².
+Conexionado completo en ambos cuadros.
+Identificación del circuito.
+Accesorios de montaje, fijaciones y pequeño material.
+Medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: m de línea de alimentación definida en la documentación del proyecto.
+
+Criterio de medición en obra: m realmente ejecutado y completamente instalado, conexionado e identificado.|
+~D|03.02
+|MO-OF1\\3
+\MO-AY1\\3
+\MT-TB3\\25
+\MT-CB4\\25
+\%MT-Elec\\0.05
+\|
+~C|MT-TB3|m|Tubo de PVC rígido Ø32 mm, instalación tipo B1|2.3||3|
+~C|MT-CB4|m|Manguera libre de halógenos, Cu RZ1-K(AS) 0,6/1 kV, 3G10mm2, (F+N+T)|6.22||3|
+~C|03.03|ud|Línea de alimentación subcuadro oficinas planta primera Q03|504.6||0|
+~T|03.03|Ejecución de la línea de alimentación eléctrica entre el cuadro general Q01 y el subcuadro Q03, constituida por canalización mediante tubo de protección y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase y neutro (F+N) de sección 1×10 mm² y conductor de protección (T) de sección 1×10 mm²., incluyendo suministro, instalación, conexionado completo, identificación permanente del circuito y preparación para su puesta en servicio.
+
+Incluye:
+
+Canalización eléctrica.
+Conductores RZ1-K (AS) de 10 mm².
+Conexionado completo en ambos cuadros.
+Identificación permanente del circuito.
+Accesorios de montaje, fijaciones y pequeño material.
+Medios manuales, herramientas y limpieza derivada de la actuación.
+
+Trabajos previos necesarios:
+
+Instalación de los cuadros Q01 y Q03.
+Verificación del recorrido previsto para la línea.
+
+Criterio de medición en proyecto: m de línea de alimentación definida en la documentación del proyecto.
+
+Criterio de medición en obra: m realmente ejecutado y completamente instalado, conexionado e identificado.|
+~D|03.03
+|MO-OF1\\3
+\MO-AY1\\3
+\MT-TB3\\35
+\MT-CB4\\35
+\%MT-Elec\\0.05
+\|
+~C|03.04|ud|Línea de alimentación nueva unidad de climatización planta baja|232.5||0|
+~T|03.04|Ejecución de la alimentación eléctrica de la unidad de climatización prevista en planta baja, mediante canalización eléctrica y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase, neutro y conductor de protección (F+N+T), de sección 1×2,5 mm², incluyendo suministro, instalación, conexionado completo, identificación permanente del circuito y preparación para la puesta en servicio del equipo.
+
+Incluye:
+
+Canalización eléctrica.
+Conductores eléctricos.
+Conexionado en cuadro y equipo.
+Identificación del circuito.
+Accesorios de montaje, fijaciones y pequeño material.
+Medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por alimentación completa de la unidad de climatización.
+
+Criterio de medición en obra: ud ejecutada cuando la alimentación eléctrica se encuentre completamente instalada, conexionada e identificada.|
+~D|03.04
+|MO-OF1\\2.5
+\MO-AY1\\2
+\MT-TB2\\26
+\MT-CB2\\26
+\%MT-Elec\\0.05
+\|
+~C|MT-TB2|m|Tubo de PVC corrugado/rígido Ø25 mm, instalación tipo B1|1.45||3|
+~C|MT-CB2|m|Manguera libre de halógenos, Cu RZ1-K(AS) 0,6/1 kV, 3G2,5mm2, (F+N+T)|1.75||3|
+~C|03.05|ud|Línea de alimentación ventilación mecánica oficinas planta baja|164.99||0|
+~T|03.05|Ejecución de la alimentación eléctrica de la unidad de ventilación mecánica situada en planta baja, mediante canalización y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, constituida por 2 conductores activos (F+N) de sección 1×1,5 mm² y 1 conductor de protección (T) de sección 1×1,5 mm², instalados bajo tubo de protección de PVC, incluyendo suministro, instalación, conexionado, identificación y preparación para la puesta en servicio del equipo.
+Incluye:
+
+Canalización eléctrica.
+Conductores eléctricos.
+Conexionado en cuadro y equipo.
+Identificación del circuito.
+Accesorios de montaje, fijaciones y pequeño material.
+Medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por alimentación completa de la unidad de climatización.
+
+Criterio de medición en obra: ud ejecutada cuando la alimentación eléctrica se encuentre completamente instalada, conexionada e identificada.|
+~D|03.05
+|MO-OF1\\2
+\MO-AY1\\2
+\MT-TB2\\15
+\MT-CB2b\\15
+\%MT-Elec\\0.05
+\|
+~C|MT-CB2b|m|Manguera libre de halógenos, Cu RZ1-K(AS) 0,6/1 kV, 3G1,5mm2, (F+N+T)|0.92|030826|3|
+~C|03.06|ud|Línea de alimentación ventilación mecánica oficinas planta primera|148.5||0|
+~T|03.06|Ejecución de la alimentación eléctrica de la unidad de ventilación mecánica situada en planta baja, mediante canalización y conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, constituida por 2 conductores activos (F+N) de sección 1×1,5 mm² y 1 conductor de protección (T) de sección 1×1,5 mm², instalados bajo tubo de protección de PVC, incluyendo suministro, instalación, conexionado, identificación y preparación para la puesta en servicio del equipo.
+Incluye:
+
+Canalización eléctrica.
+Conductores eléctricos.
+Conexionado en cuadro y equipo.
+Identificación del circuito.
+Accesorios de montaje, fijaciones y pequeño material.
+Medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por alimentación completa de la unidad de climatización.|
+~D|03.06
+|MO-OF1\\2.5
+\MO-AY1\\2
+\MT-TB2\\1
+\MT-CB2\\1
+\%MT-Elec\\0.05
+\|
+~C|03.07|ud|Instalación alumbrado de emergencia nave|1692.33||0|
+~T|03.07|Suministro e instalación del sistema de alumbrado de emergencia correspondiente a la nave industrial, constituido por luminarias autónomas LED alimentadas a 230 V, con autonomía mínima de 1 hora, grado de protección IP65 y activación automática ante fallo del suministro del alumbrado normal, instaladas mediante circuito exclusivo de alumbrado de emergencia ejecutado con conductores de cobre tipo RZ1-K (AS) 0,6/1 kV de 1,5 mm² y protegidas mediante interruptor automático magnetotérmico bipolar de 10 A, curva C, conforme a la distribución definida en el proyecto.
+
+Incluye:
+
+Suministro e instalación de luminarias autónomas LED de emergencia, alimentación a 230 V, autonomía mínima de 1 hora y grado de protección IP65.
+Canalización eléctrica y conductores de cobre RZ1-K (AS) 0,6/1 kV de 1,5 mm².
+Conexionado completo del circuito de alumbrado de emergencia.
+Conexionado de las luminarias, identificación permanente del circuito y comprobación de su funcionamiento.
+Accesorios de montaje, fijaciones, pequeño material, medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por instalación completa de cada punto de alumbrado de emergencia definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud realmente instalada, completamente conexionada, identificada, ensayada y en correcto funcionamiento.|
+~D|03.07
+|MT-LE2\\10
+\MT-TB2\\150
+\MT-CB2b\\150
+\MT-CB2bb\\4
+\MO-OF1\\6
+\MO-AY1\\6
+\%MT-Elec\\0.05
+\|
+~C|MT-LE2|ud|Luminaria de emergencia autónoma LED IP65, autonomía mínima 1 h|83.15||3|
+~C|MT-CB2bb|m|Caja de empalmes IP 55, 150x150x180|15|030826|3|
+~C|03.08|ud|Instalación alumbrado de emergencia oficinas planta baja|641.95||0|
+~T|03.08|Suministro e instalación del sistema de alumbrado de emergencia correspondiente a las oficinas de planta baja, constituido por luminarias autónomas LED alimentadas a 230 V, con autonomía mínima de 1 hora, grado de protección IP42 y activación automática ante fallo del suministro del alumbrado normal, instaladas mediante circuito exclusivo de alumbrado de emergencia ejecutado con conductores de cobre tipo RZ1-K (AS) 0,6/1 kV de 1,5 mm² y protegidas mediante interruptor automático magnetotérmico bipolar de 10 A, curva C, conforme a la distribución definida en el proyecto.
+
+Incluye:
+
+Suministro e instalación de luminarias autónomas LED de emergencia, alimentación a 230 V, autonomía mínima de 1 hora y grado de protección IP42.
+Canalización eléctrica y conductores de cobre RZ1-K (AS) 0,6/1 kV de 1,5 mm².
+Conexionado completo del circuito de alumbrado de emergencia.
+Conexionado de las luminarias, identificación permanente del circuito y comprobación de su funcionamiento.
+Accesorios de montaje, fijaciones, pequeño material, medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por instalación completa de cada punto de alumbrado de emergencia definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud realmente instalada, completamente conexionada, identificada, ensayada y en correcto funcionamiento.|
+~D|03.08
+|MT-LE2\\4
+\MT-CB2b\\60
+\MT-TB2\\60
+\MT-CB2bb\\1
+\MO-OF1\\2
+\MO-AY1\\2
+\%MT-Elec\\0.05
+\|
+~C|03.09|ud|Instalación alumbrado de emergencia oficinas planta primera|816.56||0|
+~T|03.09|Suministro e instalación del sistema de alumbrado de emergencia correspondiente a las oficinas de planta primera, constituido por luminarias autónomas LED alimentadas a 230 V, con autonomía mínima de 1 hora, grado de protección IP42 y activación automática ante fallo del suministro del alumbrado normal, instaladas mediante circuito exclusivo de alumbrado de emergencia ejecutado con conductores de cobre tipo RZ1-K (AS) 0,6/1 kV de 1,5 mm² y protegidas mediante interruptor automático magnetotérmico bipolar de 10 A, curva C, conforme a la distribución definida en el proyecto.
+
+Incluye:
+
+Suministro e instalación de luminarias autónomas LED de emergencia, alimentación a 230 V, autonomía mínima de 1 hora y grado de protección IP42.
+Canalización eléctrica y conductores de cobre RZ1-K (AS) 0,6/1 kV de 1,5 mm².
+Conexionado completo del circuito de alumbrado de emergencia.
+Conexionado de las luminarias, identificación permanente del circuito y comprobación de su funcionamiento.
+Accesorios de montaje, fijaciones, pequeño material, medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por instalación completa de cada punto de alumbrado de emergencia definido en la documentación del proyecto.
+
+Criterio de medición en obra: ud realmente instalada, completamente conexionada, identificada, ensayada y en correcto funcionamiento.|
+~D|03.09
+|MT-LE2\\6
+\MT-TB2\\60
+\MT-CB2b\\60
+\MT-CB2bb\\1
+\MO-OF1\\2
+\MO-AY1\\2
+\%MT-Elec\\0.05
+\|
+~C|03.10|ud|Alimentación central de detección de incendios|118.21||0|
+~T|03.10|Ejecución de la alimentación eléctrica exclusiva de la central de detección y alarma de incendios, mediante línea eléctrica bajo tubo de protección, ejecutada con conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase y neutro (F+N) de sección 1×1,5 mm² y conductor de protección (T) de sección 1×1,5 mm², incluyendo el suministro e instalación de la canalización, conductores, conexionado completo en cuadro eléctrico y central de incendios, identificación permanente del circuito mediante señalización «NO DESCONECTAR», comprobaciones funcionales y preparación para su puesta en servicio.
+
+Incluye:
+
+Línea eléctrica bajo tubo de protección ejecutada mediante conductores unipolares de cobre tipo RZ1-K (AS) 0,6/1 kV, compuesta por fase y neutro (F+N) de sección 1×1,5 mm² y conductor de protección (T) de sección 1×1,5 mm².
+Canalización eléctrica y accesorios de montaje.
+Conexionado completo en el cuadro eléctrico de origen y en la central de detección y alarma de incendios.
+Identificación permanente del circuito mediante etiquetado «NO DESCONECTAR».
+Accesorios de instalación, fijaciones, pequeño material, medios manuales, herramientas y limpieza derivada de la actuación.
+
+Criterio de medición en proyecto: ud por alimentación eléctrica completa de la central de detección y alarma de incendios definida en la documentación del proyecto.
+
+Criterio de medición en obra: ud ejecutada cuando la línea eléctrica se encuentre completamente instalada, conexionada, identificada y preparada para su puesta en servicio.|
+~D|03.10
+|MO-OF1\\2
+\MO-AY1\\1.5
+\MT-TB2\\2
+\MT-CB2b\\2
+\%MT-Elec\\0.05
+\|
+~C|04#||ENSAYOS Y LEGALIZACIÓN|365.47||0|
+~T|04#|Capítulo correspondiente a la realización de las verificaciones reglamentarias, comprobaciones funcionales y emisión del Certificado de Instalación Eléctrica (CIE) de la instalación eléctrica reformada, una vez finalizados los trabajos de ejecución, incluyendo los ensayos necesarios para verificar la correcta ejecución de la instalación y su aptitud para la puesta en servicio.|
+~D|04#
+|04.01\\1
+\04.02\\1
+\|
+~C|04.01|ud|Ensayos y verificaciones reglamentarias|174.83||0|
+~T|04.01|Realización de las verificaciones reglamentarias y comprobaciones funcionales de la instalación eléctrica reformada, previamente a su puesta en servicio, mediante los equipos de medida adecuados, verificando el correcto funcionamiento de la instalación y el cumplimiento de las condiciones previstas en el proyecto.
+
+Incluye:
+
+Comprobación de la continuidad de los conductores de protección y uniones equipotenciales.
+Medida de la resistencia de aislamiento de los circuitos eléctricos.
+Verificación de la resistencia de puesta a tierra.
+Comprobación de la polaridad de los circuitos.
+Verificación de la impedancia de bucle y funcionamiento de las protecciones.
+Ensayo funcional de los interruptores diferenciales.
+Comprobación del funcionamiento general de la instalación.
+Equipos de medida, medios manuales y herramientas necesarios para la realización de los ensayos.
+
+Criterio de medición en proyecto: ud por conjunto completo de verificaciones reglamentarias de la instalación eléctrica.
+
+Criterio de medición en obra: ud ejecutada una vez realizadas la totalidad de las verificaciones y comprobaciones previstas, obteniendo resultados conformes para la puesta en servicio de la instalación.|
+~D|04.01
+|MO-OF1\\2.5
+\MO-OF1\\2.5
+\%MT-Elec\\0.05
+\|
+~C|04.02|ud|Emisión de Certificado de Instalación Eléctrica (CIE)|180||0|
+~T|04.02|Emisión del Certificado de Instalación Eléctrica (CIE) correspondiente a la instalación eléctrica objeto del proyecto, por empresa instaladora habilitada, una vez verificadas las condiciones de seguridad y el correcto funcionamiento de la instalación, incluyendo la cumplimentación de la documentación reglamentaria necesaria para su entrega a la Dirección Facultativa como parte integrante del expediente de legalización.
+
+Incluye:
+
+Revisión final de la instalación ejecutada.
+Cumplimentación del Certificado de Instalación Eléctrica.
+Firma del certificado por empresa instaladora habilitada.
+Entrega de la documentación a la Dirección Facultativa para su incorporación al expediente de legalización.
+
+Criterio de medición en proyecto: ud por emisión completa del Certificado de Instalación Eléctrica de la instalación objeto del proyecto.
+
+Criterio de medición en obra: ud emitida y entregada a la Dirección Facultativa una vez formalizado el Certificado de Instalación Eléctrica correspondiente a la instalación ejecutada.|
+~D|04.02
+|MT-CE1\\1
+\|
+~C|MT-CE1|ud|Verificaciones reglamentarias y emisión del Certificado de Instalación Eléctrica (CIE)|180||3|
+~T|MT-CE1|Realización de las comprobaciones reglamentarias de la instalación, documentación de resultados y emisión del Certificado de Instalación Eléctrica por empresa instaladora habilitada.|

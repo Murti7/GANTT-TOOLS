@@ -1,6 +1,6 @@
 proyecto:
   nombre: Adecuación del sistema de climatización del Complexe Balear de Recerca — UIB
-  fecha_inicio: '2026-09-01'
+  fecha_inicio: '2025-09-01'
   horas_dia: 8
   dias_semana: 5
   plazo_contractual_dias: 80
@@ -16,6 +16,9 @@ escenarios:
     MO-mo102: 1
     MO-ELEC-O1: 1
     MO-ELEC-AY: 1
+    MO-MONT-TECHO: 1
+    MO-mo041: 1
+    MO-mo087: 1
     MO-AUX-GEN: 1
     MO-DELINEANTE: 1
 
@@ -29,6 +32,9 @@ escenarios:
     MO-mo102: 1
     MO-ELEC-O1: 1
     MO-ELEC-AY: 1
+    MO-MONT-TECHO: 1
+    MO-mo041: 1
+    MO-mo087: 1
     MO-AUX-GEN: 1
     MO-DELINEANTE: 1
 
@@ -42,8 +48,8 @@ tareas:
     dependencias: []
     grupo_visual: Inicio / documentación contractual
     nombre_corto: Inicio obra
-    entregables:
-      - Acta Replanteo
+    entregables: 
+    - Acta Replanteo
     orden_visual: 40
 
   A_aud:
@@ -54,7 +60,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. control
+    nombre_corto: A_aud
     entregables:
       - PL01
     orden_visual: 10
@@ -81,7 +87,7 @@ tareas:
     dependencias:
       - A_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. control
+    nombre_corto: A_ejec
     entregables: []
     orden_visual: 10
 
@@ -93,7 +99,7 @@ tareas:
     dependencias:
       - A_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. control
+    nombre_corto: A_val
     entregables:
       - Acta valid. A
     orden_visual: 10
@@ -106,7 +112,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Actuaciones habilitadoras sistémicas
-    nombre_corto: Purgado/sector.
+    nombre_corto: B_ejec
     entregables: []
     orden_visual: 10
 
@@ -118,7 +124,7 @@ tareas:
     dependencias:
       - B_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. hidr. base
+    nombre_corto: B_val
     entregables:
       - Acta valid. B
     orden_visual: 20
@@ -131,7 +137,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Actuaciones habilitadoras sistémicas
-    nombre_corto: Sala máquinas
+    nombre_corto: C_ejec
     entregables: []
     orden_visual: 20
 
@@ -144,7 +150,7 @@ tareas:
       - C_ejec
       - A_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. sala maq.
+    nombre_corto: C_val
     entregables:
       - Acta valid. C
     orden_visual: 30
@@ -157,7 +163,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. ventilación
+    nombre_corto: D_aud
     entregables:
       - PL02
     orden_visual: 20
@@ -191,10 +197,11 @@ tareas:
       - D1.10
       - D1.11
       - D1.12
+      - D1.13
     dependencias:
       - D_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. ventilación
+    nombre_corto: D_ejec
     entregables: []
     orden_visual: 20
 
@@ -207,7 +214,7 @@ tareas:
       - D_ejec
       - A_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. ventilación
+    nombre_corto: D_val
     entregables:
       - Acta valid. D
     orden_visual: 40
@@ -220,7 +227,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. hidráulica
+    nombre_corto: E_aud
     entregables:
       - PL03
     orden_visual: 30
@@ -270,10 +277,11 @@ tareas:
       - E3.3
       - E3.4
       - E3.5
+      - E3.6
     dependencias:
       - E_inv
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. hidráulica
+    nombre_corto: E_ejec
     entregables: []
     orden_visual: 30
 
@@ -287,7 +295,7 @@ tareas:
       - A_val
       - B_val
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. hidráulica
+    nombre_corto: E_val
     entregables:
       - Acta valid. E
     orden_visual: 50
@@ -300,7 +308,7 @@ tareas:
     dependencias:
       - H1
     grupo_visual: Auditorías técnicas
-    nombre_corto: Aud. fugas/accesos
+    nombre_corto: F_aud
     entregables:
       - PL04
     orden_visual: 40
@@ -317,6 +325,18 @@ tareas:
     entregables:
       - PL04 valid.
     orden_visual: 40
+
+  LAMAS:
+    nombre: Bloque F — Registros en lamas F4.1
+    tipo: tarea
+    capitulos_bc3:
+      - F4.1
+    dependencias:
+      - H1
+    grupo_visual: Actuaciones habilitadoras sistémicas
+    nombre_corto: F4.1 Registros
+    entregables: []
+    orden_visual: 30
 
   F_ejec:
     nombre: Bloque F — Ejecución fugas, desagües, aislamiento y accesos
@@ -342,8 +362,9 @@ tareas:
       - F3.3
     dependencias:
       - F_inv
+      - LAMAS
     grupo_visual: Ejecución correctiva por bloques
-    nombre_corto: Ejec. fugas/accesos
+    nombre_corto: F_ejec
     entregables: []
     orden_visual: 40
 
@@ -355,7 +376,7 @@ tareas:
     dependencias:
       - F_ejec
     grupo_visual: Validación funcional por bloques
-    nombre_corto: Valid. fugas/accesos
+    nombre_corto: F_val
     entregables:
       - Acta valid. F
     orden_visual: 60
@@ -424,7 +445,8 @@ tareas:
   ASB:
     nombre: Proyecto As Built
     tipo: tarea
-    capitulos_bc3: []
+    capitulos_bc3:
+      - 11#
     duracion_dias_fija: 5
     dependencias:
       - H4
@@ -446,6 +468,6 @@ tareas:
       - VLC
       - VLR
     grupo_visual: Proyecto As Built
-    nombre_corto: Cierre total
+    nombre_corto: Acta Rececpión obra
     entregables: []
     orden_visual: 20

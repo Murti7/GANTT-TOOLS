@@ -1,0 +1,21 @@
+project:
+  code: BAF-VID-2026-001
+  name: Auditoria energetica integral
+  site: Viding Fitness Calvia
+  revision: "00"
+
+client:
+  legal_name: Viding Fitness
+  tax_id: B00000000
+  country: ES
+  type: company
+  billing_email: billing@example.com
+
+issuer: bafras-engineering
+
+defaults:
+  language: es
+
+documents:
+  budget:
+    title: Presupuesto de auditoria energetica

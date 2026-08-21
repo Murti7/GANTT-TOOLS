@@ -8,7 +8,7 @@ en el formato estándar BC3 de la construcción española.
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ProjectConfig(BaseModel):
@@ -18,6 +18,8 @@ class ProjectConfig(BaseModel):
     Los campos con valor por defecto permiten funcionar sin yaml.
     Los campos de texto vacíos se omiten en el encabezado documental.
     """
+
+    model_config = ConfigDict(extra='forbid')
 
     # ── Metadatos documentales ────────────────────────────────────────────────
     entidad:            str = ''   # entidad contratante
@@ -37,6 +39,29 @@ class ProjectConfig(BaseModel):
 
     # ── Estructura del presupuesto ────────────────────────────────────────────
     codigo_capitulo_gr:  str = ''   # código BC3 del capítulo de gestión de residuos
+    client: 'ProjectClientConfig | None' = None
+
+
+class ProjectClientConfig(BaseModel):
+    """Cliente contractual configurado en input/config.yaml."""
+
+    model_config = ConfigDict(extra='forbid')
+
+    legal_name: str
+    tax_id: str = ''
+    vat_id: str = ''
+    address: str = ''
+    country: str = 'ES'
+    type: str = 'company'
+    billing_email: str = ''
+    contact_person: str = ''
+    language: str = 'es'
+    contract_reference: str = ''
+    purchase_order: str = ''
+    expediente: str = ''
+
+
+ProjectConfig.model_rebuild()
 
 
 class RecursoMO(BaseModel):
@@ -106,6 +131,8 @@ class BrandingConfig(BaseModel):
     Todos los campos tienen valor por defecto para garantizar
     compatibilidad con proyectos sin empresa configurada.
     """
+    model_config = ConfigDict(extra='forbid')
+
     # Identidad
     nombre: str = "Sin empresa"
     tipo_entidad: str = "sl"
@@ -169,6 +196,77 @@ class Presupuesto(BaseModel):
 Capitulo.model_rebuild()
 
 
+class CompanyIdentityConfig(BaseModel):
+    """Bloque de identidad corporativa de company.yaml."""
+    model_config = ConfigDict(extra='forbid')
+
+    nombre: str
+    tipo_entidad: str
+    nif_cif: str = ''
+    direccion_fiscal: str = ''
+    telefono: str = ''
+    email: str = ''
+    web: str = ''
+
+
+class CompanyFiscalConfig(BaseModel):
+    """Bloque fiscal de company.yaml."""
+    model_config = ConfigDict(extra='forbid')
+
+    tipo_entidad: str = ''
+    irpf_tipo: float = 0.0
+    iva_tipo: float = 0.21
+    irpf_inicio_actividad: bool = False
+    nota_irpf: str = ''
+
+
+class CompanyBankConfig(BaseModel):
+    """Bloque bancario de company.yaml."""
+    model_config = ConfigDict(extra='forbid')
+
+    iban: str = ''
+    bic_swift: str = ''
+    entitat_bancaria: str = ''
+    titular_compte: str = ''
+    termini_pagament_dies: int = 30
+    forma_pagament: str = 'transferencia'
+
+
+class CompanyBrandingYamlConfig(BaseModel):
+    """Bloque visual de company.yaml antes de resolver la ruta del logo."""
+    model_config = ConfigDict(extra='forbid')
+
+    color_primario: str = '#1B3A5C'
+    color_secundario: str = '#2E6DA4'
+    color_acento: str = '#4F7B6E'
+    color_texto: str = '#1A1C1E'
+    color_fondo_alt: str = '#F5F7FA'
+    color_blanco: str = '#FFFFFF'
+    fuente_principal: str = 'Calibri'
+    fuente_fallback: str = 'Calibri'
+    logo: str = 'logo.png'
+
+
+class CompanyBillingConfig(BaseModel):
+    """Bloque de facturación de company.yaml."""
+    model_config = ConfigDict(extra='forbid')
+
+    serie_factura: str = 'A'
+    moneda: str = 'EUR'
+    idioma: str = 'es'
+
+
+class CompanyYamlConfig(BaseModel):
+    """Contrato validado del archivo company.yaml."""
+    model_config = ConfigDict(extra='forbid')
+
+    identitat: CompanyIdentityConfig
+    fiscal: CompanyFiscalConfig = Field(default_factory=CompanyFiscalConfig)
+    bancari: CompanyBankConfig = Field(default_factory=CompanyBankConfig)
+    branding: CompanyBrandingYamlConfig = Field(default_factory=CompanyBrandingYamlConfig)
+    facturacio: CompanyBillingConfig = Field(default_factory=CompanyBillingConfig)
+
+
 def cargar_company(empresa_slug: str, companies_dir: Path) -> BrandingConfig:
     """
     Carga el company.yaml de la empresa indicada.
@@ -185,40 +283,40 @@ def cargar_company(empresa_slug: str, companies_dir: Path) -> BrandingConfig:
         )
 
     with open(yaml_path, encoding='utf-8') as f:
-        data = yaml.safe_load(f)
+        data = CompanyYamlConfig.model_validate(yaml.safe_load(f) or {})
 
-    logo_filename = data.get('branding', {}).get('logo', 'logo.png')
+    logo_filename = data.branding.logo
     logo_path = company_dir / logo_filename
     logo_path = logo_path if logo_path.exists() else None
 
     return BrandingConfig(
-        nombre=data['identitat']['nombre'],
-        tipo_entidad=data['identitat']['tipo_entidad'],
-        nif_cif=data['identitat'].get('nif_cif', ''),
-        direccion_fiscal=data['identitat'].get('direccion_fiscal', ''),
-        telefono=data['identitat'].get('telefono', ''),
-        email=data['identitat'].get('email', ''),
-        web=data['identitat'].get('web', ''),
-        irpf_tipo=data['fiscal'].get('irpf_tipo', 0.0),
-        iva_tipo=data['fiscal'].get('iva_tipo', 0.21),
-        irpf_inicio_actividad=data['fiscal'].get('irpf_inicio_actividad', False),
-        nota_irpf=data['fiscal'].get('nota_irpf', ''),
-        iban=data['bancari'].get('iban', ''),
-        bic_swift=data['bancari'].get('bic_swift', ''),
-        entitat_bancaria=data['bancari'].get('entitat_bancaria', ''),
-        titular_compte=data['bancari'].get('titular_compte', ''),
-        termini_pagament_dies=data['bancari'].get('termini_pagament_dies', 30),
-        forma_pagament=data['bancari'].get('forma_pagament', 'transferencia'),
-        color_primario=data['branding'].get('color_primario', '#1B3A5C'),
-        color_secundario=data['branding'].get('color_secundario', '#2E6DA4'),
-        color_acento=data['branding'].get('color_acento', '#4F7B6E'),
-        color_texto=data['branding'].get('color_texto', '#1A1C1E'),
-        color_fondo_alt=data['branding'].get('color_fondo_alt', '#F5F7FA'),
-        color_blanco=data['branding'].get('color_blanco', '#FFFFFF'),
-        fuente_principal=data['branding'].get('fuente_principal', 'Calibri'),
-        fuente_fallback=data['branding'].get('fuente_fallback', 'Calibri'),
+        nombre=data.identitat.nombre,
+        tipo_entidad=data.identitat.tipo_entidad,
+        nif_cif=data.identitat.nif_cif,
+        direccion_fiscal=data.identitat.direccion_fiscal,
+        telefono=data.identitat.telefono,
+        email=data.identitat.email,
+        web=data.identitat.web,
+        irpf_tipo=data.fiscal.irpf_tipo,
+        iva_tipo=data.fiscal.iva_tipo,
+        irpf_inicio_actividad=data.fiscal.irpf_inicio_actividad,
+        nota_irpf=data.fiscal.nota_irpf,
+        iban=data.bancari.iban,
+        bic_swift=data.bancari.bic_swift,
+        entitat_bancaria=data.bancari.entitat_bancaria,
+        titular_compte=data.bancari.titular_compte,
+        termini_pagament_dies=data.bancari.termini_pagament_dies,
+        forma_pagament=data.bancari.forma_pagament,
+        color_primario=data.branding.color_primario,
+        color_secundario=data.branding.color_secundario,
+        color_acento=data.branding.color_acento,
+        color_texto=data.branding.color_texto,
+        color_fondo_alt=data.branding.color_fondo_alt,
+        color_blanco=data.branding.color_blanco,
+        fuente_principal=data.branding.fuente_principal,
+        fuente_fallback=data.branding.fuente_fallback,
         logo_path=logo_path,
-        serie_factura=data['facturacio'].get('serie_factura', 'A'),
-        moneda=data['facturacio'].get('moneda', 'EUR'),
-        idioma=data['facturacio'].get('idioma', 'es'),
+        serie_factura=data.facturacio.serie_factura,
+        moneda=data.facturacio.moneda,
+        idioma=data.facturacio.idioma,
     )

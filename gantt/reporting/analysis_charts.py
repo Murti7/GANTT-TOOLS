@@ -18,7 +18,16 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from openpyxl import load_workbook
 
-from gantt.reporting.styles import CHART_DPI, CHART_PALETA, CHART_PALETA_APILADA
+from gantt.bc3.models import Presupuesto
+from gantt.reporting.reporting_models import BudgetAnalysisData, build_budget_analysis_data
+from gantt.reporting.styles import (
+    CHART_DPI,
+    CHART_PALETA,
+    CHART_PALETA_APILADA,
+    ChartStyle,
+    DocumentPalette,
+    build_palette,
+)
 from gantt.reporting.palette import (
     CHART_AZUL, CHART_AZUL_MEDIO, CHART_VERDE,
     CHART_GRIS_CLARO, CHART_BORDE, CHART_GRID,
@@ -132,15 +141,16 @@ def simplify_profile_name(name: str) -> str:
     return replacements.get(str(name), str(name))
 
 
-def setup_axes(ax) -> None:
+def setup_axes(ax, style: ChartStyle | None = None) -> None:
     """
     Aplica estilo base común a los ejes.
     """
-    ax.set_facecolor('white')
+    style = style or build_palette(None).chart
+    ax.set_facecolor(style.background)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
-    ax.grid(axis='x', linestyle='--', alpha=0.16, color=COLOR_GRID, linewidth=0.8)
+    ax.grid(axis='x', linestyle='--', alpha=0.16, color=style.grid, linewidth=0.8)
     ax.set_axisbelow(True)
 
 
@@ -154,6 +164,7 @@ def save_barh_chart(
     value_fmt: str = '{:,.1f}',
     wrap_labels: bool = True,
     filter_zero: bool = True,
+    style: ChartStyle | None = None,
 ) -> None:
     """
     Genera y guarda un gráfico de barras horizontales.
@@ -170,15 +181,18 @@ def save_barh_chart(
     labels = [r[0] for r in rows]
     values = [r[1] for r in rows]
 
+    style = style or build_palette(None).chart
+    plt.rcParams['font.family'] = style.font_family
+
     n = len(labels)
     max_val = max(values) if values else 1
     fig_height = max(4.2, n * 0.52 + 1.2)
 
     fig, ax = plt.subplots(figsize=(12.5, fig_height))
-    fig.patch.set_facecolor('white')
+    fig.patch.set_facecolor(style.background)
 
     y_pos = list(range(n))
-    bars = ax.barh(y_pos, values, color=color, edgecolor='white', height=0.54)
+    bars = ax.barh(y_pos, values, color=color, edgecolor=style.background, height=0.54)
 
     rendered_labels = [
         wrap_label(label, width=48, max_lines=2) if wrap_labels else clean_label(label)
@@ -192,7 +206,7 @@ def save_barh_chart(
     ax.set_title(title, fontsize=16, fontweight='bold', pad=16)
     ax.set_xlim(0, max_val * 1.10)
 
-    setup_axes(ax)
+    setup_axes(ax, style)
 
     for bar, val in zip(bars, values):
         if val > 0:
@@ -203,11 +217,11 @@ def save_barh_chart(
                 va='center',
                 ha='left',
                 fontsize=8.5,
-                color=COLOR_TEXT,
+                color=style.text,
             )
 
     fig.tight_layout(pad=1.8)
-    fig.savefig(path, dpi=CHART_DPI, bbox_inches='tight', facecolor='white')
+    fig.savefig(path, dpi=style.dpi, bbox_inches='tight', facecolor=style.background)
     plt.close(fig)
 
 
@@ -217,6 +231,7 @@ def save_top_partidas_chart(
     col_desc: str,
     col_imp: str,
     path: Path,
+    style: ChartStyle | None = None,
 ) -> None:
     """
     Genera el gráfico de top partidas por impacto económico.
@@ -224,6 +239,9 @@ def save_top_partidas_chart(
     rows = [r for r in rows if float(r.get(col_imp) or 0) > 0]
     if not rows:
         return
+
+    style = style or build_palette(None).chart
+    plt.rcParams['font.family'] = style.font_family
 
     n = len(rows)
     values = [float(r.get(col_imp) or 0) for r in rows]
@@ -237,11 +255,11 @@ def save_top_partidas_chart(
 
     fig_height = max(6.0, n * 0.58 + 1.7)
     fig, ax = plt.subplots(figsize=(14.5, fig_height))
-    fig.patch.set_facecolor('white')
-    ax.set_facecolor('white')
+    fig.patch.set_facecolor(style.background)
+    ax.set_facecolor(style.background)
 
     y_pos = list(range(n))
-    bars = ax.barh(y_pos, values, color=COLOR_BLUE, edgecolor='white', height=0.52)
+    bars = ax.barh(y_pos, values, color=style.primary, edgecolor=style.background, height=0.52)
 
     ax.set_yticks(y_pos)
     ax.set_yticklabels(['' for _ in y_pos])
@@ -250,7 +268,7 @@ def save_top_partidas_chart(
     ax.set_title('Partidas con mayor impacto económico (€ PEM)', fontsize=16, fontweight='bold', pad=16)
     ax.set_xlim(0, max_val * 1.13)
 
-    setup_axes(ax)
+    setup_axes(ax, style)
 
     # Columnas visuales de código y descripción.
     x_code = -max_val * 0.67
@@ -264,7 +282,7 @@ def save_top_partidas_chart(
             va='center',
             ha='left',
             fontsize=8.7,
-            color=COLOR_MUTED,
+            color=style.muted,
             fontweight='bold',
             clip_on=False,
         )
@@ -275,7 +293,7 @@ def save_top_partidas_chart(
             va='center',
             ha='left',
             fontsize=8.7,
-            color=COLOR_TEXT,
+            color=style.text,
             clip_on=False,
         )
 
@@ -287,11 +305,11 @@ def save_top_partidas_chart(
             va='center',
             ha='left',
             fontsize=8.5,
-            color=COLOR_TEXT,
+            color=style.text,
         )
 
     fig.subplots_adjust(left=0.38, right=0.96, top=0.91, bottom=0.09)
-    fig.savefig(path, dpi=CHART_DPI, bbox_inches='tight', facecolor='white')
+    fig.savefig(path, dpi=style.dpi, bbox_inches='tight', facecolor=style.background)
     plt.close(fig)
 
 
@@ -300,6 +318,7 @@ def save_stacked_mo_chart(
     profiles: list[str],
     col_desc: str,
     path: Path,
+    style: ChartStyle | None = None,
 ) -> None:
     """
     Genera un gráfico apilado de horas MO por perfil y capítulo.
@@ -338,10 +357,12 @@ def save_stacked_mo_chart(
     y_pos = list(range(n_caps))
     left = [0.0] * n_caps
 
-    palette = CHART_PALETA_APILADA
+    style = style or build_palette(None).chart
+    plt.rcParams['font.family'] = style.font_family
+    palette = style.stacked or tuple(CHART_PALETA_APILADA)
 
     fig, ax = plt.subplots(figsize=(13.5, max(4.5, n_caps * 0.58 + 1.5)))
-    fig.patch.set_facecolor('white')
+    fig.patch.set_facecolor(style.background)
 
     for i, col in enumerate(plot_profiles):
         vals = [float(r.get(col) or 0) for r in caps]
@@ -352,7 +373,7 @@ def save_stacked_mo_chart(
             label=simplify_profile_name(col),
             color=palette[i % len(palette)],
             height=0.58,
-            edgecolor='white',
+            edgecolor=style.background,
         )
         left = [l + v for l, v in zip(left, vals)]
 
@@ -366,9 +387,9 @@ def save_stacked_mo_chart(
             vals,
             left=left,
             label='Otros perfiles (<50 h)',
-            color=CHART_GRIS_CLARO,
+            color=style.muted,
             height=0.58,
-            edgecolor='white',
+            edgecolor=style.background,
         )
 
     ax.set_yticks(y_pos)
@@ -380,19 +401,19 @@ def save_stacked_mo_chart(
     ax.set_xlabel('Horas MO', fontsize=10)
     ax.set_title('Distribución de horas de MO por capítulo y perfil', fontsize=16, fontweight='bold', pad=16)
 
-    setup_axes(ax)
+    setup_axes(ax, style)
 
     ax.legend(
         loc='lower right',
         fontsize=8,
         ncol=2,
         framealpha=0.95,
-        facecolor='white',
-        edgecolor=CHART_BORDE,
+        facecolor=style.background,
+        edgecolor=style.border,
     )
 
     fig.tight_layout(pad=1.8)
-    fig.savefig(path, dpi=CHART_DPI, bbox_inches='tight', facecolor='white')
+    fig.savefig(path, dpi=style.dpi, bbox_inches='tight', facecolor=style.background)
     plt.close(fig)
 
 
@@ -415,14 +436,38 @@ class AnalysisChartsReport:
     a partir del Excel de análisis del presupuesto BC3.
     """
 
-    def __init__(self, excel_path: Path, output_dir: Path) -> None:
+    def __init__(
+        self,
+        excel_path: Path | None,
+        output_dir: Path,
+        palette: DocumentPalette | None = None,
+        data: BudgetAnalysisData | None = None,
+    ) -> None:
         self.excel_path = excel_path
         self.output_dir = output_dir
+        self.palette = palette or build_palette(None)
+        self.chart_style = self.palette.chart
+        self.data = data
         self.resumen_headers: list = []
         self.resumen_rows: list[dict] = []
         self.mo_profile_cols: list[str] = []
         self.partidas_headers: list = []
         self.partidas_rows: list[dict] = []
+
+    @classmethod
+    def from_presupuesto(
+        cls,
+        presupuesto: Presupuesto,
+        output_dir: Path,
+        palette: DocumentPalette | None = None,
+    ) -> "AnalysisChartsReport":
+        """Construye los graficos desde el modelo Presupuesto, sin leer Excel."""
+        return cls(
+            excel_path=None,
+            output_dir=output_dir,
+            palette=palette,
+            data=build_budget_analysis_data(presupuesto),
+        )
 
     def generate(self) -> None:
         """
@@ -431,9 +476,22 @@ class AnalysisChartsReport:
         (self.output_dir / '01_economico').mkdir(parents=True, exist_ok=True)
         (self.output_dir / '02_mano_obra').mkdir(parents=True, exist_ok=True)
 
-        self.read_workbook_tables()
+        if self.data is not None:
+            self.read_model_tables()
+        else:
+            self.read_workbook_tables()
         self.write_economic_charts()
         self.write_labor_charts()
+
+    def read_model_tables(self) -> None:
+        """Carga las tablas intermedias desde BudgetAnalysisData."""
+        if self.data is None:
+            return
+        self.resumen_headers = self.data.resumen_headers()
+        self.resumen_rows = self.data.resumen_rows()
+        self.mo_profile_cols = list(self.data.profiles)
+        self.partidas_headers = self.data.partidas_headers()
+        self.partidas_rows = self.data.partidas_rows()
 
     def read_workbook_tables(self) -> None:
         """
@@ -441,6 +499,9 @@ class AnalysisChartsReport:
         """
         resumen_sheet = 'Resumen por capítulo'
         partidas_sheet = 'Partidas detalladas'
+
+        if self.excel_path is None:
+            raise ValueError("excel_path es obligatorio al generar graficos desde Excel")
 
         wb = load_workbook(self.excel_path, read_only=True, data_only=True)
 
@@ -507,7 +568,8 @@ class AnalysisChartsReport:
 
         return [
             r for r in self.resumen_rows
-            if r.get(col_cod) and '.' not in str(r[col_cod])
+            if r.get("_is_main") is True
+            or ("_is_main" not in r and r.get(col_cod) and '.' not in str(r[col_cod]))
         ]
 
     def write_economic_charts(self) -> None:
@@ -543,7 +605,8 @@ class AnalysisChartsReport:
                 title='Importe por capítulo',
                 xlabel='Importe (€)',
                 value_fmt='{:,.0f}',
-                color=COLOR_BLUE,
+                color=self.chart_style.primary,
+                style=self.chart_style,
             )
             print('      OK 01_importe_por_capitulo.png')
 
@@ -556,7 +619,8 @@ class AnalysisChartsReport:
                     title='Peso económico por capítulo (% sobre PEM)',
                     xlabel='% sobre importe total',
                     value_fmt='{:.1f}%',
-                    color=COLOR_GREEN,
+                    color=self.chart_style.secondary,
+                    style=self.chart_style,
                 )
                 print('      OK 02_peso_economico_por_capitulo.png')
             else:
@@ -594,6 +658,7 @@ class AnalysisChartsReport:
             col_desc=col_pdesc,
             col_imp=col_pimp,
             path=ec_dir / '03_top_partidas_por_importe.png',
+            style=self.chart_style,
         )
         print('      OK 03_top_partidas_por_importe.png')
 
@@ -630,8 +695,9 @@ class AnalysisChartsReport:
                 title='Horas de mano de obra por capítulo',
                 xlabel='Horas MO',
                 value_fmt='{:,.1f}',
-                color=CHART_AZUL_MEDIO,
+                color=self.chart_style.accent,
                 filter_zero=True,
+                style=self.chart_style,
             )
             print('      OK 01_horas_mo_por_capitulo.png')
 
@@ -658,8 +724,9 @@ class AnalysisChartsReport:
                 title='Total de horas por perfil de mano de obra',
                 xlabel='Horas',
                 value_fmt='{:,.1f}',
-                color=COLOR_BLUE_LIGHT,
+                color=self.chart_style.secondary,
                 filter_zero=True,
+                style=self.chart_style,
             )
             print('      OK 02_horas_por_perfil.png')
 
@@ -698,5 +765,6 @@ class AnalysisChartsReport:
             profiles=active_profiles,
             col_desc=col_desc,
             path=mo_dir / '03_horas_por_perfil_y_capitulo.png',
+            style=self.chart_style,
         )
         print('      OK 03_horas_por_perfil_y_capitulo.png')

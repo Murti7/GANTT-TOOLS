@@ -15,6 +15,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Side  # usados inline en helpers de layout
 from openpyxl.utils import get_column_letter
 
+from gantt.bc3.economics import calcular_resumen_financiero
 from gantt.bc3.models import Capitulo, Partida, Presupuesto, ProjectConfig
 from gantt.bc3.parser import expandir_descompuesto
 
@@ -28,6 +29,57 @@ from gantt.reporting.styles import (
     DocumentPalette, build_palette, inserir_cabecera, inserir_peu,
 )
 from gantt.reporting.palette import GRIS_LINEA
+from gantt.reporting.documents import DocumentType
+from gantt.reporting.rendering import (
+    apply_document_footer,
+    configure_excel_printing,
+    metadata_from_project_config,
+    presentation_from_palette_company,
+    render_budget_header,
+)
+
+
+_HEADER_CONTEXT = WeakKeyDictionary()
+_METADATA_CONTEXT = WeakKeyDictionary()
+_ANEXO_DOCUMENT_TYPE = {
+    "PRES.01": DocumentType.BUDGET_OFFER,
+    "PRES.02.01": DocumentType.UNIT_PRICE_TABLE_1,
+    "PRES.02.02": DocumentType.UNIT_PRICE_TABLE_2,
+    "PRES.02.03": DocumentType.DECOMPOSED_BUDGET,
+    "PRES.02.04": DocumentType.CHAPTER_SUMMARY,
+    "PRES.03": DocumentType.MEASUREMENTS_BLIND,
+    "PRES.05": DocumentType.VEC_SETTLEMENT,
+    "JUST_PRECIOS": DocumentType.RESOURCE_PRICE_JUSTIFICATION,
+}
+
+
+def inserir_cabecera(
+    ws,
+    palette: DocumentPalette,
+    company,
+    titol_document: str,
+    num_columnes: int,
+    ref_projecte: str = "",
+    data_generacio: str = "",
+    revisio: str = "00",
+) -> int:
+    """Compatibilidad legacy: captura presentacion; el header real usa metadata."""
+    _HEADER_CONTEXT[ws] = (palette, company, titol_document, num_columnes, ref_projecte, revisio)
+    return 1
+
+
+def inserir_peu(
+    ws,
+    palette: DocumentPalette,
+    company,
+    num_columnes: int,
+) -> None:
+    """Compatibilidad legacy: footer visible normalizado desde metadata."""
+    metadata = _METADATA_CONTEXT.get(ws)
+    if metadata is None:
+        return
+    presentation = presentation_from_palette_company(palette, company)
+    apply_document_footer(ws, metadata, presentation, num_columnes)
 
 
 # ── Tablas para conversión numérica ──────────────────────────────────────────
@@ -221,6 +273,37 @@ def configurar_impresion(
 
 
 # ── Helpers de datos ─────────────────────────────────────────────────────────
+
+def aplicar_encabezado_documental(
+    ws, config: ProjectConfig, anexo: str, titulo: str, n_cols: int,
+    pal: DocumentPalette | None = None,
+) -> None:
+    """Renderiza el encabezado documental Budget desde DocumentMetadata."""
+    cached = _HEADER_CONTEXT.get(ws)
+    palette, company = (cached[0], cached[1]) if cached else (pal or build_palette(None), None)
+    metadata = metadata_from_project_config(
+        config,
+        _ANEXO_DOCUMENT_TYPE.get(anexo, DocumentType.BUDGET_ANALYSIS),
+        title=titulo,
+    )
+    _METADATA_CONTEXT[ws] = metadata
+    presentation = presentation_from_palette_company(palette, company)
+    render_budget_header(ws, metadata, presentation, n_cols)
+
+
+def configurar_impresion(
+    ws,
+    orientacion: str,
+    fila_cabecera: int | None = None,
+    config: ProjectConfig | None = None,
+) -> None:
+    """Configura impresion con politica documental normalizada."""
+    for row in ws.iter_rows():
+        for cell in row:
+            if cell.value is not None and cell.font.name in (None, "Calibri"):
+                cell.font = PRES_FN
+    configure_excel_printing(ws, orientation=orientacion, repeat_row=fila_cabecera)
+
 
 def get_recurso_info(codigo: str, presupuesto: Presupuesto) -> tuple[str, str, float]:
     """
@@ -1372,15 +1455,7 @@ def generar_pres0204(
     N3 = 3
     ajustar_columnas(ws, {'A': 52, 'B': 14, 'C': 18})
 
-    cap_gr     = get_cap_gr(presupuesto)
-    importe_gr = cap_gr.importe_total if cap_gr else 0.0
-    pem_sin_gr = presupuesto.importe_total - importe_gr
-    gg  = pem_sin_gr * presupuesto.config.porcentaje_gg
-    bi  = pem_sin_gr * presupuesto.config.porcentaje_bi
-    pec = pem_sin_gr + gg + bi
-    iva_obra = pec * presupuesto.config.iva_obra
-    iva_gr   = importe_gr * presupuesto.config.iva_gr
-    pgl      = pec + importe_gr + iva_obra + iva_gr
+    resumen = calcular_resumen_financiero(presupuesto)
 
     # ── Sección 1: tabla por capítulos ────────────────────────────────────────
     inserir_cabecera(
@@ -1432,17 +1507,17 @@ def generar_pres0204(
     cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'], pal=pal)
 
     filas = [
-        ('PEM (sin residuos)',        '—',   pem_sin_gr, False),
-        (f'Gastos Generales',         f'{presupuesto.config.porcentaje_gg*100:.0f}%', gg,  False),
-        (f'Beneficio Industrial',     f'{presupuesto.config.porcentaje_bi*100:.0f}%', bi,  False),
+        ('PEM (sin residuos)',        '—',   resumen.pem_sin_gr, False),
+        (f'Gastos Generales',         f'{presupuesto.config.porcentaje_gg*100:.0f}%', resumen.gg,  False),
+        (f'Beneficio Industrial',     f'{presupuesto.config.porcentaje_bi*100:.0f}%', resumen.bi,  False),
         None,
-        ('PEC',                       '—',   pec,        True),
-        ('Gestión de Residuos (GR)',  '—',   importe_gr, False),
+        ('PEC',                       '—',   resumen.pec,        True),
+        ('Gestión de Residuos (GR)',  '—',   resumen.importe_gr, False),
         None,
-        (f'IVA obra',                 f'{presupuesto.config.iva_obra*100:.0f}%', iva_obra, False),
-        (f'IVA residuos',             f'{presupuesto.config.iva_gr*100:.0f}%',   iva_gr,   False),
+        (f'IVA obra',                 f'{presupuesto.config.iva_obra*100:.0f}%', resumen.iva_obra, False),
+        (f'IVA residuos',             f'{presupuesto.config.iva_gr*100:.0f}%',   resumen.iva_gr,   False),
         None,
-        ('PGL (Presupuesto Global de Licitación)', '—', pgl, True),
+        ('PGL (Presupuesto Global de Licitación)', '—', resumen.pgl, True),
     ]
     escribir_cascade(ws, filas, N3)
 
@@ -1468,28 +1543,7 @@ def generar_pres05(
     N3 = 3
     ajustar_columnas(ws, {'A': 55, 'B': 14, 'C': 18})
 
-    cap_gr     = get_cap_gr(presupuesto)
-    importe_gr = cap_gr.importe_total if cap_gr else 0.0
-    pem_sin_gr = presupuesto.importe_total - importe_gr
-    gg  = pem_sin_gr * presupuesto.config.porcentaje_gg
-    bi  = pem_sin_gr * presupuesto.config.porcentaje_bi
-    pec = pem_sin_gr + gg + bi
-
-    # ── Calcular base de liquidación (Bloque 2) ───────────────────────────────
-    pem_liq = sum(
-        p.precio_unitario * p.cantidad
-        for cap, sub, p in iter_todas_partidas(presupuesto)
-        if es_partida_liquidable(p.codigo, presupuesto)
-    )
-    gg_liq   = pem_liq * presupuesto.config.porcentaje_gg
-    bi_liq   = pem_liq * presupuesto.config.porcentaje_bi
-    pec_liq  = pem_liq + gg_liq + bi_liq
-    liq_max  = (pec_liq + importe_gr) * presupuesto.config.porcentaje_liquidacion
-
-    vec      = pec + importe_gr + liq_max
-    iva_obra = pec * presupuesto.config.iva_obra
-    iva_gr   = importe_gr * presupuesto.config.iva_gr
-    pgl      = pec + importe_gr + iva_obra + iva_gr
+    resumen = calcular_resumen_financiero(presupuesto)
 
     # ── BLOQUE 1: VEC ─────────────────────────────────────────────────────────
     inserir_cabecera(
@@ -1513,19 +1567,19 @@ def generar_pres05(
     ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     filas_b1 = [
-        ('PEM (sin residuos)',                       '—',  pem_sin_gr, False),
-        (f'Gastos Generales',                        f'{presupuesto.config.porcentaje_gg*100:.0f}%',   gg,      False),
-        (f'Beneficio Industrial',                    f'{presupuesto.config.porcentaje_bi*100:.0f}%',   bi,      False),
+        ('PEM (sin residuos)',                       '—',  resumen.pem_sin_gr, False),
+        (f'Gastos Generales',                        f'{presupuesto.config.porcentaje_gg*100:.0f}%',   resumen.gg,      False),
+        (f'Beneficio Industrial',                    f'{presupuesto.config.porcentaje_bi*100:.0f}%',   resumen.bi,      False),
         None,
-        ('PEC',                                      '—',  pec,        True),
-        ('Gestión de Residuos (GR)',                 '—',  importe_gr, False),
-        (f'Liquidación máxima ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', liq_max, False),
+        ('PEC',                                      '—',  resumen.pec,        True),
+        ('Gestión de Residuos (GR)',                 '—',  resumen.importe_gr, False),
+        (f'Liquidación máxima ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', resumen.liq_max, False),
         None,
-        ('VEC (sin IVA)',                            '—',  vec,        True),
-        (f'IVA obra ({presupuesto.config.iva_obra*100:.0f}%)',  f'{presupuesto.config.iva_obra*100:.0f}%', iva_obra, False),
-        (f'IVA residuos ({presupuesto.config.iva_gr*100:.0f}%)', f'{presupuesto.config.iva_gr*100:.0f}%', iva_gr, False),
+        ('VEC (sin IVA)',                            '—',  resumen.vec,        True),
+        (f'IVA obra ({presupuesto.config.iva_obra*100:.0f}%)',  f'{presupuesto.config.iva_obra*100:.0f}%', resumen.iva_obra, False),
+        (f'IVA residuos ({presupuesto.config.iva_gr*100:.0f}%)', f'{presupuesto.config.iva_gr*100:.0f}%', resumen.iva_gr, False),
         None,
-        ('PGL (Presupuesto Global de Licitación)',   '—',  pgl,        True),
+        ('PGL (Presupuesto Global de Licitación)',   '—',  resumen.pgl,        True),
     ]
     escribir_cascade(ws, filas_b1, N3)
 
@@ -1573,26 +1627,26 @@ def generar_pres05(
         cel_eur(ws, r, 3, importe_p)
         ws.cell(r, 3).fill = fill
 
-    ws.append(['', 'TOTAL BASE IMPONIBLE LIQUIDACIÓN', pem_liq])
+    ws.append(['', 'TOTAL BASE IMPONIBLE LIQUIDACIÓN', resumen.pem_liq])
     r = ws.max_row
     for c in range(1, N3 + 1):
         ws.cell(r, c).fill = pal.fill_subhead
         ws.cell(r, c).font = pal.font_subhead
         ws.cell(r, c).border = PRES_BORDE_TABLA
-    cel_eur(ws, r, 3, pem_liq, font=pal.font_subhead)
+    cel_eur(ws, r, 3, resumen.pem_liq, font=pal.font_subhead)
     ws.cell(r, 3).fill = pal.fill_subhead
     registrar_altura_manual(ws, r)
     sep_vacia(ws, 6.0, N3)
 
     filas_b2 = [
-        ('PEM liquidación',          '—',   pem_liq,    False),
-        (f'Gastos Generales',        f'{presupuesto.config.porcentaje_gg*100:.0f}%',  gg_liq,  False),
-        (f'Beneficio Industrial',    f'{presupuesto.config.porcentaje_bi*100:.0f}%',  bi_liq,  False),
+        ('PEM liquidación',          '—',   resumen.pem_liq,    False),
+        (f'Gastos Generales',        f'{presupuesto.config.porcentaje_gg*100:.0f}%',  resumen.gg_liq,  False),
+        (f'Beneficio Industrial',    f'{presupuesto.config.porcentaje_bi*100:.0f}%',  resumen.bi_liq,  False),
         None,
-        ('PEC liquidación',          '—',   pec_liq,    True),
-        ('Gestión de Residuos (GR)', '—',   importe_gr, False),
+        ('PEC liquidación',          '—',   resumen.pec_liq,    True),
+        ('Gestión de Residuos (GR)', '—',   resumen.importe_gr, False),
         None,
-        (f'LIQUIDACIÓN MÁXIMA ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', liq_max, True),
+        (f'LIQUIDACIÓN MÁXIMA ({presupuesto.config.porcentaje_liquidacion*100:.0f}%)', '—', resumen.liq_max, True),
     ]
     escribir_cascade(ws, filas_b2, N3)
 

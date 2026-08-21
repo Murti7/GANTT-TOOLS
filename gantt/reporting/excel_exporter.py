@@ -31,7 +31,37 @@ from gantt.planning.models import PlanificacionProyecto
 from gantt.reporting.styles import (
     GANTT_FILL_ALT, GANTT_FILL_CAP, GANTT_FILL_GREEN, GANTT_FILL_HEADER, GANTT_FILL_RED, GANTT_FILL_WHITE, GANTT_FILL_YELLOW,
     GANTT_FONT_BOLD, GANTT_FONT_HEADER, GANTT_FONT_ITALIC,
+    DocumentPalette, build_palette,
 )
+from gantt.reporting.documents import DocumentMetadata, DocumentType, PlanningMetadata
+from gantt.reporting.presentation import PresentationContext
+from gantt.reporting.rendering import (
+    apply_document_footer,
+    configure_excel_printing,
+    metadata_from_project_config,
+    presentation_from_palette_company,
+    render_budget_header,
+    render_planning_header,
+)
+
+
+def _apply_palette_to_legacy_styles(palette: DocumentPalette) -> None:
+    """
+    Puente temporal para el exporter historico, que todavia usa constantes
+    globales. Mantiene API interna estable mientras se completa la migracion a
+    estilos inyectados por funcion.
+    """
+    global GANTT_FILL_ALT, GANTT_FILL_CAP, GANTT_FILL_HEADER, GANTT_FILL_WHITE, GANTT_FILL_YELLOW
+    global GANTT_FONT_BOLD, GANTT_FONT_HEADER, GANTT_FONT_ITALIC
+
+    GANTT_FILL_HEADER = palette.fill_header
+    GANTT_FILL_CAP = palette.fill_subhead
+    GANTT_FILL_ALT = palette.fill_alt
+    GANTT_FILL_WHITE = palette.fill_white
+    GANTT_FILL_YELLOW = palette.fill_yellow
+    GANTT_FONT_HEADER = palette.font_header
+    GANTT_FONT_BOLD = palette.font_bold
+    GANTT_FONT_ITALIC = Font(name=palette.font_family, italic=True, size=10)
 
 
 def horas_capitulo(capitulo: Capitulo, codigos: list[str]) -> dict[str, float]:
@@ -532,6 +562,7 @@ def write_dashboard(
     ws,
     presupuesto: Presupuesto,
     planificaciones: list[PlanificacionProyecto],
+    palette: DocumentPalette | None = None,
 ) -> None:
     """
     Escribe la hoja Dashboard: resumen ejecutivo, diagrama de red embebido,
@@ -582,7 +613,7 @@ def write_dashboard(
     ws.cell(r, 1).alignment = Alignment(horizontal='center')
 
     image_row  = ws.max_row + 1
-    png_bytes  = generar_diagrama_red(planificaciones[-1])
+    png_bytes  = generar_diagrama_red(planificaciones[-1], palette=palette)
     img        = XLImage(io.BytesIO(png_bytes))
     img.width  = 1400
     img.height = 600
@@ -853,6 +884,9 @@ def exportar_analisis(
     presupuesto: Presupuesto,
     output_path: Path,
     planificaciones: list[PlanificacionProyecto] | None = None,
+    palette: DocumentPalette | None = None,
+    metadata: DocumentMetadata | None = None,
+    presentation: PresentationContext | None = None,
 ) -> None:
     """
     Genera el Excel de análisis del presupuesto BC3 y lo escribe en output_path.
@@ -868,6 +902,25 @@ def exportar_analisis(
         se generan también la hoja 'Simulador de cuadrillas', 'Carga recursos'
         y una hoja 'MSProject_{escenario}' por cada escenario.
     """
+    pal = palette or (presentation.palette if presentation else None) or build_palette(presupuesto.company)
+    presentation_context = presentation or presentation_from_palette_company(pal, presupuesto.company)
+    document_type = DocumentType.PLANNING_ANALYSIS if planificaciones else DocumentType.BUDGET_ANALYSIS
+    metadata = metadata or metadata_from_project_config(
+        presupuesto.config,
+        document_type,
+        title="Planificacion y analisis de escenarios" if planificaciones else "Analisis economico del presupuesto",
+    )
+    if planificaciones and not metadata.planning:
+        metadata = metadata.model_copy(
+            update={
+                "planning": PlanningMetadata(
+                    scenario=planificaciones[-1].escenario.nombre,
+                    contractual_deadline=planificaciones[-1].parametros.plazo_contractual_dias,
+                )
+            }
+        )
+    _apply_palette_to_legacy_styles(pal)
+
     recursos = list(presupuesto.recursos_mo.values())
     wb = Workbook()
 
@@ -890,7 +943,23 @@ def exportar_analisis(
             write_ms_project_sheet(wb.create_sheet(sheet_name), plan, presupuesto)
 
         # Dashboard como primera hoja (índice 0, se inserta delante de todo)
-        write_dashboard(wb.create_sheet('Dashboard', 0), presupuesto, planificaciones)
+        write_dashboard(wb.create_sheet('Dashboard', 0), presupuesto, planificaciones, palette=pal)
+
+    for ws in wb.worksheets:
+        ws.insert_rows(1, amount=9)
+        n_cols = max(ws.max_column, 6)
+        if planificaciones:
+            render_planning_header(ws, metadata, presentation_context, n_cols)
+        else:
+            render_budget_header(ws, metadata, presentation_context, n_cols)
+        if ws.max_row > 12:
+            ws.freeze_panes = "A11"
+        apply_document_footer(ws, metadata, presentation_context, n_cols)
+        configure_excel_printing(
+            ws,
+            orientation="landscape" if n_cols > 6 or planificaciones else "portrait",
+            repeat_row=11 if ws.max_row > 12 else None,
+        )
 
     wb.save(output_path)
 

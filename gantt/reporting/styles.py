@@ -11,6 +11,7 @@ Secciones:
   CHART_*  → analysis_charts       (matplotlib)
 """
 
+import re
 from dataclasses import dataclass
 from datetime import date
 
@@ -117,6 +118,59 @@ CHART_PALETA_APILADA = [
 CHART_DPI = 300
 
 
+HEX_COLOR_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+
+
+def validate_hex_color(value: str) -> str:
+    """Valida y normaliza un color hexadecimal #RRGGBB."""
+    if not isinstance(value, str) or not HEX_COLOR_RE.match(value):
+        raise ValueError(f"Color hexadecimal invalido: {value!r}")
+    return value.upper()
+
+
+def as_matplotlib_hex(value: str) -> str:
+    """Devuelve un color con # para APIs matplotlib."""
+    return value if value.startswith("#") else f"#{value}"
+
+
+@dataclass(frozen=True)
+class ChartStyle:
+    """Tokens visuales para graficos matplotlib."""
+    primary: str
+    secondary: str
+    accent: str
+    series: tuple[str, ...]
+    stacked: tuple[str, ...]
+    grid: str
+    text: str
+    muted: str
+    border: str
+    background: str
+    font_family: str
+    dpi: int
+
+
+@dataclass(frozen=True)
+class DiagramStyle:
+    """Tokens visuales para el diagrama temporal de planificacion."""
+    critical_fill: str
+    critical_border: str
+    task_fill: str
+    task_border: str
+    milestone_fill: str
+    milestone_border: str
+    finish_fill: str
+    post_fill: str
+    post_border: str
+    dependency: str
+    dependency_critical: str
+    document: str
+    grid: str
+    text: str
+    band_default: str
+    panel_separator: str
+
+
 # ── Branding corporativo — paleta dinámica por empresa ────────────────────────
 # A diferencia de las secciones anteriores (paleta fija del proyecto), esta
 # sección construye estilos openpyxl a partir del BrandingConfig de la empresa
@@ -152,6 +206,12 @@ class DocumentPalette:
     color_primario:    str
     color_secundario:  str
     color_texto:       str
+    color_acento:      str
+    color_blanco:      str
+    color_fondo_alt:   str
+    font_family:       str
+    chart:             ChartStyle
+    diagram:           DiagramStyle
 
 
 def build_palette(company: BrandingConfig | None = None) -> DocumentPalette:
@@ -162,6 +222,12 @@ def build_palette(company: BrandingConfig | None = None) -> DocumentPalette:
     c = company or BrandingConfig()
 
     fuente = c.fuente_principal
+    primary = validate_hex_color(c.color_primario)
+    secondary = validate_hex_color(c.color_secundario)
+    accent = validate_hex_color(c.color_acento)
+    text = validate_hex_color(c.color_texto)
+    alt = validate_hex_color(c.color_fondo_alt)
+    white = validate_hex_color(c.color_blanco)
 
     def fill(hex_color: str) -> PatternFill:
         return PatternFill('solid', fgColor=hex_color.lstrip('#'))
@@ -171,22 +237,61 @@ def build_palette(company: BrandingConfig | None = None) -> DocumentPalette:
         return Font(name=fuente, bold=bold, size=size, color=color_txt)
 
     return DocumentPalette(
-        fill_header   = fill(c.color_primario),
-        fill_subhead  = fill(c.color_secundario),
-        fill_alt      = fill(c.color_fondo_alt),
-        fill_white    = fill(c.color_blanco),
+        fill_header   = fill(primary),
+        fill_subhead  = fill(secondary),
+        fill_alt      = fill(alt),
+        fill_white    = fill(white),
         fill_yellow   = fill('#FFF3CD'),
-        font_header   = font_sobre(c.color_primario, bold=True, size=10),
-        font_subhead  = font_sobre(c.color_secundario, bold=True, size=10),
+        font_header   = font_sobre(primary, bold=True, size=10),
+        font_subhead  = font_sobre(secondary, bold=True, size=10),
         font_bold     = Font(name=fuente, bold=True, size=10,
-                            color=c.color_texto.lstrip('#')),
+                            color=text.lstrip('#')),
         font_normal   = Font(name=fuente, size=10,
-                            color=c.color_texto.lstrip('#')),
+                            color=text.lstrip('#')),
         font_small    = Font(name=fuente, size=8,
-                            color=c.color_texto.lstrip('#')),
-        color_primario   = c.color_primario,
-        color_secundario = c.color_secundario,
-        color_texto      = c.color_texto,
+                            color=text.lstrip('#')),
+        color_primario   = primary,
+        color_secundario = secondary,
+        color_texto      = text,
+        color_acento     = accent,
+        color_blanco     = white,
+        color_fondo_alt  = alt,
+        font_family      = fuente,
+        chart=ChartStyle(
+            primary=primary,
+            secondary=secondary,
+            accent=accent,
+            series=(primary, secondary, accent, CHART_NARANJA, CHART_MORADO, CHART_CYAN),
+            stacked=(
+                primary, secondary, accent, CHART_AZUL_CLARO, CHART_VERDE_CLARO,
+                CHART_NARANJA, CHART_NARANJA_CL, CHART_TIERRA, CHART_GRIS,
+            ),
+            grid=CHART_GRID,
+            text=text,
+            muted=CHART_MUTED,
+            border=CHART_BORDE,
+            background=white,
+            font_family=FONT_CHART,
+            dpi=CHART_DPI,
+        ),
+        diagram=DiagramStyle(
+            critical_fill="#FFD6D6",
+            critical_border=as_matplotlib_hex(ROJO_ALERTA),
+            task_fill=alt,
+            task_border=secondary,
+            milestone_fill=as_matplotlib_hex(AMARILLO_ADV),
+            milestone_border=text,
+            finish_fill=as_matplotlib_hex(VERDE_EXITO_FONDO),
+            post_fill=as_matplotlib_hex(GRIS_SUAVE),
+            post_border=as_matplotlib_hex(GRIS_TEXTO),
+            dependency=text,
+            dependency_critical=as_matplotlib_hex(ROJO_ALERTA),
+            document=as_matplotlib_hex(GRIS_TEXTO),
+            grid=as_matplotlib_hex(GRIS_LINEA),
+            text=text,
+            band_default=as_matplotlib_hex(GRIS_SUAVE),
+            panel_separator=as_matplotlib_hex(GRIS_LINEA),
+        ),
     )
 
 

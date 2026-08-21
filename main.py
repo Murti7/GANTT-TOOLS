@@ -15,13 +15,19 @@ Ejemplos:
 """
 
 import sys
-import yaml
 from pathlib import Path
 
-from gantt.bc3.models import cargar_company
+from gantt.application.context import (
+    resolver_contexto_ejecucion,
+    seleccionar_bc3,
+    resolver_output_dir as resolver_output_dir_contexto,
+)
+from gantt.application.manifest import write_run_manifest
+from gantt.application.documents import apply_document_identity_fallbacks
 from gantt.bc3.parser import parse_bc3
 from gantt.planning.analyser import duracion_total_proyecto
-from gantt.reporting.styles import build_palette
+from gantt.planning.validation import validar_planificacion_previa
+from gantt.reporting.presentation import build_presentation_context
 
 
 def verificar_entorno() -> None:
@@ -48,36 +54,14 @@ def resolver_bc3_path(input_dir: Path, bc3_filename: str | None = None) -> tuple
     """
     Localiza el BC3 a procesar y devuelve tambien todos los BC3 disponibles.
     """
-    bc3_files = sorted(input_dir.glob('*.bc3'), key=lambda ruta: ruta.name.lower())
-
-    if bc3_filename:
-        bc3_path = input_dir / bc3_filename
-        if not bc3_path.exists():
-            raise FileNotFoundError(
-                f'No se encontró el archivo BC3 indicado: {bc3_path}'
-            )
-        return bc3_path, bc3_files
-
-    if not bc3_files:
-        raise FileNotFoundError(f'No se encontró ningún .bc3 en {input_dir}')
-    if len(bc3_files) > 1:
-        raise ValueError(
-            f'Múltiples .bc3 en {input_dir}. '
-            f'Especifica el archivo: '
-            f'python main.py <nombre-proyecto> <archivo.bc3>\n'
-            f'Disponibles: {[f.name for f in bc3_files]}'
-        )
-    return bc3_files[0], bc3_files
+    return seleccionar_bc3(input_dir, bc3_filename)
 
 
 def resolver_output_dir(project_name: str, bc3_path: Path, bc3_files: list[Path]) -> Path:
     """
     Si un proyecto tiene varias versiones BC3, separa sus salidas por fichero.
     """
-    project_output_dir = Path('projects') / project_name / 'output'
-    if len(bc3_files) > 1:
-        return project_output_dir / bc3_path.stem
-    return project_output_dir
+    return resolver_output_dir_contexto(Path('projects') / project_name, bc3_path, bc3_files)
 
 
 def main(project_name: str, bc3_filename: str | None = None) -> None:
@@ -86,14 +70,17 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
     El bloque de presupuesto y reporting se ejecuta siempre.
     El bloque de planificación solo si existe planificacion.yaml.
     """
-    input_dir  = Path('projects') / project_name / 'input'
-    bc3_path, bc3_files = resolver_bc3_path(input_dir, bc3_filename)
-    output_dir = resolver_output_dir(project_name, bc3_path, bc3_files)
+    context = resolver_contexto_ejecucion(project_name, bc3_filename)
+    input_dir = context.input_dir
+    bc3_path = context.bc3_path
+    output_dir = context.output_dir
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    yaml_path = input_dir / 'planificacion.yaml'
-    total = 4 if yaml_path.exists() else 3
+    yaml_path = context.planificacion_path
+    total = 4 if yaml_path is not None else 3
     output_path = output_dir / f'{project_name}_gantt.xlsx'
+    outputs: list[Path] = []
+    warnings: list[str] = []
 
     # ── BLOQUE 1: Presupuesto ──────────────────────────────────────────
     print(f'[1/{total}] Parseando BC3: {bc3_path.name}')
@@ -102,42 +89,46 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
           f'{len(presupuesto.recursos_mo)} recursos MO, '
           f'{len(presupuesto.recursos_mt)} recursos MT')
 
-    config_path = input_dir / 'config.yaml'
-    project_config: dict = {}
-    if config_path.exists():
-        project_config = yaml.safe_load(config_path.read_text(encoding='utf-8')) or {}
+    if context.config_path:
         presupuesto = presupuesto.model_copy(
-            update={'config': presupuesto.config.model_copy(update=project_config)}
+            update={'config': presupuesto.config.model_copy(update=context.project_config_update)}
         )
         print(f'      config.yaml cargado')
+    presupuesto = apply_document_identity_fallbacks(presupuesto, context)
 
-    companies_dir = Path('companies')
-    empresa_slug = project_config.get('empresa')
-    if empresa_slug and companies_dir.exists():
-        presupuesto.company = cargar_company(empresa_slug, companies_dir)
+    if context.company_config:
+        presupuesto.company = context.company_config
         print(f'      Empresa: {presupuesto.company.nombre} ({presupuesto.company.idioma})')
     else:
         print('      Sin empresa configurada — documentos sin branding')
+        warnings.append('No hay empresa configurada para esta ejecución.')
 
-    palette = build_palette(presupuesto.company)
+    presentation = build_presentation_context(presupuesto.company)
+    palette = presentation.palette
 
     print(f'[2/{total}] Generando documentos de presupuesto...')
     rutas = generar_todos(presupuesto, output_dir, palette=palette)
+    outputs.extend(rutas)
     for ruta in rutas:
         print(f'      {ruta.name}')
 
     print(f'[3/{total}] Generando gráficos de reporting...')
-    exportar_analisis(presupuesto, output_path, None)
-    report = AnalysisChartsReport(
-        excel_path=output_path,
+    exportar_analisis(presupuesto, output_path, None, palette=palette)
+    report = AnalysisChartsReport.from_presupuesto(
+        presupuesto=presupuesto,
         output_dir=output_dir / 'reporting',
+        palette=palette,
     )
     report.generate()
+    outputs.append(output_path)
+    outputs.extend(sorted((output_dir / 'reporting').rglob('*.png')))
     print(f'      {output_path.name}')
     print(f'      reporting/ ({len(list((output_dir / "reporting").rglob("*.png")))} gráficos)')
 
     # ── BLOQUE 2: Planificación (opcional) ────────────────────────────
-    if not yaml_path.exists():
+    if yaml_path is None:
+        warnings.append('No se encontró planificacion.yaml; se omitió planificación temporal.')
+        write_run_manifest(context, outputs, [], warnings, presentation=presentation)
         print()
         print('No se encontró planificacion.yaml — omitiendo Gantt y diagrama de red.')
         print(f'Documentos generados en: {output_dir}')
@@ -145,6 +136,9 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
 
     print('[4/4] Calculando planificación y exportando...')
     parametros, escenarios, tareas, bandas = cargar_planificacion_yaml(yaml_path)
+    warnings.extend(
+        validar_planificacion_previa(presupuesto, parametros, escenarios, tareas)
+    )
 
     planificaciones = []
     for escenario in escenarios:
@@ -163,13 +157,22 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
             f'{dias_totales} dias habiles - {cumple}'
         )
 
-    exportar_analisis(presupuesto, output_path, planificaciones)
+    exportar_analisis(presupuesto, output_path, planificaciones, palette=palette)
     print(f'      {output_path.name} (actualizado con planificación)')
 
     ruta_png = output_dir / f'{project_name}_gantt.png'
-    png_bytes = generar_diagrama_red(planificaciones[0])
+    png_bytes = generar_diagrama_red(planificaciones[0], palette=palette)
     ruta_png.write_bytes(png_bytes)
+    outputs.append(ruta_png)
     print(f'      {ruta_png.name}')
+
+    write_run_manifest(
+        context,
+        outputs,
+        [plan.escenario.nombre for plan in planificaciones],
+        warnings,
+        presentation=presentation,
+    )
 
     print()
     print(f'Completado. Resultados en: {output_dir}')

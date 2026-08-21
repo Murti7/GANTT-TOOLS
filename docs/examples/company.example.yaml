@@ -1,0 +1,39 @@
+identitat:
+  nombre: Example Engineering S.L.
+  tipo_entidad: sl
+  nif_cif: B00000000
+  direccion_fiscal: Example Street 1
+  telefono: ""
+  email: ""
+  web: ""
+
+fiscal:
+  tipo_entidad: sl
+  irpf_tipo: 0.0
+  iva_tipo: 0.21
+  irpf_inicio_actividad: false
+  nota_irpf: ""
+
+bancari:
+  iban: ""
+  bic_swift: ""
+  entitat_bancaria: ""
+  titular_compte: Example Engineering S.L.
+  termini_pagament_dies: 30
+  forma_pagament: transferencia
+
+branding:
+  color_primario: "#0E2B25"
+  color_secundario: "#1A7A5A"
+  color_acento: "#4F7B6E"
+  color_texto: "#1A1C1E"
+  color_fondo_alt: "#E6E6E6"
+  color_blanco: "#FFFFFF"
+  fuente_principal: Aptos
+  fuente_fallback: Calibri
+  logo: logo.png
+
+facturacio:
+  serie_factura: A
+  moneda: EUR
+  idioma: es

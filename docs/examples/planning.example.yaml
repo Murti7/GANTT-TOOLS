@@ -1,0 +1,24 @@
+proyecto:
+  nombre: Proyecto ejemplo
+  fecha_inicio: "2026-01-05"
+  horas_dia: 8
+  dias_semana: 5
+  plazo_contractual_dias: 60
+
+escenarios:
+  base:
+    MO-OFI1: 1
+
+tareas:
+  T1:
+    nombre: Ejecutar trabajos
+    tipo: tarea
+    capitulos_bc3: ["01#"]
+    dependencias: []
+  FIN:
+    nombre: Fin
+    tipo: hito
+    capitulos_bc3: []
+    duracion_dias_fija: 0
+    dependencias: [T1]
+    es_fin_plazo: true

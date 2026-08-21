@@ -27,6 +27,7 @@ from matplotlib.patches import FancyBboxPatch
 
 from gantt.planning.analyser import calcular_holguras, dias_habiles_entre
 from gantt.planning.models import BandaVisual, PlanificacionProyecto, TareaGantt
+from gantt.reporting.styles import DiagramStyle, DocumentPalette, build_palette
 
 
 COLOR_CRITICO = "#FFD6D6"
@@ -280,16 +281,22 @@ def es_critica(tarea: TareaGantt, holguras: dict[str, float]) -> bool:
     return holguras.get(tarea.id, 1.0) <= 0
 
 
-def color_tarea(tarea: TareaGantt, holguras: dict[str, float], post: set[str]) -> tuple[str, str]:
+def color_tarea(
+    tarea: TareaGantt,
+    holguras: dict[str, float],
+    post: set[str],
+    style: DiagramStyle | None = None,
+) -> tuple[str, str]:
+    style = style or build_palette(None).diagram
     if tarea.id in post or tarea.estacional:
-        return COLOR_POST, COLOR_POST_BORDE
+        return style.post_fill, style.post_border
     if tarea.es_fin_plazo:
-        return COLOR_FIN_PLAZO, COLOR_HITO_BORDE
+        return style.finish_fill, style.milestone_border
     if tarea.tipo == "hito":
-        return COLOR_HITO, COLOR_HITO_BORDE
+        return style.milestone_fill, style.milestone_border
     if es_critica(tarea, holguras):
-        return COLOR_CRITICO, COLOR_CRITICO_BORDE
-    return COLOR_NORMAL, COLOR_NORMAL_BORDE
+        return style.critical_fill, style.critical_border
+    return style.task_fill, style.task_border
 
 
 def wrap(texto: str, ancho: int) -> str:
@@ -303,27 +310,30 @@ def wrap(texto: str, ancho: int) -> str:
 
 def dibujar_fondo_bandas(
     ax, bandas: list[BandaVisual], bandas_y: dict[str, tuple[float, float]],
-    x_min: float, x_max: float,
+    x_min: float, x_max: float, style: DiagramStyle | None = None,
 ) -> None:
     """
     Dibuja los fondos de color de las bandas en toda la zona temporal.
     Solo fondos y separadores horizontales, sin texto.
     """
+    style = style or build_palette(None).diagram
     for banda in bandas:
         y_inf, y_sup = bandas_y[banda.id]
-        color = banda.color or COLOR_BANDA_DEFECTO
+        color = banda.color or style.band_default
         ax.axhspan(y_inf, y_sup, xmin=0, xmax=1, color=color, zorder=0)
-        ax.plot([x_min, x_max], [y_inf, y_inf], color="#BDBDBD", lw=0.7, zorder=1)
+        ax.plot([x_min, x_max], [y_inf, y_inf], color=style.panel_separator, lw=0.7, zorder=1)
 
 
 def dibujar_panel_bandas(
-    ax, bandas: list[BandaVisual], bandas_y: dict[str, tuple[float, float]]
+    ax, bandas: list[BandaVisual], bandas_y: dict[str, tuple[float, float]],
+    style: DiagramStyle | None = None,
 ) -> None:
     """
     Dibuja el panel izquierdo fijo: número, título y descripción de cada banda.
     Todo el contenido se posiciona entre x=0 y x=ANCHO_PANEL.
     Sin eje temporal, sin grid, sin flechas.
     """
+    style = style or build_palette(None).diagram
     for idx, banda in enumerate(bandas, start=1):
         y_inf, y_sup = bandas_y[banda.id]
         y_centro = (y_inf + y_sup) / 2
@@ -338,7 +348,7 @@ def dibujar_panel_bandas(
             va="center",
             fontsize=12,
             fontweight="bold",
-            color="#333333",
+            color=style.text,
             zorder=2,
         )
         ax.text(
@@ -349,7 +359,7 @@ def dibujar_panel_bandas(
             va="center",
             fontsize=9,
             fontweight="bold",
-            color=COLOR_TEXTO,
+            color=style.text,
             zorder=2,
         )
         ax.text(
@@ -359,11 +369,11 @@ def dibujar_panel_bandas(
             ha="left",
             va="center",
             fontsize=7,
-            color=COLOR_TEXTO,
+            color=style.text,
             zorder=2,
         )
 
-    ax.axvline(ANCHO_PANEL, color="#BDBDBD", lw=1.0, zorder=3)
+    ax.axvline(ANCHO_PANEL, color=style.panel_separator, lw=1.0, zorder=3)
 
 
 def dibujar_barra(
@@ -374,11 +384,13 @@ def dibujar_barra(
     y: float,
     color: str,
     borde: str,
+    style: DiagramStyle | None = None,
 ) -> None:
     """
     Dibuja la barra de una tarea con texto adaptativo según ancho disponible.
     x0 y x1 ya incluyen la transformación ANCHO_PANEL + días_relativos.
     """
+    style = style or build_palette(None).diagram
     alto = 0.56
     ancho_real = x1 - x0
 
@@ -401,7 +413,7 @@ def dibujar_barra(
         boxstyle="round,pad=0.025,rounding_size=0.04",
         facecolor=color,
         edgecolor=borde,
-        linewidth=1.6 if borde == COLOR_CRITICO_BORDE else 1.0,
+        linewidth=1.6 if borde == style.critical_border else 1.0,
         zorder=5,
     )
     ax.add_patch(rect)
@@ -413,8 +425,8 @@ def dibujar_barra(
         ha="center",
         va="center",
         fontsize=5.8,
-        fontweight="bold" if borde == COLOR_CRITICO_BORDE else "normal",
-        color=COLOR_TEXTO,
+        fontweight="bold" if borde == style.critical_border else "normal",
+        color=style.text,
         zorder=6,
         clip_on=True,
     )
@@ -427,11 +439,13 @@ def dibujar_hito(
     y: float,
     color: str,
     borde: str,
+    style: DiagramStyle | None = None,
 ) -> None:
     """
     Dibuja el rombo de un hito y su nombre corto a la derecha.
     x ya incluye la transformación ANCHO_PANEL + días_relativos.
     """
+    style = style or build_palette(None).diagram
     radio = 0.50
 
     rombo = mpatches.RegularPolygon(
@@ -454,7 +468,7 @@ def dibujar_hito(
         va="center",
         fontsize=6.5,
         fontweight="bold",
-        color=COLOR_TEXTO,
+        color=style.text,
         zorder=8,
     )
 
@@ -466,12 +480,20 @@ def dibujar_hito(
             ha="left",
             va="center",
             fontsize=6.0,
-            color=COLOR_TEXTO,
+            color=style.text,
             zorder=8,
         )
 
 
-def dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) -> None:
+def dibujar_entregables(
+    ax,
+    tarea: TareaGantt,
+    x: float,
+    y: float,
+    idx: int,
+    style: DiagramStyle | None = None,
+) -> None:
+    style = style or build_palette(None).diagram
     if not tarea.entregables:
         return
 
@@ -482,7 +504,7 @@ def dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) -> 
         ax.plot(
             [x, x_box - 0.08],
             [y - 0.22, y_box],
-            color=COLOR_DOC,
+            color=style.document,
             lw=0.55,
             linestyle="--",
             zorder=4,
@@ -495,11 +517,11 @@ def dibujar_entregables(ax, tarea: TareaGantt, x: float, y: float, idx: int) -> 
             ha="left",
             va="center",
             fontsize=5.5,
-            color=COLOR_TEXTO,
+            color=style.text,
             bbox={
                 "boxstyle": "round,pad=0.12",
                 "facecolor": "#FFFFFF",
-                "edgecolor": COLOR_DOC,
+                "edgecolor": style.document,
                 "linewidth": 0.55,
             },
             zorder=9,
@@ -512,7 +534,9 @@ def dibujar_dependencias(
     y_tareas: dict[str, float],
     base: date,
     holguras: dict[str, float],
+    style: DiagramStyle | None = None,
 ) -> None:
+    style = style or build_palette(None).diagram
     tarea_map = {t.id: t for t in tareas}
 
     for tarea in tareas:
@@ -531,7 +555,7 @@ def dibujar_dependencias(
             y_orig = y_tareas[origen.id]
 
             critica = es_critica(tarea, holguras) and es_critica(origen, holguras)
-            color = COLOR_DEP_CRITICA if critica else COLOR_DEP
+            color = style.dependency_critical if critica else style.dependency
             lw = 1.05 if critica else 0.55
 
             ax.annotate(
@@ -550,11 +574,18 @@ def dibujar_dependencias(
             )
 
 
-def dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
+def dibujar_eje(
+    ax,
+    x_min: float,
+    x_max: float,
+    y_min: float,
+    style: DiagramStyle | None = None,
+) -> None:
     """
     Dibuja el eje temporal con etiquetas de días hábiles relativos a H1.
     Las marcas se posicionan en x = ANCHO_PANEL + día_relativo.
     """
+    style = style or build_palette(None).diagram
     ax.set_xlim(x_min, x_max)
     ax.set_xlabel(
         "DÍAS HÁBILES DESDE EL INICIO DE OBRA (H1)",
@@ -575,9 +606,9 @@ def dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
     for d in range(dia_min_rel, dia_max_rel, 10):
         x = ANCHO_PANEL + d
         if x >= ANCHO_PANEL:
-            ax.axvline(x, color=COLOR_GRID, linestyle="--", lw=0.55, zorder=1)
+            ax.axvline(x, color=style.grid, linestyle="--", lw=0.55, zorder=1)
 
-    ax.axvline(ANCHO_PANEL, color="#333333", linewidth=1.1, zorder=2)
+    ax.axvline(ANCHO_PANEL, color=style.text, linewidth=1.1, zorder=2)
     ax.text(
         ANCHO_PANEL,
         y_min + 0.15,
@@ -586,12 +617,13 @@ def dibujar_eje(ax, x_min: float, x_max: float, y_min: float) -> None:
         va="bottom",
         fontsize=7,
         fontweight="bold",
-        color="#333333",
+        color=style.text,
         zorder=30,
     )
 
 
-def dibujar_leyenda(ax, x: float, y: float) -> None:
+def dibujar_leyenda(ax, x: float, y: float, style: DiagramStyle | None = None) -> None:
+    style = style or build_palette(None).diagram
     def caja(titulo: str, y_top: float, alto: float) -> None:
         rect = FancyBboxPatch(
             (x, y_top - alto),
@@ -599,7 +631,7 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
             alto,
             boxstyle="round,pad=0.28,rounding_size=0.06",
             facecolor="#FFFFFF",
-            edgecolor="#555555",
+            edgecolor=style.document,
             linewidth=0.8,
             zorder=20,
         )
@@ -624,8 +656,8 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
         0.85,
         0.22,
         boxstyle="round,pad=0.03,rounding_size=0.03",
-        facecolor=COLOR_NORMAL,
-        edgecolor=COLOR_NORMAL_BORDE,
+        facecolor=style.task_fill,
+        edgecolor=style.task_border,
         linewidth=0.8,
         zorder=21,
     )
@@ -638,8 +670,8 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
         4,
         radius=0.18,
         orientation=0.785398,
-        facecolor=COLOR_HITO,
-        edgecolor=COLOR_HITO_BORDE,
+        facecolor=style.milestone_fill,
+        edgecolor=style.milestone_border,
         linewidth=0.8,
         zorder=21,
     )
@@ -653,7 +685,7 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
         0.22,
         boxstyle="round,pad=0.03",
         facecolor="#FFFFFF",
-        edgecolor=COLOR_DOC,
+        edgecolor=style.document,
         linewidth=0.7,
         zorder=21,
     )
@@ -665,24 +697,24 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
         "",
         xy=(x + 1.3, y0),
         xytext=(x + 0.45, y0),
-        arrowprops={"arrowstyle": "->", "lw": 0.8, "color": COLOR_DEP},
+        arrowprops={"arrowstyle": "->", "lw": 0.8, "color": style.dependency},
         zorder=21,
     )
     ax.text(x + 1.65, y0, "Dependencia temporal", va="center", fontsize=6.6, zorder=21)
 
     y0 -= 0.43
-    ax.plot([x + 0.45, x + 1.3], [y0, y0], "--", lw=0.8, color=COLOR_DOC, zorder=21)
+    ax.plot([x + 0.45, x + 1.3], [y0, y0], "--", lw=0.8, color=style.document, zorder=21)
     ax.text(x + 1.65, y0, "Relación documental", va="center", fontsize=6.6, zorder=21)
 
     y2 = y - 4.35
     caja("LEYENDA DE COLORES", y2, 3.55)
 
     items = [
-        ("Camino crítico", COLOR_CRITICO, COLOR_CRITICO_BORDE),
-        ("Tarea con holgura", COLOR_NORMAL, COLOR_NORMAL_BORDE),
-        ("Hito contractual", COLOR_HITO, COLOR_HITO_BORDE),
-        ("Fin plazo contractual", COLOR_FIN_PLAZO, COLOR_HITO_BORDE),
-        ("Actividad diferida / post-plazo", COLOR_POST, COLOR_POST_BORDE),
+        ("Camino crítico", style.critical_fill, style.critical_border),
+        ("Tarea con holgura", style.task_fill, style.task_border),
+        ("Hito contractual", style.milestone_fill, style.milestone_border),
+        ("Fin plazo contractual", style.finish_fill, style.milestone_border),
+        ("Actividad diferida / post-plazo", style.post_fill, style.post_border),
     ]
 
     yc = y2 - 0.9
@@ -725,13 +757,17 @@ def dibujar_leyenda(ax, x: float, y: float) -> None:
     )
 
 
-def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
+def generar_diagrama_red(
+    planificacion: PlanificacionProyecto,
+    palette: DocumentPalette | None = None,
+) -> bytes:
     """
     Genera el diagrama temporal de implantación como PNG.
     """
     tareas = planificacion.tareas
     if not tareas:
         raise ValueError("La planificación no contiene tareas.")
+    style = (palette or build_palette(None)).diagram
 
     base = fecha_base(tareas)
     holguras = calcular_holguras(tareas)
@@ -750,10 +786,10 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
 
     fig, ax = plt.subplots(figsize=(24, 14))
 
-    dibujar_fondo_bandas(ax, bandas_render, bandas_y, x_min, x_max)
-    dibujar_panel_bandas(ax, bandas_render, bandas_y)
-    dibujar_eje(ax, x_min, x_max, y_min)
-    dibujar_dependencias(ax, tareas, y_tareas, base, holguras)
+    dibujar_fondo_bandas(ax, bandas_render, bandas_y, x_min, x_max, style)
+    dibujar_panel_bandas(ax, bandas_render, bandas_y, style)
+    dibujar_eje(ax, x_min, x_max, y_min, style)
+    dibujar_dependencias(ax, tareas, y_tareas, base, holguras, style)
 
     for idx, tarea in enumerate(tareas):
         if tarea.id not in y_tareas:
@@ -762,16 +798,16 @@ def generar_diagrama_red(planificacion: PlanificacionProyecto) -> bytes:
         y = y_tareas[tarea.id]
         x0 = x_plot(tarea.fecha_inicio, base)
         x1 = x_plot(tarea.fecha_fin, base)
-        color, borde = color_tarea(tarea, holguras, post)
+        color, borde = color_tarea(tarea, holguras, post, style)
 
         if tarea.tipo == "hito":
-            dibujar_hito(ax, tarea, x0, y, color, borde)
-            dibujar_entregables(ax, tarea, x0 + 0.4, y, idx)
+            dibujar_hito(ax, tarea, x0, y, color, borde, style)
+            dibujar_entregables(ax, tarea, x0 + 0.4, y, idx, style)
         else:
-            dibujar_barra(ax, tarea, x0, x1, y, color, borde)
-            dibujar_entregables(ax, tarea, x1, y, idx)
+            dibujar_barra(ax, tarea, x0, x1, y, color, borde, style)
+            dibujar_entregables(ax, tarea, x1, y, idx, style)
 
-    dibujar_leyenda(ax, x_max - 11.8, y_max - 0.6)
+    dibujar_leyenda(ax, x_max - 11.8, y_max - 0.6, style)
 
     ax.set_title(
         "DIAGRAMA TEMPORAL DE IMPLANTACIÓN, DEPENDENCIAS PRINCIPALES Y CAMINO CRÍTICO",

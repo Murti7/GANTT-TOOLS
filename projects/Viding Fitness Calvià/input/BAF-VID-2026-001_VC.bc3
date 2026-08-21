@@ -1,0 +1,460 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\3\3\3\2\2\2\2\EUR\|0\0\0\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|BAF-VID-2026-001_V2.2##||Importado desde ficheros CSV|9415.01|210826|0|
+~D|BAF-VID-2026-001_V2.2##
+|01#\\1
+\02#\\1
+\03#\\1
+\04#\\1
+\05#\\1
+\06#\\1
+\07#\\1
+\08#\\1
+\09#\\1
+\10#\\1
+\|
+~C|01#||INFORMACIÓN TÉCNICA Y CARACTERIZACIÓN DEL CENTRO|745||0|
+~T|01#|Gestión técnica y documental necesaria para el desarrollo ordenado de la auditoría, incluyendo coordinación con Viding, solicitud, recepción, clasificación y control de la información disponible, identificación de carencias y organización de la base documental de trabajo. El capítulo establece las condiciones de partida necesarias para desarrollar posteriormente los análisis energéticos y técnicos con información estructurada y trazable.|
+~D|01#
+|01.01\\1
+\|
+~C|01.01|ud|Levantamiento inicial, información técnica y caracterización del centro|745||0|
+~T|01.01|Servicio de recopilación, organización y caracterización inicial de la información necesaria para establecer una base técnica fiable de la auditoría y comprender el funcionamiento general del centro antes de abordar los análisis específicos de cada suministro.
+
+Incluye:
+- Gestión de la solicitud, recepción, clasificación y trazabilidad de contratos, facturas, históricos de consumo, planos, proyectos, esquemas, fichas técnicas, documentación de mantenimiento y datos de monitorización disponibles.
+- Identificación de documentación recibida, pendiente, incompleta o no disponible y preparación de las aclaraciones necesarias.
+- Caracterización funcional del centro: horarios, calendario, servicios, usuarios, accesos, ocupación, superficies y cambios operativos o reformas relevantes.
+- Identificación preliminar de suministros, contadores, subcontadores, sistemas energéticos, equipos principales y fuentes de datos.
+- Evaluación inicial de coherencia, resolución temporal y suficiencia de la información para los análisis posteriores.
+- Organización de la base documental y de datos de trabajo, diferenciando información medida, facturada, documentada, calculada o estimada.
+- Preparación de las necesidades de contraste documental e inspección que deberán resolverse durante el trabajo de campo.
+
+Resultado de los trabajos:
+Base documental estructurada y caracterización inicial del centro, con identificación de la información disponible, carencias relevantes, sistemas energéticos principales y condicionantes para el desarrollo de la auditoría.|
+~D|01.01
+|MO-II\\5
+\MO-ITI\\13
+\|
+~C|MO-II|h|Ingeniero Industrial|45||1|
+~C|MO-ITI|h|Ingeniero Técnico Industrial|40||1|
+~C|02#||AUDITORÍA DEL SUMINISTRO ELÉCTRICO|1135||0|
+~T|02#|Análisis energético y económico del suministro eléctrico mediante revisión contractual y de facturación, tratamiento de curvas de carga y caracterización temporal de la demanda, potencia, energía reactiva, carga base y comportamiento fuera de horario. El capítulo permitirá identificar patrones de consumo, anomalías y oportunidades de optimización contractual u operativa, relacionando la demanda eléctrica con la actividad y los principales usos del centro.|
+~D|02#
+|02.01\\1
+\02.02\\1
+\02.03\\1
+\02.04\\1
+\|
+~C|02.01|ud|Análisis contractual, facturación y costes eléctricos|170||0|
+~T|02.01|Servicio de análisis técnico-económico del suministro eléctrico a partir del contrato y del histórico de facturación disponible, orientado a reconstruir la estructura real del coste eléctrico e identificar desviaciones u oportunidades de optimización contractual.
+
+Incluye:
+- Revisión de contrato, tarifa, potencia contratada, periodos tarifarios y condiciones económicas relevantes.
+- Consolidación del histórico de facturación y comprobación de coherencia entre periodos, energía registrada e importes facturados.
+- Análisis de energía activa, potencia facturada o demandada, excesos de potencia cuando proceda y energía reactiva.
+- Desagregación de términos fijos, variables, peajes, cargos y otros conceptos relevantes para interpretar el coste.
+- Cálculo de precios efectivos y evolución temporal de los principales componentes económicos.
+- Identificación de cambios contractuales, discontinuidades, penalizaciones o patrones de facturación susceptibles de revisión.
+- Evaluación preliminar de la adecuación de potencia y estructura contractual al comportamiento observado de la demanda.
+
+Resultado de los trabajos:
+Caracterización contractual y económica del suministro eléctrico, con estructura de costes reconstruida e identificación de posibles oportunidades de optimización que deban contrastarse con el análisis de demanda.|
+~D|02.01
+|MO-II\\2
+\MO-ITI\\2
+\|
+~C|02.02|ud|Análisis de demanda, curvas de carga y potencia|375||0|
+~T|02.02|Servicio de análisis de la demanda eléctrica mediante tratamiento de curvas de carga y series temporales disponibles, destinado a caracterizar el comportamiento operativo del centro y detectar patrones de consumo anómalos o mejorables.
+
+Incluye:
+- Depuración, homogeneización y tratamiento de curvas horarias o cuarto-horarias, con control de huecos, duplicidades y discontinuidades relevantes.
+- Obtención de perfiles diarios, semanales, mensuales y estacionales, diferenciando días laborables, fines de semana y periodos de distinta actividad.
+- Análisis de potencia máxima, distribución de demanda, factores de utilización y relación con la potencia contratada.
+- Determinación de carga base y cuantificación del consumo fuera de horario o en periodos de baja ocupación.
+- Identificación de rampas, picos, cambios de régimen, consumos persistentes y comportamientos atípicos.
+- Cruce con horarios, calendario, usuarios, actividad y variables operativas disponibles.
+- Construcción de indicadores eléctricos que permitan comparar periodos y establecer referencias para el diagnóstico.
+- Selección de periodos o anomalías que deban investigarse mediante documentación, BMS o inspección in situ.
+
+Resultado de los trabajos:
+Caracterización temporal de la demanda eléctrica, con perfiles representativos, carga base, máximos, comportamiento fuera de horario y anomalías relevantes identificadas.|
+~D|02.02
+|MO-II\\3
+\MO-ITI\\6
+\|
+~C|02.03|ud|Caracterización energética de instalaciones y principales cargas|250||0|
+~T|02.03|Servicio de caracterización energética de las instalaciones eléctricas y de los principales consumidores del centro, orientado a relacionar la demanda medida con los sistemas y usos que previsiblemente la generan, sin constituir un levantamiento reglamentario completo de la instalación.
+
+Incluye:
+- Revisión de esquemas, cuadros, proyectos, inventarios y documentación técnica disponible de los sistemas eléctricamente relevantes.
+- Identificación de principales cargas: climatización, bombeo, ventilación, iluminación, equipos deportivos, restauración, SPA, auxiliares y otros consumidores significativos.
+- Recopilación de potencias nominales, horarios, modos de operación y sistemas de regulación cuando aporten capacidad diagnóstica.
+- Contraste entre información documental, observaciones de campo y comportamiento de las curvas de demanda.
+- Estimación de órdenes de magnitud de consumo por sistemas cuando exista base técnica suficiente, evitando atribuciones no soportadas por medida o información disponible.
+- Identificación de cargas permanentes, funcionamiento simultáneo, equipos fuera de horario y oportunidades de submedición.
+- Selección de consumidores o circuitos que requieran verificaciones específicas durante la inspección.
+
+Resultado de los trabajos:
+Mapa funcional de los principales consumidores eléctricos y relación técnicamente justificada entre instalaciones, operación y patrones de demanda observados.|
+~D|02.03
+|MO-II\\2
+\MO-ITI\\4
+\|
+~C|02.04|ud|Diagnóstico energético integrado del sistema eléctrico|340||0|
+~T|02.04|Servicio de diagnóstico integrado del comportamiento eléctrico del centro mediante combinación de resultados contractuales, curvas de demanda, caracterización de cargas, información operativa y evidencias obtenidas durante la auditoría.
+
+Incluye:
+- Integración de resultados de facturación, potencia, energía activa y reactiva, perfiles temporales y principales consumidores.
+- Contraste de anomalías detectadas con horarios, actividad, ocupación, BMS, mantenimiento e inspección de instalaciones.
+- Identificación de consumos evitables, carga base excesiva, funcionamiento fuera de horario, simultaneidades y desajustes entre demanda y contratación.
+- Evaluación de oportunidades de optimización contractual, operativa, de regulación, mantenimiento y control.
+- Estimación del impacto energético y económico de desviaciones cuando los datos permitan una cuantificación suficientemente robusta.
+- Identificación de necesidades de submedición o monitorización adicional cuando una anomalía relevante no pueda resolverse con la información existente.
+- Formulación de conclusiones eléctricas que alimenten el diagnóstico global y la posterior definición de medidas.
+
+Resultado de los trabajos:
+Diagnóstico energético del sistema eléctrico, con anomalías, causas probables, impactos y oportunidades de mejora identificadas y trazables respecto a la evidencia analizada.|
+~D|02.04
+|MO-II\\4
+\MO-ITI\\4
+\|
+~C|03#||AUDITORÍA DEL SUMINISTRO DE GAS Y EVALUACIÓN DEL EVENTUAL SOBRECONSUMO|800||0|
+~T|03#|Análisis del suministro y consumo de gas destinado a determinar su evolución, estructura de costes, comportamiento temporal y relación con actividad, climatología y otras variables explicativas. Incluye la normalización de consumos y, cuando exista información comparable, benchmarking con otros centros de Viding, con objeto de verificar y cuantificar el eventual sobreconsumo y proporcionar una base objetiva para su posterior diagnóstico físico.|
+~D|03#
+|03.01\\1
+\03.02\\1
+\03.03\\1
+\|
+~C|03.01|ud|Análisis contractual, facturación e histórico de consumo de gas|165||0|
+~T|03.01|Servicio de análisis del suministro de gas a partir de las condiciones contractuales y del histórico de facturación, diferenciando expresamente consumo energético y gasto económico para establecer una base cuantitativa fiable del diagnóstico térmico.
+
+Incluye:
+- Revisión del contrato, identificación del suministro, estructura tarifaria y conceptos económicos relevantes.
+- Consolidación y validación del histórico de facturas y lecturas disponibles, preferentemente sobre un periodo suficientemente representativo.
+- Homogeneización de unidades y comprobación de factores de conversión cuando la facturación parta de volumen de gas.
+- Análisis de energía consumida, coste total, términos fijos y variables, precio efectivo y evolución de los principales componentes.
+- Comprobación de periodos facturados, lecturas reales o estimadas, regularizaciones, discontinuidades y cambios contractuales.
+- Identificación de diferencias entre variaciones de coste y variaciones reales de consumo.
+- Preparación de una serie histórica energética coherente para los análisis de normalización y benchmarking posteriores.
+
+Resultado de los trabajos:
+Histórico validado de consumo y coste de gas, con estructura económica caracterizada y base energética homogénea para evaluar objetivamente el eventual sobreconsumo.|
+~D|03.01
+|MO-II\\1
+\MO-ITI\\3
+\|
+~C|03.02|ud|Caracterización temporal y normalización de la demanda de gas|335||0|
+~T|03.02|Servicio de caracterización temporal y normalización de la demanda de gas para determinar cómo evoluciona el consumo, qué variables explican sus variaciones y qué parte de su comportamiento permanece potencialmente anómala.
+
+Incluye:
+- Análisis mensual y, cuando exista resolución suficiente, diario o de mayor detalle del consumo de gas.
+- Identificación de estacionalidad, consumo base, máximos, mínimos, cambios de régimen y discontinuidades entre periodos.
+- Evaluación de la persistencia de demanda en épocas de baja necesidad térmica y localización temporal de posibles desviaciones.
+- Cruce del consumo con temperatura exterior y construcción de indicadores climáticos, como grados-día, cuando sean representativos.
+- Relación con usuarios, accesos, horarios, días de apertura, actividad, servicios y otras variables explicativas disponibles.
+- Análisis de cambios temporales asociados a reformas, averías, modificaciones de horarios, mantenimiento o incorporación de nuevos servicios.
+- Desarrollo de indicadores normalizados que permitan separar variaciones razonablemente explicables de aquellas que requieran investigación adicional.
+
+Resultado de los trabajos:
+Perfil temporal y normalizado de la demanda de gas, con identificación de periodos anómalos, variables explicativas relevantes y desviaciones que deban contrastarse mediante benchmarking y diagnóstico térmico.|
+~D|03.02
+|MO-II\\3
+\MO-ITI\\5
+\|
+~C|03.03|ud|Benchmarking y evaluación del eventual sobreconsumo de gas|300||0|
+~T|03.03|Servicio de benchmarking y evaluación cuantitativa del eventual sobreconsumo de gas, utilizando como referencia prioritaria otros centros Viding cuando exista información comparable y complementando el análisis con indicadores normalizados.
+
+Incluye:
+- Evaluación previa de comparabilidad entre centros en términos de periodo, usuarios, accesos, superficie, horarios, clima, servicios, ACS, climatización y características generales de operación.
+- Homogeneización de consumos y periodos para evitar comparaciones directas entre magnitudes no equivalentes.
+- Construcción de indicadores como kWh/usuario, kWh/acceso, kWh/m2, kWh/día de actividad u otros técnicamente representativos.
+- Comparación mediante varios indicadores complementarios, evitando utilizar un único KPI como prueba concluyente.
+- Cuantificación de la desviación absoluta y relativa cuando la calidad de los datos lo permita.
+- Evaluación de qué parte de la diferencia puede explicarse por actividad, clima o configuración funcional y qué parte permanece sin justificar.
+- Determinación de la magnitud y patrón temporal que deberá investigarse físicamente en el sistema térmico.
+
+Resultado de los trabajos:
+Conclusión técnica sobre la existencia y magnitud del eventual sobreconsumo de gas, o identificación explícita de la incertidumbre residual y de la información necesaria para resolverla.|
+~D|03.03
+|MO-II\\4
+\MO-ITI\\3
+\|
+~C|04#||AUDITORÍA DEL SUMINISTRO DE AGUA|330||0|
+~T|04#|Auditoría básica del suministro de agua, centrada en evolución del consumo, indicadores normalizados, principales usos y detección de anomalías, con especial atención a su relación con usuarios, duchas, vestuarios, SPA, psicinia climatizada, y producción de ACS por su capacidad para aportar evidencia al diagnóstico térmico.|
+~D|04#
+|04.01\\1
+\|
+~C|04.01|ud|Análisis del consumo de agua, usos principales y anomalías|330||0|
+~T|04.01|Servicio de auditoría básica del suministro de agua, orientado a caracterizar su evolución, relacionarlo con la actividad del centro e identificar anomalías o usos con incidencia energética, especialmente aquellos vinculados a la producción de ACS.
+
+Incluye:
+- Revisión de contrato, facturación e histórico de consumos disponible.
+- Consolidación de consumos mensuales y análisis de evolución, estacionalidad, máximos, mínimos y posibles discontinuidades.
+- Construcción de indicadores por usuario, acceso, día de apertura u otras variables representativas.
+- Identificación de consumos base, incrementos no explicados y posibles indicios de fugas o consumos permanentes.
+- Caracterización funcional de los principales usos: duchas y vestuarios, ACS, SPA, limpieza, riego, restauración y otros servicios relevantes.
+- Revisión de contadores y subcontadores disponibles y evaluación de la capacidad real de desagregación.
+- Cruce agua-usuarios y agua-ACS para aportar evidencia al diagnóstico del consumo térmico.
+- Identificación de oportunidades operativas o de medida que puedan reducir consumo o mejorar su control.
+
+Resultado de los trabajos:
+Caracterización del consumo de agua, indicadores normalizados, principales usos y anomalías identificadas, incluyendo su relación con la demanda de ACS cuando resulte relevante.|
+~D|04.01
+|MO-II\\2
+\MO-ITI\\6
+\|
+~C|05#||AUDITORÍA Y DIAGNÓSTICO DEL SISTEMA TÉRMICO|2485||0|
+~T|05#|Auditoría energética y funcional del sistema térmico desde la generación hasta los principales usos finales, incluyendo generación, acumulación e intercambio, distribución térmica, ACS, piscinas climatizadas y SPA, climatización, ventilación, recuperación, regulación y BMS. El análisis estará orientado a comprender los flujos de energía, identificar pérdidas e ineficiencias y explicar las causas del eventual sobreconsumo, sin constituir una auditoría hidráulica integral ni una comprobación exhaustiva del dimensionamiento de las instalaciones.|
+~D|05#
+|05.01\\1
+\05.02\\1
+\05.03\\1
+\05.04\\1
+\05.05\\1
+\|
+~C|05.01|ud|Reconstrucción funcional del sistema térmico|420||0|
+~T|05.01|Servicio de reconstrucción funcional del sistema térmico del centro a partir de documentación técnica, información de mantenimiento, BMS y contraste con la instalación existente, con el nivel de detalle necesario para comprender los flujos de energía y dirigir el diagnóstico causal.
+
+Incluye:
+- Revisión de proyectos RITE, reformas, esquemas hidráulicos, planos, fichas de equipos, manuales, documentación de control y mantenimiento disponibles.
+- Identificación de generadores, acumuladores, intercambiadores, colectores, bombas, circuitos, válvulas, consumidores térmicos, instrumentación y puntos de medida.
+- Reconstrucción de las relaciones entre generación, acumulación, intercambio y distribución térmica y los principales usos finales: ACS y duchas, climatización, ventilación, piscinas climatizadas, SPA y otros servicios térmicamente relevantes.
+- Identificación de circuitos primarios y secundarios, retornos, bypass, recirculaciones y conexiones relevantes para el comportamiento energético.
+- Contraste entre diseño documentado, modificaciones posteriores y configuración observada durante la inspección.
+- Identificación de equipos o circuitos heredados, anulados, modificados o insuficientemente documentados que puedan afectar a la operación.
+- Elaboración de un esquema funcional simplificado orientado al diagnóstico, diferenciándolo expresamente de un levantamiento as-built.
+
+Resultado de los trabajos:
+Modelo funcional del sistema térmico, identificando los flujos de energía desde generación hasta los principales usos finales y los equipos, circuitos e interacciones relevantes para el diagnóstico energético.|
+~D|05.01
+|MO-II\\4
+\MO-ITI\\6
+\|
+~C|05.02|ud|Análisis energético de generación, distribución térmica y principales usos|670||0|
+~T|05.02|Servicio de análisis energético y funcional de la generación, acumulación, intercambio y distribución de energía térmica hacia ACS, piscinas climatizadas, SPA y demás usos conectados, orientado a determinar cómo se produce y utiliza el calor y qué pérdidas, regímenes de funcionamiento o condiciones operativas pueden contribuir al consumo de gas.
+
+Incluye:
+- Caracterización de generadores: tecnología, potencia, antigüedad, modulación, secuenciación, temperaturas, horas de funcionamiento y condiciones de carga parcial.
+- Evaluación de potencia instalada frente a demanda observada, ciclos de funcionamiento, standby y mantenimiento de temperatura sin demanda.
+- Revisión de condiciones de condensación cuando proceda y de análisis de combustión disponibles: O2, CO2, CO, temperatura de humos, exceso de aire y rendimiento.
+- Análisis de los circuitos térmicos asociados a piscinas climatizadas y SPA: generación o intercambio, temperaturas de primario y secundario, consignas, horarios, régimen de circulación y condiciones de operación relevantes para determinar su demanda e incidencia sobre el consumo térmico.
+- Análisis de depósitos, acumuladores e intercambiadores: volumen, temperaturas, estratificación, aislamiento, pérdidas y lógica de carga/descarga.
+- Análisis energético-funcional de bombas, válvulas, bypass, colectores y circuitos únicamente en el grado necesario para interpretar caudales, saltos térmicos, circulación, transferencia de energía y condiciones de funcionamiento con incidencia energética.
+- Análisis específico de ACS: producción, acumulación, mezcla, distribución, recirculación, temperaturas, horarios y pérdidas permanentes, relacionándolo con el consumo de agua y usuarios.
+- Revisión del estado de aislamiento, mantenimiento e incidencias que puedan afectar al rendimiento del conjunto.
+
+Resultado de los trabajos:
+Diagnóstico técnico de la cadena generación-distribución-ACS, con identificación de pérdidas, ineficiencias y condiciones operativas capaces de explicar parte del consumo térmico.|
+~D|05.02
+|MO-II\\6
+\MO-ITI\\10
+\|
+~C|05.03|ud|Análisis de climatización, ventilación y recuperación de calor|420||0|
+~T|05.03|Servicio de análisis de los sistemas de climatización, ventilación y recuperación de calor con incidencia térmica, destinado a determinar su contribución a la demanda y detectar condiciones de funcionamiento incompatibles con una operación energéticamente eficiente.
+
+Incluye:
+- Identificación de UTAs, climatizadores, baterías, fan-coils, unidades terminales, sistemas autónomos y zonas atendidas.
+- Caracterización de horarios, consignas, temperaturas y modos de funcionamiento de los equipos térmicamente relevantes.
+- Análisis de aportación de aire exterior, ventilación, free-cooling y estrategias de recuperación de calor existentes.
+- Revisión específica de zonas húmedas y SPA, incluyendo necesidades de ventilación, control de humedad y deshumidificación cuando existan.
+- Identificación de calefacción y refrigeración simultáneas, baterías activas sin demanda, funcionamiento fuera de ocupación o consignas incompatibles.
+- Evaluación de recuperación de calor inexistente, anulada o con funcionamiento deficiente cuando pueda representar una carga significativa.
+- Contraste con BMS, horarios de ocupación y condiciones ambientales disponibles.
+- Estimación del impacto de desviaciones cuando exista información suficiente, sin atribuir automáticamente demanda térmica al vaso principal de piscina no calefactado.
+
+Resultado de los trabajos:
+Caracterización de la demanda térmica asociada a HVAC y ventilación e identificación de anomalías de operación, simultaneidad o recuperación con incidencia energética.|
+~D|05.03
+|MO-II\\4
+\MO-ITI\\6
+\|
+~C|05.04|ud|Análisis de regulación, control, BMS y condiciones de operación|420||0|
+~T|05.04|Servicio de análisis de la regulación, BMS y condiciones reales de operación del sistema térmico, orientado a reconstruir qué órdenes mantienen activos los equipos, cuándo se generan y si la lógica de control responde adecuadamente a la demanda del centro.
+
+Incluye:
+- Revisión de arquitectura y variables BMS disponibles, calendarios, horarios, consignas, alarmas y programaciones.
+- Análisis de secuencias de arranque y parada, prioridades, enclavamientos, modos verano/invierno, compensación climática y estrategias de anticipación.
+- Identificación de overrides manuales, equipos en modo manual, automatismos anulados y condiciones de funcionamiento permanente.
+- Contraste de sensores, actuadores, válvulas, variadores y estados ON/OFF cuando la información permita evaluar su coherencia.
+- Tratamiento de históricos BMS exportables para relacionar órdenes de control con temperaturas, demanda y funcionamiento real.
+- Investigación de demandas persistentes provocadas por consignas, sensores, válvulas o secuencias incorrectas.
+- Contraste con incidencias de mantenimiento, averías recurrentes y modificaciones de programación.
+- Identificación de oportunidades de ajuste de horarios, consignas, secuencias y control que puedan aplicarse sin reforma sustancial.
+
+Resultado de los trabajos:
+Diagnóstico de la estrategia de regulación y control, con identificación de secuencias o condiciones operativas susceptibles de provocar consumo térmico innecesario.|
+~D|05.04
+|MO-II\\4
+\MO-ITI\\6
+\|
+~C|05.05|ud|Balance térmico y diagnóstico causal del eventual sobreconsumo|555||0|
+~T|05.05|Servicio de elaboración del balance térmico y diagnóstico causal del eventual sobreconsumo, integrando consumos de gas, modelo funcional, generación, hidráulica, ACS, HVAC, BMS, mantenimiento, inspección y mediciones disponibles.
+
+Incluye:
+- Reconstrucción del flujo energético desde la energía adquirida hasta los principales usos térmicos —ACS, climatización, ventilación, piscinas climatizadas, SPA y otros usos identificados— y las pérdidas técnicamente cuantificables.
+- Elaboración del balance con el máximo grado de desagregación soportado por datos, submedición y estimaciones técnicamente justificables.
+- Contraste de hipótesis relativas a rendimiento de generación, carga parcial, temperaturas, pérdidas de acumulación y distribución, bombeo, bypass, ACS, ventilación, recuperación y control.
+- Relación entre evidencias temporales del capítulo de gas y comportamiento físico de los sistemas térmicos.
+- Cuantificación de pérdidas o desviaciones cuando exista base técnica suficiente, indicando hipótesis e incertidumbre asociada.
+- Clasificación de causas según grado de evidencia: verificadas, fuertemente soportadas, probables o pendientes de verificación.
+- Identificación de combinaciones de causas cuando el sobreconsumo no responda a una única anomalía.
+- Definición de mediciones, submedición o estudios adicionales necesarios para resolver cuestiones relevantes que permanezcan abiertas.
+
+Resultado de los trabajos:
+Balance térmico técnicamente justificable y diagnóstico causal estructurado del eventual sobreconsumo, con causas, evidencias, impactos e incertidumbres claramente identificados.|
+~D|05.05
+|MO-II\\7
+\MO-ITI\\6
+\|
+~C|06#||INSPECCIÓN TÉCNICA, VERIFICACIONES Y MEDICIONES IN SITU|1090||0|
+~T|06#|Inspección técnica dirigida de las instalaciones y sistemas energéticamente relevantes para contrastar la documentación y los análisis previos con las condiciones reales de funcionamiento. Comprende reconocimiento visual, identificación y contraste de equipos y circuitos, revisión de consignas y estados operativos, entrevistas técnicas, toma de evidencias y realización de lecturas y mediciones puntuales necesarias para verificar hipótesis y sustentar el diagnóstico energético.|
+~D|06#
+|06.01\\1
+\|
+~C|06.01|ud|Inspección técnica, verificaciones y mediciones in situ|1090||0|
+~T|06.01|Servicio de inspección técnica dirigida de las instalaciones energéticas del centro, incluyendo verificaciones operativas y mediciones puntuales destinadas a contrastar la documentación, validar hipótesis y obtener evidencias para los análisis eléctrico, térmico y de agua.
+
+Incluye:
+- Preparación previa de plantillas de revisión, recorridos y puntos de verificación a partir de anomalías detectadas durante el análisis documental y de consumos.
+- Inspección visual de salas técnicas, generación térmica, distribución, ACS, climatización, ventilación, cuadros y principales consumidores energéticos.
+- Identificación de equipos, lectura de placas, estados de operación, consignas, horarios, posiciones de válvulas y condiciones aparentes de mantenimiento.
+- Contraste entre esquemas/documentación y configuración real de las instalaciones.
+- Mediciones puntuales técnicamente justificadas de temperaturas, condiciones ambientales, parámetros eléctricos u otras variables accesibles mediante instrumentación portátil disponible.
+- Lectura de variables existentes en contadores, BMS, variadores y equipos cuando resulten útiles para el diagnóstico.
+- Entrevistas con responsables de operación y mantenimiento para identificar averías, modificaciones, automatismos anulados y modos de funcionamiento reales.
+- Registro fotográfico y estructurado de evidencias y hallazgos relevantes.
+
+Resultado de los trabajos:
+Conjunto trazable de observaciones, lecturas, mediciones y evidencias de campo que permita confirmar o descartar hipótesis y completar el diagnóstico energético.|
+~D|06.01
+|MO-II\\10
+\MO-ITI\\16
+\|
+~C|07#||BALANCE Y DIAGNÓSTICO ENERGÉTICO GLOBAL|510||0|
+~T|07#|Integración de los resultados obtenidos para construir una interpretación conjunta del comportamiento energético y de agua del centro, relacionando suministros, actividad, instalaciones, operación, BMS, inspección y mediciones. Se elaborarán los balances e indicadores técnicamente justificables y se contrastarán las principales anomalías e hipótesis, determinando su relevancia, impacto y grado de evidencia y evitando considerar aisladamente fenómenos relacionados entre distintos vectores.|
+~D|07#
+|07.01\\1
+\|
+~C|07.01|ud|Balance energético global y diagnóstico del centro|510||0|
+~T|07.01|Servicio de integración de los resultados de electricidad, gas, agua, sistema térmico y trabajo de campo para construir una visión energética global del centro, identificar interacciones entre vectores y establecer las conclusiones técnicas consolidadas de la auditoría.
+
+Incluye:
+- Integración de consumos, costes, indicadores, perfiles temporales y resultados de los distintos capítulos técnicos.
+- Construcción de balances energéticos globales y parciales hasta el nivel de desagregación soportado por la información disponible.
+- Cruce de electricidad, gas y agua con actividad, usuarios, horarios, clima, BMS, reformas e incidencias de mantenimiento.
+- Análisis de relaciones agua-ACS-gas, electricidad-climatización y otras interdependencias con capacidad diagnóstica.
+- Consolidación de anomalías evitando duplicidades entre sistemas y diferenciando causas, síntomas y consecuencias.
+- Cuantificación de impactos energéticos y económicos cuando exista base suficiente, incluyendo rangos cuando la incertidumbre sea relevante.
+- Clasificación estructurada de hallazgos según evidencia, impacto, urgencia y necesidad de desarrollo posterior.
+- Identificación de cuestiones no resueltas y de las actuaciones necesarias para reducir la incertidumbre.
+
+Resultado de los trabajos:
+Diagnóstico energético global del centro, con balances, interacciones entre vectores, hallazgos priorizados y base técnica consolidada para definir las medidas de mejora.|
+~D|07.01
+|MO-II\\6
+\MO-ITI\\6
+\|
+~C|08#||MEDIDAS DE MEJORA Y EVALUACIÓN TÉCNICO-ECONÓMICA|1820||0|
+~T|08#|Identificación, definición y evaluación preliminar de actuaciones derivadas del diagnóstico, incluyendo medidas operativas, mantenimiento, regulación y control, reformas de instalaciones y oportunidades estratégicas que resulten justificadas. Las medidas se analizarán en términos de ahorro energético y económico, inversión orientativa, retorno, complejidad, incertidumbre y necesidad de desarrollo posterior, considerando posibles interacciones o solapamientos entre actuaciones.|
+~D|08#
+|08.01\\1
+\08.02\\1
+\08.03\\1
+\|
+~C|08.01|ud|Identificación y definición técnica de medidas de mejora|550||0|
+~T|08.01|Servicio de identificación y definición técnica preliminar de medidas de mejora derivadas directamente de los hallazgos de la auditoría, diferenciando actuaciones operativas, mantenimiento, pequeñas correcciones, reformas e iniciativas que requieran estudios posteriores.
+
+Incluye:
+- Transformación de hallazgos y causas diagnosticadas en actuaciones concretas y técnicamente coherentes.
+- Definición de medidas de ajuste de horarios, consignas, secuencias, regulación, mantenimiento y optimización contractual.
+- Identificación de mejoras sobre generación, distribución, ACS, climatización, ventilación, control, submedición y otros sistemas cuando estén justificadas.
+- Definición conceptual de reformas o renovaciones necesarias, indicando objetivo, sistema afectado y principio de solución.
+- Screening preliminar de oportunidades estratégicas como fotovoltaica, marquesinas, recarga de vehículo eléctrico, almacenamiento o electrificación térmica cuando resulten razonables.
+- Identificación de incompatibilidades, dependencias y posibles solapes entre actuaciones.
+- Determinación del nivel de desarrollo requerido para cada medida: ejecución directa, mantenimiento, pequeña ingeniería, estudio de viabilidad, proyecto o campaña adicional de medición.
+
+Resultado de los trabajos:
+Cartera estructurada de medidas vinculadas a los hallazgos de la auditoría, con definición técnica suficiente para su evaluación y posterior toma de decisiones.|
+~D|08.01
+|MO-II\\6
+\MO-ITI\\7
+\|
+~C|08.02|ud|Evaluación técnico-económica de las medidas|590||0|
+~T|08.02|Servicio de evaluación técnico-económica preliminar de las medidas de mejora con el nivel de precisión compatible con una auditoría energética, orientado a comparar alternativas y establecer su atractivo energético, económico y operativo.
+
+Incluye:
+- Estimación del ahorro energético mediante balances, históricos, rendimientos, horas de funcionamiento, referencias técnicas y demás evidencias disponibles.
+- Conversión de ahorros energéticos a impacto económico utilizando costes de energía representativos y condiciones contractuales analizadas.
+- Estimación de CAPEX de orden de magnitud mediante referencias, ratios o experiencias comparables, sin constituir presupuesto contractual de ejecución.
+- Cálculo de periodo simple de retorno y otros indicadores económicos cuando aporten valor a la decisión.
+- Identificación de costes recurrentes, mantenimiento o efectos operativos relevantes cuando puedan alterar la comparación.
+- Evaluación cualitativa de complejidad, riesgo técnico, afección a la operación y grado de incertidumbre.
+- Control de interacciones y solapes para evitar sumar ahorros incompatibles entre medidas.
+- Definición de rangos o escenarios cuando la precisión de datos, alcance o solución técnica no permita una estimación única suficientemente robusta.
+
+Resultado de los trabajos:
+Ficha técnico-económica de las medidas evaluables, con ahorro, CAPEX orientativo, retorno, complejidad e incertidumbre necesarios para su comparación.|
+~D|08.02
+|MO-II\\6
+\MO-ITI\\8
+\|
+~C|08.03|ud|Priorización y plan de actuación|680||0|
+~T|08.03|Servicio de priorización de las actuaciones identificadas y elaboración de un plan de acción que convierta los resultados de la auditoría en una secuencia de decisiones ejecutable por la dirección del centro.
+
+Incluye:
+- Clasificación de medidas según ahorro, inversión, retorno, complejidad, urgencia, impacto operativo, riesgo e incertidumbre.
+- Identificación de quick wins y actuaciones de operación o mantenimiento susceptibles de aplicación prioritaria.
+- Ordenación de reformas e inversiones considerando dependencias técnicas y posibles incompatibilidades.
+- Separación entre actuaciones ejecutables directamente y aquellas que requieren medición adicional, estudio de viabilidad, ingeniería o proyecto.
+- Agrupación de medidas por horizontes temporales y nivel de prioridad.
+- Identificación de actuaciones habilitadoras, como submedición, correcciones de control o estudios previos, necesarias antes de inversiones mayores.
+- Definición del siguiente paso recomendado para cada medida.
+- Integración del conjunto en un roadmap coherente que facilite la planificación interna y la futura contratación de fases posteriores.
+
+Resultado de los trabajos:
+Plan priorizado de actuación con medidas ordenadas, dependencias, horizonte temporal y siguiente paso recomendado para cada oportunidad.|
+~D|08.03
+|MO-II\\8
+\MO-ITI\\8
+\|
+~C|09#||INFORME, PLAN DE ACTUACIÓN Y PRESENTACIÓN DE RESULTADOS|500||0|
+~T|09#|Elaboración e integración de los resultados de la auditoría en documentación técnica y ejecutiva destinada a facilitar su comprensión y utilización por Viding. Comprende informe técnico, anexos, inventarios y esquemas funcionales necesarios, síntesis de hallazgos, medidas y evaluación económica, resumen ejecutivo, roadmap priorizado y presentación final de resultados, estableciendo para cada actuación los siguientes pasos recomendados.|
+~D|09#
+|09.01\\1
+\|
+~C|09.01|ud|Elaboración, presentación y cierre de la auditoría|500||0|
+~T|09.01|Servicio de elaboración de la documentación final, presentación de resultados y cierre técnico de la auditoría, integrando de forma trazable los análisis, evidencias, diagnósticos y medidas desarrollados durante el servicio.
+
+Incluye:
+- Redacción del informe técnico de auditoría con alcance, metodología, información utilizada, calidad de datos, análisis por vectores, trabajo de campo, balances, diagnóstico y conclusiones.
+- Preparación de anexos con gráficos, indicadores, tablas, esquemas funcionales, inventario energético selectivo, fotografías, mediciones y registro de hallazgos cuando aporten valor.
+- Elaboración de resumen ejecutivo orientado a Dirección, centrado en situación energética, eventual problema térmico, impactos, quick wins, inversiones y prioridades.
+- Integración de la matriz de medidas y del plan de actuación priorizado.
+- Revisión técnica y de coherencia interna entre datos, cálculos, conclusiones y recomendaciones.
+- Preparación de presentación ejecutiva de resultados.
+- Celebración de reunión final para exposición de conclusiones, resolución de cuestiones y explicación de siguientes pasos.
+- Incorporación de ajustes finales derivados de la revisión técnica del entregable.
+
+Resultado de los trabajos:
+Informe final de auditoría, resumen ejecutivo, anexos técnicos, plan de actuación y presentación de resultados preparados para su utilización por Viding.|
+~D|09.01
+|MO-II\\4
+\MO-ITI\\8
+\|
+~C|10#||CONDICIONES GENERALES DE ALCANCE Y LIMITACIONES DEL SERVICIO|0.01||0|
+~T|10#|Definición unificada de las condiciones de alcance y criterios de interpretación del servicio, estableciendo su carácter energético, diagnóstico y funcional y la profundidad prevista para cada sistema. Delimita el tratamiento de información e incertidumbre, el alcance de inspecciones y mediciones, el carácter funcional de esquemas e inventarios y la frontera respecto de campañas especializadas, comprobaciones exhaustivas de diseño o dimensionamiento, inspecciones reglamentarias, proyectos, legalizaciones y demás desarrollos posteriores de ingeniería.|
+~D|10#
+|10.01\\1
+\|
+~C|10.01|ud|Condiciones generales de alcance, limitaciones y exclusiones de la auditoría|0.01||0|
+~T|10.01|La presente auditoría tiene carácter energético, diagnóstico y funcional. Su alcance comprende el análisis de los suministros de electricidad, gas y agua, la caracterización de sus consumos y costes, la evaluación energética de las principales instalaciones consumidoras, la inspección técnica dirigida, la realización de mediciones puntuales previstas, el diagnóstico de anomalías e ineficiencias y la identificación y evaluación preliminar de medidas de mejora.
+
+El análisis de las instalaciones se realizará con el grado de profundidad necesario para comprender su funcionamiento energético, establecer balances, contrastar hipótesis e identificar las causas de las desviaciones detectadas. En particular, la revisión de equipos, circuitos hidráulicos, bombas, válvulas, intercambiadores, sistemas de piscina, climatización y demás componentes tendrá carácter energético y funcional, y no constituirá una comprobación exhaustiva de su dimensionamiento, aptitud hidráulica, estado reglamentario o adecuación de diseño.
+
+La auditoría se desarrollará a partir de la documentación, históricos, datos de monitorización e información facilitada por Viding, complementados mediante inspección y mediciones puntuales accesibles durante los trabajos. Las conclusiones y cuantificaciones se establecerán con el nivel de precisión soportado por la información disponible, diferenciando cuando resulte necesario entre datos medidos, documentados, calculados y estimados.
+
+Los esquemas, inventarios y representaciones desarrollados tendrán carácter funcional y estarán destinados al análisis energético, sin constituir levantamientos as-built. Las estimaciones de ahorro, inversión y retorno económico tendrán carácter preliminar y de apoyo a la toma de decisiones, no equivalente a proyecto, oferta de ejecución o presupuesto contractual de obra.
+
+Quedan fuera del alcance, salvo contratación expresa, las campañas prolongadas de monitorización o submedición, ensayos especializados, cálculos hidráulicos exhaustivos, equilibrado de redes, comprobación de aptitud o dimensionamiento de bombas y sistemas de filtración, inspecciones reglamentarias integrales, proyectos y diseños ejecutivos, legalizaciones, licitación, dirección de obra, commissioning y verificación posterior de ahorros. Cuando el diagnóstico determine que alguno de estos trabajos resulta necesario, se identificará como actuación posterior recomendada.|

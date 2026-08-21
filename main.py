@@ -44,6 +44,42 @@ from gantt.reporting.network_diagram import generar_diagrama_red
 from gantt.reporting.presupuesto_exporter import generar_todos
 
 
+def resolver_bc3_path(input_dir: Path, bc3_filename: str | None = None) -> tuple[Path, list[Path]]:
+    """
+    Localiza el BC3 a procesar y devuelve tambien todos los BC3 disponibles.
+    """
+    bc3_files = sorted(input_dir.glob('*.bc3'), key=lambda ruta: ruta.name.lower())
+
+    if bc3_filename:
+        bc3_path = input_dir / bc3_filename
+        if not bc3_path.exists():
+            raise FileNotFoundError(
+                f'No se encontró el archivo BC3 indicado: {bc3_path}'
+            )
+        return bc3_path, bc3_files
+
+    if not bc3_files:
+        raise FileNotFoundError(f'No se encontró ningún .bc3 en {input_dir}')
+    if len(bc3_files) > 1:
+        raise ValueError(
+            f'Múltiples .bc3 en {input_dir}. '
+            f'Especifica el archivo: '
+            f'python main.py <nombre-proyecto> <archivo.bc3>\n'
+            f'Disponibles: {[f.name for f in bc3_files]}'
+        )
+    return bc3_files[0], bc3_files
+
+
+def resolver_output_dir(project_name: str, bc3_path: Path, bc3_files: list[Path]) -> Path:
+    """
+    Si un proyecto tiene varias versiones BC3, separa sus salidas por fichero.
+    """
+    project_output_dir = Path('projects') / project_name / 'output'
+    if len(bc3_files) > 1:
+        return project_output_dir / bc3_path.stem
+    return project_output_dir
+
+
 def main(project_name: str, bc3_filename: str | None = None) -> None:
     """
     Pipeline completo para el proyecto indicado.
@@ -51,28 +87,9 @@ def main(project_name: str, bc3_filename: str | None = None) -> None:
     El bloque de planificación solo si existe planificacion.yaml.
     """
     input_dir  = Path('projects') / project_name / 'input'
-    output_dir = Path('projects') / project_name / 'output'
+    bc3_path, bc3_files = resolver_bc3_path(input_dir, bc3_filename)
+    output_dir = resolver_output_dir(project_name, bc3_path, bc3_files)
     output_dir.mkdir(parents=True, exist_ok=True)
-
-    # — Localizar BC3
-    if bc3_filename:
-        bc3_path = input_dir / bc3_filename
-        if not bc3_path.exists():
-            raise FileNotFoundError(
-                f'No se encontró el archivo BC3 indicado: {bc3_path}'
-            )
-    else:
-        bc3_files = list(input_dir.glob('*.bc3'))
-        if not bc3_files:
-            raise FileNotFoundError(f'No se encontró ningún .bc3 en {input_dir}')
-        if len(bc3_files) > 1:
-            raise ValueError(
-                f'Múltiples .bc3 en {input_dir}. '
-                f'Especifica el archivo: '
-                f'python main.py {project_name} <archivo.bc3>\n'
-                f'Disponibles: {[f.name for f in bc3_files]}'
-            )
-        bc3_path = bc3_files[0]
 
     yaml_path = input_dir / 'planificacion.yaml'
     total = 4 if yaml_path.exists() else 3

@@ -11,11 +11,13 @@ from openpyxl.drawing.image import Image as XLImage
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from gantt.bc3.models import BrandingConfig, ProjectConfig
+from gantt.bc3.models import BrandingConfig, LogoAssetType, ProjectConfig
 from gantt.reporting.documents import (
     BillingMetadata,
     DocumentMetadata,
+    DocumentPurpose,
     DocumentType,
+    document_purpose,
     document_type_info,
 )
 from gantt.reporting.presentation import PresentationContext
@@ -35,13 +37,14 @@ BOX_BORDER = Border(
 class LogoRenderPolicy:
     """Politica unica de dimensionado de logo."""
 
-    container_width: int = 170
-    container_height: int = 56
-    max_width: int = 150
-    max_height: int = 44
+    container_width: int = 230
+    container_height: int = 62
+    max_width: int = 190
+    max_height: int = 52
     alignment: str = "center"
     clear_space: int = 8
     preserve_aspect_ratio: bool = True
+    minimum_visual_presence: int = 120
 
 
 @dataclass(frozen=True)
@@ -97,6 +100,25 @@ def add_logo(ws, company: BrandingConfig | None, policy: LogoRenderPolicy | None
         return None
 
 
+def _clean_pending(value: str | None, *, lower: bool = False) -> str:
+    text = (value or "").strip()
+    if not text or text.upper() == "PENDIENTE":
+        return "pendiente" if lower else "-"
+    return text
+
+
+def _unique_non_empty(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        text = (value or "").strip()
+        key = text.casefold()
+        if text and key not in seen:
+            result.append(text)
+            seen.add(key)
+    return result
+
+
 def metadata_from_project_config(
     config: ProjectConfig,
     document_type: DocumentType,
@@ -124,64 +146,123 @@ def render_budget_header(
     presentation: PresentationContext,
     num_columns: int,
 ) -> int:
-    """Cabecera profesional para familia Budget/Analysis."""
+    """Cabecera compacta para documentos Budget DELIVERY."""
     palette = presentation.palette
     company = presentation.company
-    col_max = get_column_letter(num_columns)
-    has_logo = add_logo(ws, company) is not None
+    logo_size = add_logo(ws, company, LogoRenderPolicy(max_width=185, max_height=48))
+    logo_contains_text = _logo_contains_identity_text(company)
+    info = document_type_info(metadata.document_type)
 
-    for row, height in [(1, 26), (2, 18), (3, 18), (4, 8), (5, 26), (6, 20), (7, 26), (8, 20), (9, 8)]:
+    for row, height in [(1, 24), (2, 20), (3, 8), (4, 14), (5, 24), (6, 20), (7, 24)]:
         ws.row_dimensions[row].height = height
 
-    if has_logo:
-        ws.column_dimensions["A"].width = max(ws.column_dimensions["A"].width or 0, 14)
-        if num_columns >= 2:
-            ws.column_dimensions["B"].width = max(ws.column_dimensions["B"].width or 0, 12)
-        start_col = 3 if num_columns >= 4 else 2
+    left_end = min(max(2, num_columns // 2), max(1, num_columns - 2))
+    if num_columns >= 4:
+        ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=left_end)
+        ws.merge_cells(start_row=1, start_column=left_end + 1, end_row=1, end_column=num_columns)
+        ws.merge_cells(start_row=2, start_column=left_end + 1, end_row=2, end_column=num_columns)
+        ws.cell(1, left_end + 1).value = metadata.reference or metadata.project_code
+        ws.cell(2, left_end + 1).value = (
+            f"Rev. {metadata.revision} - {metadata.issue_date.strftime('%d/%m/%Y')}"
+        )
+        ws.cell(1, left_end + 1).font = _font(palette, size=11, bold=True)
+        ws.cell(2, left_end + 1).font = _font(palette, size=9)
+        ws.cell(1, left_end + 1).alignment = Alignment(horizontal="right", vertical="center")
+        ws.cell(2, left_end + 1).alignment = Alignment(horizontal="right", vertical="center")
     else:
-        start_col = 1
+        ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=num_columns)
+        ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=num_columns)
+        ws.merge_cells(start_row=3, start_column=1, end_row=3, end_column=num_columns)
+        if not logo_contains_text:
+            ws.cell(1, 1).value = company.nombre if company else ""
+        ws.cell(3, 1).value = (
+            f"{metadata.reference or metadata.project_code} - "
+            f"Rev. {metadata.revision} - {metadata.issue_date.strftime('%d/%m/%Y')}"
+        )
+        ws.cell(3, 1).font = _font(palette, size=9)
 
-    ws.merge_cells(start_row=1, start_column=start_col, end_row=1, end_column=num_columns)
-    ws.merge_cells(start_row=2, start_column=start_col, end_row=2, end_column=num_columns)
-    ws.cell(1, start_col).value = company.nombre if company else ""
-    ws.cell(1, start_col).font = _font(palette, size=15, bold=True, color=palette.color_primario)
-    ws.cell(2, start_col).value = _company_claim(company)
-    ws.cell(2, start_col).font = _font(palette, size=9, color=palette.color_texto)
+    if not logo_size:
+        ws.cell(1, 1).value = company.nombre if company else ""
+        ws.cell(1, 1).font = _font(palette, size=14, bold=True, color=palette.color_primario)
+    if not logo_contains_text:
+        ws.cell(2, 1).value = _company_claim(company)
+        ws.cell(2, 1).font = _font(palette, size=8, color=palette.color_texto)
 
-    info = document_type_info(metadata.document_type)
+    project_lines = _unique_non_empty([metadata.client_name, metadata.site_name])
+    display_client = (project_lines[0] if project_lines else metadata.project_name).upper()
+    display_project = metadata.project_name
+
+    ws.merge_cells(start_row=4, start_column=1, end_row=4, end_column=num_columns)
+    ws.cell(4, 1).value = "CLIENTE"
+    ws.cell(4, 1).font = _font(palette, size=8, bold=True, color=palette.color_primario)
+
     ws.merge_cells(start_row=5, start_column=1, end_row=5, end_column=num_columns)
-    ws.cell(5, 1).value = (metadata.project_name or "").upper()
+    ws.cell(5, 1).value = display_client
     ws.cell(5, 1).font = _font(palette, size=13, bold=True, color=palette.color_primario)
-    ws.cell(5, 1).alignment = Alignment(horizontal="left", vertical="center")
 
     ws.merge_cells(start_row=6, start_column=1, end_row=6, end_column=num_columns)
-    site_client = " - ".join(p for p in [metadata.site_name, metadata.client_name] if p)
-    ws.cell(6, 1).value = site_client
+    ws.cell(6, 1).value = display_project if display_project.casefold() != display_client.casefold() else ""
     ws.cell(6, 1).font = _font(palette, size=10)
 
-    ws.merge_cells(start_row=7, start_column=1, end_row=7, end_column=num_columns)
-    ws.cell(7, 1).value = f"{info.document_code} - {(metadata.title or info.default_title).upper()}"
+    if num_columns >= 4:
+        ws.merge_cells(start_row=7, start_column=1, end_row=7, end_column=num_columns - 1)
+        ws.cell(7, num_columns).value = info.document_code
+        ws.cell(7, num_columns).font = palette.font_header
+        ws.cell(7, num_columns).alignment = Alignment(horizontal="right", vertical="center")
+        ws.cell(7, 1).value = (metadata.title or info.default_title).upper()
+    else:
+        ws.merge_cells(start_row=7, start_column=1, end_row=7, end_column=num_columns)
+        ws.cell(7, 1).value = f"{(metadata.title or info.default_title).upper()} - {info.document_code}"
     ws.cell(7, 1).fill = palette.fill_header
     ws.cell(7, 1).font = palette.font_header
     ws.cell(7, 1).alignment = Alignment(horizontal="left", vertical="center")
 
-    ws.merge_cells(start_row=8, start_column=1, end_row=8, end_column=num_columns)
-    date_text = metadata.issue_date.strftime("%d/%m/%Y")
-    parts = [f"Ref. {metadata.reference or metadata.project_code}", f"Rev. {metadata.revision}", date_text]
-    if metadata.planning and metadata.planning.scenario:
-        parts.insert(0, f"Escenario: {metadata.planning.scenario}")
-    ws.cell(8, 1).value = "   |   ".join(p for p in parts if p)
-    ws.cell(8, 1).font = _font(palette, size=9)
-
-    for row in range(1, 9):
+    for row in range(1, 8):
         for col in range(1, num_columns + 1):
             ws.cell(row, col).border = BOX_BORDER
-            if row in (1, 7):
+            if row == 7:
                 ws.cell(row, col).fill = palette.fill_header
             else:
                 ws.cell(row, col).fill = palette.fill_white
             ws.cell(row, col).alignment = Alignment(vertical="center", wrap_text=True)
-    return 10
+    return 8
+
+
+def render_analysis_header(
+    ws,
+    metadata: DocumentMetadata,
+    presentation: PresentationContext,
+    num_columns: int,
+) -> int:
+    """Cabecera compacta para libros de analisis en pantalla."""
+    palette = presentation.palette
+    company = presentation.company
+    info = document_type_info(metadata.document_type)
+    add_logo(ws, company, LogoRenderPolicy(max_width=120, max_height=30))
+    for row, height in [(1, 24), (2, 18), (3, 18), (4, 6), (5, 20)]:
+        ws.row_dimensions[row].height = height
+    title = "PLANIFICACION" if metadata.document_type == DocumentType.PLANNING_ANALYSIS else "BUDGET ANALYSIS"
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=num_columns)
+    ws.cell(1, 1).value = f"{company.nombre if company else ''} - {title}".strip(" -")
+    ws.cell(1, 1).fill = palette.fill_header
+    ws.cell(1, 1).font = palette.font_header
+    ws.merge_cells(start_row=2, start_column=1, end_row=2, end_column=num_columns)
+    ws.cell(2, 1).value = metadata.project_name
+    ws.cell(2, 1).font = _font(palette, size=11, bold=True, color=palette.color_primario)
+    ws.merge_cells(start_row=3, start_column=1, end_row=3, end_column=num_columns)
+    parts = []
+    if metadata.planning and metadata.planning.scenario:
+        parts.append(f"Escenario: {metadata.planning.scenario}")
+    parts.extend([metadata.reference or metadata.project_code, metadata.issue_date.strftime("%d/%m/%Y")])
+    ws.cell(3, 1).value = " - ".join(p for p in parts if p)
+    ws.cell(3, 1).font = _font(palette, size=9)
+    ws.merge_cells(start_row=5, start_column=1, end_row=5, end_column=num_columns)
+    ws.cell(5, 1).value = f"{info.document_code} - {metadata.title or info.default_title}"
+    ws.cell(5, 1).font = _font(palette, size=9, bold=True)
+    for row in range(1, 6):
+        for col in range(1, num_columns + 1):
+            ws.cell(row, col).alignment = Alignment(vertical="center", wrap_text=True)
+    return 6
 
 
 def render_planning_header(
@@ -190,17 +271,9 @@ def render_planning_header(
     presentation: PresentationContext,
     num_columns: int,
 ) -> int:
-    """Cabecera especifica para planificacion."""
+    """Cabecera especifica para planificacion ANALYSIS."""
     metadata = metadata.model_copy(update={"title": metadata.title or "Planificacion del proyecto"})
-    first_content = render_budget_header(ws, metadata, presentation, num_columns)
-    ws.cell(7, 1).value = "PLANIFICACION DEL PROYECTO"
-    if metadata.planning and metadata.planning.scenario:
-        ws.cell(8, 1).value = (
-            f"Escenario: {metadata.planning.scenario}   |   "
-            f"Ref. {metadata.reference or metadata.project_code}   |   "
-            f"Rev. {metadata.revision}   |   {metadata.issue_date.strftime('%d/%m/%Y')}"
-        )
-    return first_content
+    return render_analysis_header(ws, metadata, presentation, num_columns)
 
 
 def render_invoice_header(
@@ -212,40 +285,36 @@ def render_invoice_header(
     """Cabecera especifica para facturas."""
     palette = presentation.palette
     company = presentation.company
-    add_logo(ws, company)
-    for row, height in [(1, 26), (2, 18), (3, 18), (4, 18), (5, 8)]:
+    add_logo(ws, company, LogoRenderPolicy(max_width=180, max_height=48))
+    for row, height in [(1, 28), (2, 22), (3, 18), (4, 8)]:
         ws.row_dimensions[row].height = height
-    ws.merge_cells(start_row=1, start_column=2, end_row=1, end_column=3)
-    ws.merge_cells(start_row=2, start_column=2, end_row=2, end_column=3)
-    ws.merge_cells(start_row=3, start_column=2, end_row=3, end_column=3)
-    ws.cell(1, 2).value = company.nombre if company else ""
-    ws.cell(1, 2).font = _font(palette, size=15, bold=True, color=palette.color_primario)
-    ws.cell(2, 2).value = f"CIF/NIF: {company.nif_cif}" if company else ""
-    ws.cell(3, 2).value = company.direccion_fiscal if company else ""
-    ws.cell(2, 2).font = _font(palette, size=9)
-    ws.cell(3, 2).font = _font(palette, size=9)
+    left_end = 3 if num_columns >= 6 else max(1, num_columns // 2)
+    ws.merge_cells(start_row=1, start_column=1, end_row=3, end_column=left_end)
+    if not company or not company.logo_path:
+        ws.cell(1, 1).value = company.nombre if company else ""
+        ws.cell(1, 1).font = _font(palette, size=15, bold=True, color=palette.color_primario)
 
     billing = metadata.billing or BillingMetadata()
-    ws.merge_cells(start_row=1, start_column=4, end_row=1, end_column=num_columns)
-    ws.cell(1, 4).value = "FACTURA"
-    ws.cell(1, 4).font = _font(palette, size=18, bold=True)
-    ws.cell(1, 4).alignment = Alignment(horizontal="right")
-    lines = [
-        f"Numero: {billing.invoice_number or 'BORRADOR'}",
-        f"Estado: {billing.invoice_status.upper()}",
-        f"Fecha: {metadata.issue_date.strftime('%d/%m/%Y')}",
-        f"Vence: {billing.due_date.strftime('%d/%m/%Y') if billing.due_date else ''}",
-    ]
-    for idx, text in enumerate(lines, start=2):
-        ws.merge_cells(start_row=idx, start_column=4, end_row=idx, end_column=num_columns)
-        ws.cell(idx, 4).value = text
-        ws.cell(idx, 4).font = _font(palette, size=9, bold=idx == 2)
-        ws.cell(idx, 4).alignment = Alignment(horizontal="right")
-    for row in range(1, 5):
+    right_start = left_end + 1
+    status_or_number = billing.invoice_number or "BORRADOR"
+    ws.merge_cells(start_row=1, start_column=right_start, end_row=1, end_column=num_columns)
+    ws.merge_cells(start_row=2, start_column=right_start, end_row=2, end_column=num_columns)
+    ws.merge_cells(start_row=3, start_column=right_start, end_row=3, end_column=num_columns)
+    ws.cell(1, right_start).value = (metadata.title or "Factura").upper()
+    ws.cell(2, right_start).value = status_or_number
+    ws.cell(3, right_start).value = metadata.issue_date.strftime("%d/%m/%Y")
+    if billing.due_date and billing.invoice_status != "draft":
+        ws.cell(3, right_start).value = f"{metadata.issue_date.strftime('%d/%m/%Y')} - Vence {billing.due_date.strftime('%d/%m/%Y')}"
+    ws.cell(1, right_start).font = _font(palette, size=18, bold=True)
+    ws.cell(2, right_start).font = _font(palette, size=12, bold=True, color=palette.color_primario)
+    ws.cell(3, right_start).font = _font(palette, size=9)
+    for row in (1, 2, 3):
+        ws.cell(row, right_start).alignment = Alignment(horizontal="right", vertical="center")
+    for row in range(1, 4):
         for col in range(1, num_columns + 1):
             ws.cell(row, col).border = BOX_BORDER
             ws.cell(row, col).alignment = Alignment(vertical="center", wrap_text=True)
-    return 6
+    return 5
 
 
 def apply_document_footer(
@@ -264,11 +333,18 @@ def apply_document_footer(
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=num_columns)
     if company:
         if invoice:
-            text = " | ".join(p for p in [company.nombre, company.nif_cif, company.direccion_fiscal, company.web] if p)
+            text = " · ".join(
+                p for p in [
+                    company.nombre,
+                    "" if company.nif_cif.upper() == "PENDIENTE" else company.nif_cif,
+                    "" if company.direccion_fiscal.upper() == "PENDIENTE" else company.direccion_fiscal,
+                    "" if company.web.upper() == "PENDIENTE" else company.web,
+                ] if p
+            )
         else:
             text = " | ".join(
                 p for p in [
-                    f"{company.nombre} - {company.web}" if company.web else company.nombre,
+                    f"{company.nombre} - {_clean_pending(company.web)}" if company.web else company.nombre,
                     f"{metadata.reference or metadata.project_code} - Rev. {metadata.revision}",
                 ] if p
             )
@@ -292,7 +368,9 @@ def configure_excel_printing(
     orientation: str = "portrait",
     repeat_row: int | None = None,
     fit_to_height: int = 0,
+    purpose: DocumentPurpose = DocumentPurpose.DELIVERY,
 ) -> None:
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
     ws.page_setup.orientation = orientation
     ws.page_setup.fitToWidth = 1
     ws.page_setup.fitToHeight = fit_to_height
@@ -315,6 +393,16 @@ def _company_claim(company: BrandingConfig | None) -> str:
     parts = [company.web, company.email, company.telefono]
     contact = " | ".join(p for p in parts if p and p != "PENDIENTE")
     return contact or "Ingenieria - Energia - Sistemas"
+
+
+def _logo_contains_identity_text(company: BrandingConfig | None) -> bool:
+    if not company or not company.logo_path:
+        return False
+    return company.logo_asset_type in {
+        LogoAssetType.WORDMARK,
+        LogoAssetType.LOCKUP_HORIZONTAL,
+        LogoAssetType.LOCKUP_VERTICAL,
+    }
 
 
 def presentation_from_palette_company(

@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from gantt.application.context import ProjectExecutionContext
 from gantt.application.product import Capability
+from gantt.reporting.documents import DOCUMENT_TYPES
 
 if TYPE_CHECKING:
     from gantt.reporting.presentation import PresentationContext
@@ -43,7 +44,18 @@ class RunManifest(BaseModel):
     planning_present: bool
     scenarios: list[str] = Field(default_factory=list)
     outputs: list[str] = Field(default_factory=list)
+    document_outputs: list["ManifestDocumentOutput"] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
+
+
+class ManifestDocumentOutput(BaseModel):
+    """Metadata documental minima por fichero generado."""
+
+    document_type: str
+    document_code: str
+    capability: str | None = None
+    source: str
+    path: str
 
 
 def sha256_file(path: Path) -> str:
@@ -88,6 +100,10 @@ def build_run_manifest(
     if warnings:
         merged_warnings.extend(warnings)
 
+    relative_outputs = [
+        relative_to_workspace(path, context.workspace_root) or str(path)
+        for path in outputs
+    ]
     return RunManifest(
         project=context.project_name,
         capability=capability.value if isinstance(capability, Capability) else capability,
@@ -105,12 +121,35 @@ def build_run_manifest(
         planning_file=relative_to_workspace(context.planificacion_path, context.workspace_root),
         planning_present=context.planificacion_path is not None,
         scenarios=scenarios,
-        outputs=[
-            relative_to_workspace(path, context.workspace_root) or str(path)
-            for path in outputs
-        ],
+        outputs=relative_outputs,
+        document_outputs=_document_outputs(outputs, relative_outputs, context, capability),
         warnings=merged_warnings,
     )
+
+
+def _document_outputs(
+    outputs: list[Path],
+    relative_outputs: list[str],
+    context: ProjectExecutionContext,
+    capability: Capability | str | None,
+) -> list[ManifestDocumentOutput]:
+    by_filename = {info.default_filename: info for info in DOCUMENT_TYPES.values()}
+    capability_value = capability.value if isinstance(capability, Capability) else capability
+    result: list[ManifestDocumentOutput] = []
+    for output, relative_output in zip(outputs, relative_outputs):
+        info = by_filename.get(output.name)
+        if not info:
+            continue
+        result.append(
+            ManifestDocumentOutput(
+                document_type=info.identifier.value,
+                document_code=info.document_code,
+                capability=capability_value,
+                source=context.bc3_path.name,
+                path=relative_output,
+            )
+        )
+    return result
 
 
 def write_run_manifest(

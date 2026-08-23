@@ -3,6 +3,7 @@
 import json
 from dataclasses import dataclass
 from pathlib import Path
+from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -27,6 +28,13 @@ class InvoiceRunManifest(BaseModel):
     client: str
     project: str = ""
     source: str = ""
+    billing_preset: str = "F01"
+    billing_source_type: str = ""
+    billing_source_reference: str = ""
+    economic_basis: str = ""
+    ready_to_issue: bool = False
+    completeness_status: str = "draft_valid"
+    missing_required_fields: list[str] = Field(default_factory=list)
     data_hash: str
     outputs: list[str] = Field(default_factory=list)
 
@@ -38,6 +46,34 @@ class InvoiceExportResult:
     manifest_path: Path
 
 
+class DocumentCompletenessStatus(StrEnum):
+    DRAFT_VALID = "draft_valid"
+    ISSUE_READY = "issue_ready"
+    ISSUE_BLOCKED = "issue_blocked"
+
+
+def invoice_document_completeness(invoice: Invoice) -> tuple[DocumentCompletenessStatus, list[str]]:
+    """Valida campos administrativos visibles sin modificar logica fiscal."""
+    missing: list[str] = []
+    if not invoice.issuer.tax_id or invoice.issuer.tax_id.upper() == "PENDIENTE":
+        missing.append("issuer.tax_id")
+    if not invoice.issuer.fiscal_address or invoice.issuer.fiscal_address.upper() == "PENDIENTE":
+        missing.append("issuer.address")
+    if not (invoice.client.tax_id or invoice.client.vat_id):
+        missing.append("client.tax_id")
+    if not invoice.client.fiscal_address:
+        missing.append("client.address")
+    if invoice.status.value == "issued":
+        return (
+            DocumentCompletenessStatus.ISSUE_BLOCKED if missing else DocumentCompletenessStatus.ISSUE_READY,
+            missing,
+        )
+    return (
+        DocumentCompletenessStatus.DRAFT_VALID if missing else DocumentCompletenessStatus.ISSUE_READY,
+        missing,
+    )
+
+
 def build_invoice_run_manifest(
     invoice: Invoice,
     outputs: list[Path],
@@ -45,6 +81,7 @@ def build_invoice_run_manifest(
     source: str = "",
 ) -> InvoiceRunManifest:
     snapshot = build_invoice_snapshot(invoice)
+    completeness_status, missing = invoice_document_completeness(invoice)
     return InvoiceRunManifest(
         invoice_id=invoice.invoice_id,
         invoice_number=invoice.invoice_number,
@@ -53,6 +90,13 @@ def build_invoice_run_manifest(
         client=invoice.client.legal_name,
         project=invoice.project_name,
         source=source,
+        billing_preset=invoice.billing_preset,
+        billing_source_type=invoice.billing_source_type,
+        billing_source_reference=invoice.billing_source_reference,
+        economic_basis=invoice.economic_basis,
+        ready_to_issue=completeness_status == DocumentCompletenessStatus.ISSUE_READY,
+        completeness_status=completeness_status.value,
+        missing_required_fields=missing,
         data_hash=snapshot.data_hash,
         outputs=[str(path) for path in outputs],
     )
@@ -116,11 +160,17 @@ def export_project_invoice_artifacts(
     metadata: DocumentMetadata | None = None,
 ) -> InvoiceExportResult:
     """Exporta factura en output/billing/drafts|issued segun estado."""
+    preset = invoice.billing_preset or "F01"
+    basename = (
+        f"{invoice.invoice_number}_{preset}"
+        if invoice.invoice_number and invoice.status.value == "issued"
+        else f"{preset}_DRAFT_{invoice.invoice_id}"
+    )
     return export_invoice_artifacts(
         invoice,
         presentation,
         billing_output_dir(project_root, invoice),
-        basename="invoice",
+        basename=basename,
         source=source,
         metadata=metadata,
     )

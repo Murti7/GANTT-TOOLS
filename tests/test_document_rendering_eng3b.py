@@ -14,6 +14,8 @@ from gantt.reporting.documents import (
     DocumentMetadata,
     DocumentStatus,
     DocumentType,
+    document_purpose,
+    DocumentPurpose,
     filename_for_document,
 )
 from gantt.reporting.invoice_exporter import export_invoice_excel
@@ -50,6 +52,13 @@ def test_logo_scaling_preserva_aspect_ratio():
     assert abs((size.width / size.height) - 4.0) < 0.15
 
 
+def test_document_purpose_distingue_delivery_y_analysis():
+    assert document_purpose(DocumentType.CHAPTER_SUMMARY) == DocumentPurpose.DELIVERY
+    assert document_purpose(DocumentType.INVOICE) == DocumentPurpose.DELIVERY
+    assert document_purpose(DocumentType.BUDGET_ANALYSIS) == DocumentPurpose.ANALYSIS
+    assert document_purpose(DocumentType.PLANNING_ANALYSIS) == DocumentPurpose.ANALYSIS
+
+
 def test_budget_header_no_usa_importado_como_titulo_y_configura_printing(tmp_path: Path):
     bc3 = tmp_path / "mini.bc3"
     bc3.write_text(BC3_MINIMO_IMPORTADO, encoding="latin-1")
@@ -75,12 +84,12 @@ def test_budget_header_no_usa_importado_como_titulo_y_configura_printing(tmp_pat
         ws = wb.active
         top_values = [ws.cell(row, 1).value for row in range(1, 10)]
         assert "IMPORTADO DESDE FICHEROS CSV" not in [str(v).upper() for v in top_values if v]
-        assert "AUDITORIA ENERGETICA INTEGRAL" in top_values
+        assert any(str(value).lower() == "auditoria energetica integral" for value in top_values if value)
         assert any("PRES.02.01" in str(value) for value in top_values if value)
         assert ws.print_area
+        assert str(ws.page_setup.paperSize) == str(ws.PAPERSIZE_A4)
         assert ws.page_setup.orientation == "portrait"
-        assert ws.freeze_panes.startswith("A")
-        assert int(ws.freeze_panes[1:]) >= 10
+        assert ws.freeze_panes is None
         assert ws.oddFooter.center.text == "BAF-VID-2026-001 - Rev. 00"
     finally:
         wb.close()
@@ -125,11 +134,14 @@ def test_invoice_exporter_usa_metadata_footer_printing_y_logo_fallback(tmp_path:
     wb = load_workbook(output)
     try:
         ws = wb["Factura"]
-        values = [cell.value for row in ws.iter_rows(min_row=1, max_row=12) for cell in row]
+        values = [cell.value for row in ws.iter_rows() for cell in row]
         assert "FACTURA" in values
-        assert any("Numero: BORRADOR" == value for value in values)
+        assert values.count("BORRADOR") == 1
+        assert "DRAFT" not in values
         assert "Proyecto demo" in values
+        assert ws.freeze_panes is None
         assert ws.print_area
+        assert str(ws.page_setup.paperSize) == str(ws.PAPERSIZE_A4)
         assert ws.page_setup.orientation == "portrait"
         assert ws.oddFooter.center.text == "REF-001 - Rev. 00"
     finally:
@@ -143,4 +155,4 @@ def test_filename_invoice_draft_es_estable_desde_metadata():
         billing=BillingMetadata(invoice_status="draft"),
     )
 
-    assert filename_for_document(metadata) == "DRAFT_REF-001.xlsx"
+    assert filename_for_document(metadata) == "F01_DRAFT_REF-001.xlsx"

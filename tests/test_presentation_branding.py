@@ -2,15 +2,19 @@ from pathlib import Path
 
 import pytest
 from openpyxl import load_workbook
+from openpyxl import Workbook
+from PIL import Image
 
-from gantt.bc3.models import BrandingConfig
+from gantt.bc3.models import BrandingConfig, LogoAssetType
 from gantt.bc3.parser import parse_bc3
 from gantt.planning.calculator import calcular_planificacion
 from gantt.planning.models import cargar_planificacion_yaml
+from gantt.reporting.documents import DocumentMetadata, DocumentType
 from gantt.reporting.analysis_charts import AnalysisChartsReport
 from gantt.reporting.excel_exporter import exportar_analisis
 from gantt.reporting.network_diagram import generar_diagrama_red
 from gantt.reporting.presentation import build_presentation_context
+from gantt.reporting.rendering import render_budget_header
 from gantt.reporting.styles import build_palette
 
 
@@ -71,6 +75,24 @@ def _planificacion(tmp_path: Path, presupuesto):
     return calcular_planificacion(presupuesto, parametros, tareas, escenarios[0], bandas)
 
 
+def _png(tmp_path: Path) -> Path:
+    path = tmp_path / "logo.png"
+    Image.new("RGBA", (200, 80), (10, 40, 35, 255)).save(path)
+    return path
+
+
+def _metadata() -> DocumentMetadata:
+    return DocumentMetadata(
+        document_type=DocumentType.CHAPTER_SUMMARY,
+        title="Resumen por capitulos",
+        project_name="Auditoria energetica integral",
+        site_name="Viding Fitness Calvia",
+        client_name="Cliente demo",
+        reference="BAF-VID-2026-001",
+        revision="00",
+    )
+
+
 def test_build_palette_valida_color_hexadecimal():
     with pytest.raises(ValueError, match="Color hexadecimal"):
         build_palette(BrandingConfig(color_primario="verde"))
@@ -92,6 +114,49 @@ def test_presentation_context_expone_tema_idioma_y_paleta():
     assert context.palette.color_primario == "#123456"
     assert context.palette.chart.primary == "#123456"
     assert context.palette.diagram.task_border == "#654321"
+
+
+def test_budget_header_lockup_no_duplica_issuer_en_brand_area(tmp_path: Path):
+    ws = Workbook().active
+    company = BrandingConfig(
+        nombre="BAFRAS Engineering S.L.",
+        logo_path=_png(tmp_path),
+        logo_asset_type=LogoAssetType.LOCKUP_HORIZONTAL,
+    )
+
+    render_budget_header(ws, _metadata(), build_presentation_context(company), 3)
+
+    assert len(ws._images) == 1
+    assert ws["A1"].value is None
+    assert ws["A2"].value is None
+    assert ws["A3"].value.startswith("BAF-VID-2026-001")
+
+
+def test_budget_header_symbol_permite_identidad_textual(tmp_path: Path):
+    ws = Workbook().active
+    company = BrandingConfig(
+        nombre="Empresa Simbolo",
+        web="example.com",
+        logo_path=_png(tmp_path),
+        logo_asset_type=LogoAssetType.SYMBOL,
+    )
+
+    render_budget_header(ws, _metadata(), build_presentation_context(company), 3)
+
+    assert len(ws._images) == 1
+    assert ws["A1"].value == "Empresa Simbolo"
+    assert ws["A2"].value == "example.com"
+
+
+def test_budget_header_sin_logo_usa_marca_textual():
+    ws = Workbook().active
+    company = BrandingConfig(nombre="Empresa Sin Logo")
+
+    render_budget_header(ws, _metadata(), build_presentation_context(company), 3)
+
+    assert len(ws._images) == 0
+    assert ws["A1"].value == "Empresa Sin Logo"
+    assert ws["A2"].value == "Ingenieria - Energia - Sistemas"
 
 
 def test_analysis_charts_generan_png_desde_modelo_sin_excel(tmp_path: Path):

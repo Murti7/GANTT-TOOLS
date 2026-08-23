@@ -52,7 +52,10 @@ def test_invoice_exporter_escribe_factura_excel_y_json(tmp_path: Path):
         assert "David Murti" in values
         assert "Cliente S.A." in values
         assert "TOTAL FACTURA" in values
-        assert "LIQUIDO A PERCIBIR" in values
+        assert "A PAGAR" in values
+        assert values.count("BORRADOR") == 1
+        assert "DRAFT" not in values
+        assert ws.freeze_panes is None
         assert Decimal("1210.00") in values
         assert Decimal("1060.00") in values
         assert "ES0000000000000000000000" in values
@@ -92,4 +95,7 @@ def test_export_invoice_artifacts_escribe_manifest(tmp_path: Path):
     assert manifest["issuer"] == "BAFRAS Engineering S.L."
     assert manifest["client"] == "Cliente S.A."
     assert manifest["source"] == "manual-test"
+    assert manifest["ready_to_issue"] is False
+    assert manifest["completeness_status"] == "draft_valid"
+    assert "client.address" in manifest["missing_required_fields"]
     assert len(manifest["data_hash"]) == 64

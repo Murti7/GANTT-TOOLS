@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 from gantt.application.budgeting import run_budgeting
 from gantt.application.context import resolver_contexto_ejecucion
@@ -68,8 +69,46 @@ def test_run_budgeting_escribe_output_por_capability(tmp_path: Path):
     assert result.output_root == root
     assert (root / "documents" / "PRES.01_Cuadro_Oferta.xlsx").exists()
     assert (root / "analysis" / "budget_analysis.xlsx").exists()
+    assert (root / "documents" / "PRES.03.01_Mediciones.xlsx").exists()
+    assert (root / "documents" / "PRES.03.02_Mediciones_Ciegas.xlsx").exists()
     assert (root / "analysis" / "charts" / "01_economico" / "01_importe_por_capitulo.png").exists()
     assert (root / "run_manifest.json").exists()
+    manifest = json.loads((root / "run_manifest.json").read_text(encoding="utf-8"))
+    pres03 = {
+        item["document_code"]: item for item in manifest["document_outputs"]
+        if item["document_code"].startswith("PRES.03.")
+    }
+    assert pres03 == {
+        "PRES.03.01": {
+            "document_type": "measurements",
+            "document_code": "PRES.03.01",
+            "capability": "budgeting",
+            "source": "mini.bc3",
+            "path": "projects\\Mini\\output\\budgeting\\mini\\documents\\PRES.03.01_Mediciones.xlsx",
+        },
+        "PRES.03.02": {
+            "document_type": "blind_measurements",
+            "document_code": "PRES.03.02",
+            "capability": "budgeting",
+            "source": "mini.bc3",
+            "path": "projects\\Mini\\output\\budgeting\\mini\\documents\\PRES.03.02_Mediciones_Ciegas.xlsx",
+        },
+    } or pres03 == {
+        "PRES.03.01": {
+            "document_type": "measurements",
+            "document_code": "PRES.03.01",
+            "capability": "budgeting",
+            "source": "mini.bc3",
+            "path": "projects/Mini/output/budgeting/mini/documents/PRES.03.01_Mediciones.xlsx",
+        },
+        "PRES.03.02": {
+            "document_type": "blind_measurements",
+            "document_code": "PRES.03.02",
+            "capability": "budgeting",
+            "source": "mini.bc3",
+            "path": "projects/Mini/output/budgeting/mini/documents/PRES.03.02_Mediciones_Ciegas.xlsx",
+        },
+    }
 
 
 def test_run_planning_escribe_output_por_capability(tmp_path: Path):

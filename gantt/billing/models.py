@@ -381,6 +381,10 @@ class Invoice(BaseModel):
     currency: Currency = Currency.EUR
     original_invoice_id: str | None = None
     correction_reason: str = ""
+    billing_preset: str = "F01"
+    billing_source_type: str = ""
+    billing_source_reference: str = ""
+    economic_basis: str = ""
 
     @model_validator(mode="after")
     def validate_invoice(self) -> "Invoice":

@@ -13,6 +13,11 @@ class DocumentFamily(StrEnum):
     BILLING = "billing"
 
 
+class DocumentPurpose(StrEnum):
+    DELIVERY = "delivery"
+    ANALYSIS = "analysis"
+
+
 class DocumentStatus(StrEnum):
     DRAFT = "draft"
     FINAL = "final"
@@ -25,7 +30,8 @@ class DocumentType(StrEnum):
     UNIT_PRICE_TABLE_2 = "unit_price_table_2"
     DECOMPOSED_BUDGET = "decomposed_budget"
     CHAPTER_SUMMARY = "chapter_summary"
-    MEASUREMENTS_BLIND = "measurements_blind"
+    MEASUREMENTS = "measurements"
+    BLIND_MEASUREMENTS = "blind_measurements"
     VEC_SETTLEMENT = "vec_settlement"
     RESOURCE_PRICE_JUSTIFICATION = "resource_price_justification"
     BUDGET_ANALYSIS = "budget_analysis"
@@ -54,7 +60,8 @@ DOCUMENT_TYPES: dict[DocumentType, DocumentTypeInfo] = {
     DocumentType.UNIT_PRICE_TABLE_2: DocumentTypeInfo(identifier=DocumentType.UNIT_PRICE_TABLE_2, document_code="PRES.02.02", family=DocumentFamily.BUDGET, default_title="Cuadro de precios n. 2", default_filename="PRES.02.02_Cuadro_Precios_2.xlsx"),
     DocumentType.DECOMPOSED_BUDGET: DocumentTypeInfo(identifier=DocumentType.DECOMPOSED_BUDGET, document_code="PRES.02.03", family=DocumentFamily.BUDGET, default_title="Presupuesto descompuesto", default_filename="PRES.02.03_Presupuesto_Descompuesto.xlsx"),
     DocumentType.CHAPTER_SUMMARY: DocumentTypeInfo(identifier=DocumentType.CHAPTER_SUMMARY, document_code="PRES.02.04", family=DocumentFamily.BUDGET, default_title="Resumen de capitulos", default_filename="PRES.02.04_Resumen_Capitulos.xlsx"),
-    DocumentType.MEASUREMENTS_BLIND: DocumentTypeInfo(identifier=DocumentType.MEASUREMENTS_BLIND, document_code="PRES.03", family=DocumentFamily.BUDGET, default_title="Mediciones ciegas", default_filename="PRES.03_Mediciones_Ciegas.xlsx"),
+    DocumentType.MEASUREMENTS: DocumentTypeInfo(identifier=DocumentType.MEASUREMENTS, document_code="PRES.03.01", family=DocumentFamily.BUDGET, default_title="Mediciones", default_filename="PRES.03.01_Mediciones.xlsx"),
+    DocumentType.BLIND_MEASUREMENTS: DocumentTypeInfo(identifier=DocumentType.BLIND_MEASUREMENTS, document_code="PRES.03.02", family=DocumentFamily.BUDGET, default_title="Mediciones ciegas", default_filename="PRES.03.02_Mediciones_Ciegas.xlsx"),
     DocumentType.VEC_SETTLEMENT: DocumentTypeInfo(identifier=DocumentType.VEC_SETTLEMENT, document_code="PRES.05", family=DocumentFamily.BUDGET, default_title="VEC y liquidacion", default_filename="PRES.05_VEC_Liquidacion.xlsx"),
     DocumentType.RESOURCE_PRICE_JUSTIFICATION: DocumentTypeInfo(identifier=DocumentType.RESOURCE_PRICE_JUSTIFICATION, document_code="JUST.01", family=DocumentFamily.BUDGET, default_title="Justificacion de precios de recursos", default_filename="JUST_PRECIOS_Recursos.xlsx"),
     DocumentType.BUDGET_ANALYSIS: DocumentTypeInfo(identifier=DocumentType.BUDGET_ANALYSIS, document_code="BUD.ANALYSIS", family=DocumentFamily.BUDGET, default_title="Analisis economico del presupuesto", default_filename="budget_analysis.xlsx"),
@@ -87,6 +94,10 @@ class BillingMetadata(BaseModel):
     invoice_number: str | None = None
     invoice_status: str = "draft"
     due_date: date | None = None
+    billing_preset: str = "F01"
+    billing_source_type: str = ""
+    billing_source_reference: str = ""
+    economic_basis: str = ""
 
 
 class DocumentMetadata(BaseModel):
@@ -114,6 +125,22 @@ class DocumentMetadata(BaseModel):
 
 def document_type_info(document_type: DocumentType) -> DocumentTypeInfo:
     return DOCUMENT_TYPES[document_type]
+
+
+ANALYSIS_DOCUMENT_TYPES = {
+    DocumentType.BUDGET_ANALYSIS,
+    DocumentType.PLANNING_ANALYSIS,
+    DocumentType.PLANNING_DIAGRAM,
+    DocumentType.RESOURCE_ANALYSIS,
+}
+
+
+def document_purpose(document_type: DocumentType) -> DocumentPurpose:
+    return (
+        DocumentPurpose.ANALYSIS
+        if document_type in ANALYSIS_DOCUMENT_TYPES
+        else DocumentPurpose.DELIVERY
+    )
 
 
 def resolve_document_title(
@@ -149,7 +176,9 @@ def filename_for_document(metadata: DocumentMetadata) -> str:
     info = document_type_info(metadata.document_type)
     if metadata.document_type == DocumentType.INVOICE and metadata.billing:
         if metadata.billing.invoice_status == "issued" and metadata.billing.invoice_number:
-            return f"{safe_filename_part(metadata.billing.invoice_number)}_Factura.xlsx"
+            preset = safe_filename_part(metadata.billing.billing_preset or "F01")
+            return f"{safe_filename_part(metadata.billing.invoice_number)}_{preset}.xlsx"
+        preset = safe_filename_part(metadata.billing.billing_preset or "F01")
         source = metadata.billing.invoice_number or metadata.reference or metadata.source_name or "invoice"
-        return f"DRAFT_{safe_filename_part(source)}.xlsx"
+        return f"{preset}_DRAFT_{safe_filename_part(source)}.xlsx"
     return info.default_filename

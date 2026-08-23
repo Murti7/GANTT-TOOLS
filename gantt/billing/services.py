@@ -19,6 +19,7 @@ from gantt.billing.models import (
     SourceType,
 )
 from gantt.billing.policies import default_tax_policy
+from gantt.billing.presets import billing_preset as resolve_billing_preset
 
 
 def payment_terms_from_issuer(issuer: Issuer, issue_date=None) -> PaymentTerms:
@@ -44,8 +45,13 @@ def create_invoice(
     invoice_number: str | None = None,
     issue_date=None,
     notes: str = "",
+    billing_preset: str = "F01",
+    billing_source_type: str = "",
+    billing_source_reference: str = "",
+    economic_basis: str = "",
 ) -> Invoice:
     """Crea una factura aplicando politica fiscal y condiciones por defecto."""
+    preset = resolve_billing_preset(billing_preset)
     return Invoice(
         issuer=issuer,
         client=client,
@@ -59,6 +65,10 @@ def create_invoice(
         payment_terms=payment_terms_from_issuer(issuer, issue_date),
         notes=notes,
         currency=issuer.currency,
+        billing_preset=preset.code.value,
+        billing_source_type=billing_source_type or preset.source_type.value,
+        billing_source_reference=billing_source_reference,
+        economic_basis=economic_basis or preset.base_kind.value,
     )
 
 

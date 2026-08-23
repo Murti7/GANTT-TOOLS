@@ -6,6 +6,7 @@ en el formato estándar BC3 de la construcción española.
 """
 
 from pathlib import Path
+from enum import StrEnum
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -62,6 +63,15 @@ class ProjectClientConfig(BaseModel):
 
 
 ProjectConfig.model_rebuild()
+
+
+class LogoAssetType(StrEnum):
+    """Tipo semantico del asset usado como marca corporativa."""
+
+    SYMBOL = "symbol"
+    WORDMARK = "wordmark"
+    LOCKUP_HORIZONTAL = "lockup_horizontal"
+    LOCKUP_VERTICAL = "lockup_vertical"
 
 
 class RecursoMO(BaseModel):
@@ -166,6 +176,7 @@ class BrandingConfig(BaseModel):
     fuente_principal: str = "Calibri"
     fuente_fallback: str = "Calibri"
     logo_path: Path | None = None
+    logo_asset_type: LogoAssetType = LogoAssetType.SYMBOL
 
     # Facturación
     serie_factura: str = "A"
@@ -245,6 +256,7 @@ class CompanyBrandingYamlConfig(BaseModel):
     fuente_principal: str = 'Calibri'
     fuente_fallback: str = 'Calibri'
     logo: str = 'logo.png'
+    logo_asset_type: LogoAssetType = LogoAssetType.SYMBOL
 
 
 class CompanyBillingConfig(BaseModel):
@@ -316,6 +328,7 @@ def cargar_company(empresa_slug: str, companies_dir: Path) -> BrandingConfig:
         fuente_principal=data.branding.fuente_principal,
         fuente_fallback=data.branding.fuente_fallback,
         logo_path=logo_path,
+        logo_asset_type=data.branding.logo_asset_type,
         serie_factura=data.facturacio.serie_factura,
         moneda=data.facturacio.moneda,
         idioma=data.facturacio.idioma,

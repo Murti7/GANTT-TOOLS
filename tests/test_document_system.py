@@ -49,6 +49,8 @@ def test_title_resolution_usa_default_antes_que_descripcion_bc3():
 
 def test_filename_policy_budget_y_invoice_draft_issued():
     budget = DocumentMetadata(document_type=DocumentType.CHAPTER_SUMMARY)
+    measurements = DocumentMetadata(document_type=DocumentType.MEASUREMENTS)
+    blind_measurements = DocumentMetadata(document_type=DocumentType.BLIND_MEASUREMENTS)
     draft = DocumentMetadata(
         document_type=DocumentType.INVOICE,
         reference="invoice-123",
@@ -60,8 +62,10 @@ def test_filename_policy_budget_y_invoice_draft_issued():
     )
 
     assert filename_for_document(budget) == "PRES.02.04_Resumen_Capitulos.xlsx"
-    assert filename_for_document(draft) == "DRAFT_invoice-123.xlsx"
-    assert filename_for_document(issued) == "BAF-2026-001_Factura.xlsx"
+    assert filename_for_document(measurements) == "PRES.03.01_Mediciones.xlsx"
+    assert filename_for_document(blind_measurements) == "PRES.03.02_Mediciones_Ciegas.xlsx"
+    assert filename_for_document(draft) == "F01_DRAFT_invoice-123.xlsx"
+    assert filename_for_document(issued) == "BAF-2026-001_F01.xlsx"
 
 
 def test_metadata_por_familia_no_obliga_campos_ajenos():

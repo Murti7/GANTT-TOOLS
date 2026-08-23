@@ -111,5 +111,9 @@ def invoice_document_metadata(
         invoice_number=invoice.invoice_number,
         invoice_status=invoice.status.value,
         due_date=invoice.payment_terms.due_date,
+        billing_preset=invoice.billing_preset,
+        billing_source_type=invoice.billing_source_type,
+        billing_source_reference=invoice.billing_source_reference,
+        economic_basis=invoice.economic_basis,
     )
     return metadata

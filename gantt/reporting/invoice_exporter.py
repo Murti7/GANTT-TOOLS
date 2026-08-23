@@ -11,6 +11,7 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
 from gantt.billing.models import Invoice, InvoiceCalculation, TaxTreatment
+from gantt.billing.presets import billing_preset
 from gantt.reporting.documents import BillingMetadata, DocumentMetadata, DocumentStatus, DocumentType
 from gantt.reporting.presentation import PresentationContext
 from gantt.reporting.rendering import (
@@ -22,7 +23,7 @@ from gantt.reporting.rendering import (
 
 THIN = Side(style="thin", color="D9D9D9")
 BORDER = Border(bottom=THIN)
-MONEY_FMT = '#,##0.00 "EUR"'
+MONEY_FMT = '#.##0,00 [$€-es-ES]'
 QTY_FMT = "#,##0.###"
 PCT_FMT = "0.00%"
 
@@ -52,6 +53,31 @@ def _format_money_cell(cell) -> None:
     cell.alignment = Alignment(horizontal="right")
 
 
+def _visible(value) -> str:
+    text = "" if value is None else str(value).strip()
+    return "-" if not text or text.upper() == "PENDIENTE" else text
+
+
+def _write_pair_block(ws, row: int, start_col: int, title: str, rows: list[tuple[str, object]], context: PresentationContext) -> None:
+    end_col = start_col + 2
+    ws.merge_cells(start_row=row, start_column=start_col, end_row=row, end_column=end_col)
+    title_cell = ws.cell(row, start_col)
+    title_cell.value = title
+    title_cell.fill = context.palette.fill_header
+    title_cell.font = context.palette.font_header
+    title_cell.alignment = Alignment(horizontal="left", vertical="center")
+    ws.row_dimensions[row].height = 20
+    visible_rows = [(label, value) for label, value in rows if label == "Nombre" or _visible(value) != "-"]
+    for offset, (label, value) in enumerate(visible_rows, start=1):
+        label_cell = ws.cell(row + offset, start_col)
+        value_cell = ws.cell(row + offset, start_col + 1)
+        label_cell.value = label
+        label_cell.font = context.palette.font_small
+        value_cell.value = _visible(value)
+        ws.merge_cells(start_row=row + offset, start_column=start_col + 1, end_row=row + offset, end_column=end_col)
+        value_cell.alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+
+
 def export_invoice_excel(
     invoice: Invoice,
     calculation: InvoiceCalculation,
@@ -78,7 +104,7 @@ def export_invoice_excel(
 
     metadata = metadata or DocumentMetadata(
         document_type=DocumentType.INVOICE,
-        title="Factura",
+        title=billing_preset(invoice.billing_preset).document_title,
         project_name=invoice.project_name,
         reference=invoice.project_reference,
         status=DocumentStatus.ISSUED if invoice.status.value == "issued" else DocumentStatus.DRAFT,
@@ -86,42 +112,47 @@ def export_invoice_excel(
             invoice_number=invoice.invoice_number,
             invoice_status=invoice.status.value,
             due_date=invoice.payment_terms.due_date,
+            billing_preset=invoice.billing_preset,
+            billing_source_type=invoice.billing_source_type,
+            billing_source_reference=invoice.billing_source_reference,
+            economic_basis=invoice.economic_basis,
         ),
     )
     row = render_invoice_header(ws, metadata, context, 6)
-    _write_label_value(ws, row, "Numero", invoice.invoice_number or "BORRADOR")
-    _write_label_value(ws, row + 1, "Fecha", invoice.issue_date.isoformat() if invoice.issue_date else "")
-    _write_label_value(ws, row + 2, "Proyecto", invoice.project_name)
-    _write_label_value(ws, row + 3, "Referencia", invoice.project_reference)
-
-    row += 6
-    row = _section(ws, row, "EMISOR", 3, context)
     issuer_rows = [
         ("Nombre", invoice.issuer.legal_name),
         ("NIF/CIF", invoice.issuer.tax_id),
-        ("Direccion fiscal", invoice.issuer.fiscal_address),
+        ("Direccion", invoice.issuer.fiscal_address),
         ("Email", invoice.issuer.email),
         ("Telefono", invoice.issuer.phone),
     ]
-    for label, value in issuer_rows:
-        _write_label_value(ws, row, label, value)
-        row += 1
-
-    row += 1
-    row = _section(ws, row, "CLIENTE", 3, context)
     client_rows = [
         ("Nombre", invoice.client.legal_name),
-        ("NIF/CIF/VAT", invoice.client.tax_id or invoice.client.vat_id),
-        ("Direccion fiscal", invoice.client.fiscal_address),
+        ("NIF/CIF", invoice.client.tax_id or invoice.client.vat_id),
+        ("Direccion", invoice.client.fiscal_address),
         ("Pais", invoice.client.country),
-        ("Email facturacion", invoice.client.billing_email),
-        ("Pedido/expediente", invoice.client.purchase_order or invoice.client.expediente),
+        ("Email", invoice.client.billing_email),
+        ("Pedido", invoice.client.purchase_order or invoice.client.expediente),
     ]
-    for label, value in client_rows:
-        _write_label_value(ws, row, label, value)
-        row += 1
+    _write_pair_block(ws, row, 1, "EMISOR", issuer_rows, context)
+    _write_pair_block(ws, row, 4, "CLIENTE", client_rows, context)
+    row += max(len(issuer_rows), len(client_rows)) + 2
 
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=6)
+    ws.cell(row, 1).value = "PROYECTO"
+    ws.cell(row, 1).font = context.palette.font_subhead
+    ws.cell(row, 1).fill = context.palette.fill_subhead
     row += 1
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=6)
+    project_parts = [invoice.project_name, metadata.site_name]
+    ws.cell(row, 1).value = " - ".join(_visible(p) for p in project_parts if _visible(p) != "-")
+    ws.cell(row, 1).font = Font(name=context.palette.font_family, bold=True, size=11)
+    row += 1
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=6)
+    ws.cell(row, 1).value = f"Ref. {_visible(invoice.project_reference or metadata.reference)}"
+    ws.cell(row, 1).font = context.palette.font_small
+    row += 2
+
     row = _section(ws, row, "CONCEPTOS", 6, context)
     headers = ["Codigo", "Descripcion", "Unidad", "Cantidad", "Precio", "Importe"]
     for col, header in enumerate(headers, start=1):
@@ -157,10 +188,8 @@ def export_invoice_excel(
         row += 1
 
     row += 1
-    row = _section(ws, row, "RESUMEN", 6, context)
+    row = _section(ws, row, "RESUMEN FISCAL", 6, context)
     summary_rows = [
-        ("Subtotal", calculation.subtotal),
-        ("Descuentos", calculation.discounts),
         ("Base imponible", calculation.taxable_base),
         (f"IVA ({calculation.vat.rate:.2%})", calculation.vat.amount),
     ]
@@ -168,19 +197,16 @@ def export_invoice_excel(
         summary_rows[-1] = (f"IVA ({calculation.vat.treatment.value})", calculation.vat.amount)
     if calculation.withholding.amount:
         summary_rows.append((f"Retencion ({calculation.withholding.rate:.2%})", -calculation.withholding.amount))
-    summary_rows.extend(
-        [
-            ("TOTAL FACTURA", calculation.invoice_total),
-            ("LIQUIDO A PERCIBIR", calculation.amount_due),
-        ]
-    )
+    summary_rows.append(("TOTAL FACTURA", calculation.invoice_total))
+    if calculation.withholding.amount:
+        summary_rows.append(("A PAGAR", calculation.amount_due))
 
     for label, value in summary_rows:
         ws.cell(row, 4).value = label
-        ws.cell(row, 4).font = Font(bold=label in {"TOTAL FACTURA", "LIQUIDO A PERCIBIR"})
+        ws.cell(row, 4).font = Font(bold=label in {"TOTAL FACTURA", "A PAGAR"})
         ws.cell(row, 6).value = value
         _format_money_cell(ws.cell(row, 6))
-        if label in {"TOTAL FACTURA", "LIQUIDO A PERCIBIR"}:
+        if label in {"TOTAL FACTURA", "A PAGAR"}:
             ws.cell(row, 4).fill = _fill(context.palette.color_fondo_alt)
             ws.cell(row, 6).fill = _fill(context.palette.color_fondo_alt)
             ws.cell(row, 6).font = Font(bold=True)
@@ -197,8 +223,9 @@ def export_invoice_excel(
         ("Referencia", invoice.payment_terms.payment_reference),
     ]
     for label, value in payment_rows:
-        _write_label_value(ws, row, label, value)
-        row += 1
+        if _visible(value) != "-":
+            _write_label_value(ws, row, label, _visible(value))
+            row += 1
 
     if invoice.notes:
         row += 1
@@ -216,6 +243,5 @@ def export_invoice_excel(
 
     apply_document_footer(ws, metadata, context, 6, invoice=True)
     configure_excel_printing(ws, orientation="portrait", repeat_row=None, fit_to_height=1)
-    ws.freeze_panes = "A25"
     wb.save(output_path)
     return output_path

@@ -29,7 +29,7 @@ from gantt.reporting.styles import (
     DocumentPalette, build_palette, inserir_cabecera, inserir_peu,
 )
 from gantt.reporting.palette import GRIS_LINEA
-from gantt.reporting.documents import DocumentType
+from gantt.reporting.documents import DocumentMetadata, DocumentType, filename_for_document
 from gantt.reporting.rendering import (
     apply_document_footer,
     configure_excel_printing,
@@ -47,7 +47,8 @@ _ANEXO_DOCUMENT_TYPE = {
     "PRES.02.02": DocumentType.UNIT_PRICE_TABLE_2,
     "PRES.02.03": DocumentType.DECOMPOSED_BUDGET,
     "PRES.02.04": DocumentType.CHAPTER_SUMMARY,
-    "PRES.03": DocumentType.MEASUREMENTS_BLIND,
+    "PRES.03.01": DocumentType.MEASUREMENTS,
+    "PRES.03.02": DocumentType.BLIND_MEASUREMENTS,
     "PRES.05": DocumentType.VEC_SETTLEMENT,
     "JUST_PRECIOS": DocumentType.RESOURCE_PRICE_JUSTIFICATION,
 }
@@ -915,7 +916,6 @@ def generar_pres01(
         'P. Unit. ofertado (€)', 'Importe ofertado (€)',
     ], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     current_cap = None
     current_sub = None
@@ -1009,7 +1009,6 @@ def generar_pres0201(
 
     cabecera_tabla(ws, ['Código', 'Descripción del precio', 'Precio unit. (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, {'A': 16, 'B': 72, 'C': 18})
 
     # Recopilar partidas con sus capítulos
@@ -1072,7 +1071,6 @@ def generar_pres0202(
     cabecera_tabla(ws, ['Tipo', 'Código', 'Descripción',
                          'Ud.', 'Cant./ud', 'P. unit./Base (€)', 'Coste (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, {'A': 8, 'B': 16, 'C': 55, 'D': 8, 'E': 12, 'F': 16, 'G': 16})
 
     for cap, sub, partida in iter_todas_partidas(presupuesto):
@@ -1235,16 +1233,20 @@ def generar_pres0202(
     wb.save(filepath)
 
 
-# ── PRES.02.03 / PRES.03 — Presupuesto Descompuesto y Mediciones ─────────────
+# ── PRES.02.03 / PRES.03.01 / PRES.03.02 — Presupuesto y Mediciones ──────────
 
 def generar_descompuesto_doc(
     presupuesto: Presupuesto,
     filepath: Path,
     mostrar_precios: bool,
     palette: DocumentPalette | None = None,
+    *,
+    anexo: str | None = None,
+    titulo: str | None = None,
+    sheet_title: str | None = None,
 ) -> None:
     """
-    Generador compartido para PRES.02.03 (con precios) y PRES.03 (mediciones ciegas).
+    Generador compartido para PRES.02.03 (con precios) y PRES.03.01 (mediciones historicas).
     Con mostrar_precios=True: 6 columnas, precios, importes, horas MO visibles, PEM final.
     Con mostrar_precios=False: 4 columnas, sin precios, sin importes, horas MO ocultas.
     """
@@ -1256,12 +1258,12 @@ def generar_descompuesto_doc(
                  else {'A': 8, 'B': 55, 'C': 6, 'D': 12}
     headers    = (['Código', 'Descripción', 'Ud.', 'Cantidad', 'P. unit. (€)', 'Importe (€)']
                   if mostrar_precios else ['Código', 'Descripción', 'Ud.', 'Cantidad'])
-    anexo      = 'PRES.02.03' if mostrar_precios else 'PRES.03'
-    titulo     = 'PRESUPUESTO DESCOMPUESTO Y MEDICIONES' if mostrar_precios else 'MEDICIONES'
+    anexo      = anexo or ('PRES.02.03' if mostrar_precios else 'PRES.03.01')
+    titulo     = titulo or ('PRESUPUESTO DESCOMPUESTO Y MEDICIONES' if mostrar_precios else 'MEDICIONES')
 
     wb = Workbook()
     ws = wb.active
-    ws.title = 'Presupuesto Descompuesto' if mostrar_precios else 'Mediciones Ciegas'
+    ws.title = sheet_title or ('Presupuesto Descompuesto' if mostrar_precios else 'Mediciones')
     ajustar_columnas(ws, col_widths)
     inserir_cabecera(
         ws, pal, company,
@@ -1273,7 +1275,6 @@ def generar_descompuesto_doc(
     aplicar_encabezado_documental(ws, presupuesto.config, anexo, titulo, N, pal=pal)
     cabecera_tabla(ws, headers, pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
     ajustar_columnas(ws, col_widths)
 
     def escribir_partidas_de(nodo: Capitulo) -> None:
@@ -1433,11 +1434,110 @@ def generar_pres0203(
     generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=True, palette=palette)
 
 
-def generar_pres03_mediciones(
+def generar_pres0301_mediciones(
     presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
 ) -> None:
-    """Genera las Mediciones ciegas: descripción y unidades sin precios ni horas MO."""
-    generar_descompuesto_doc(presupuesto, filepath, mostrar_precios=False, palette=palette)
+    """Genera PRES.03.01 Mediciones con el comportamiento historico recuperado."""
+    generar_descompuesto_doc(
+        presupuesto,
+        filepath,
+        mostrar_precios=False,
+        palette=palette,
+        anexo="PRES.03.01",
+        titulo="MEDICIONES",
+        sheet_title="Mediciones",
+    )
+
+
+def generar_pres0302_mediciones_ciegas(
+    presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
+) -> None:
+    """Genera PRES.03.02 Mediciones ciegas sin economia ni descompuestos."""
+    pal = palette or build_palette(None)
+    company = presupuesto.company
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "MEDICIONES"
+    N = 4
+    col_widths = {"A": 14, "B": 62, "C": 8, "D": 14}
+    ajustar_columnas(ws, col_widths)
+
+    inserir_cabecera(
+        ws,
+        pal,
+        company,
+        titol_document="MEDICIONES",
+        num_columnes=N,
+        ref_projecte=presupuesto.config.numero_expediente,
+        revisio=presupuesto.config.revision,
+    )
+    aplicar_encabezado_documental(ws, presupuesto.config, "PRES.03.02", "MEDICIONES CIEGAS", N, pal=pal)
+    cabecera_tabla(ws, ["Código", "Descripción", "Ud.", "Cantidad"], pal=pal)
+    fila_cabecera = ws.max_row
+    ajustar_columnas(ws, col_widths)
+
+    def escribir_subcapitulo(nodo: Capitulo, nivel: int = 1) -> None:
+        for sub in nodo.subcapitulos:
+            ws.append([f"{capitulo_limpio(sub.codigo)} — {sub.descripcion}"] + [""] * (N - 1))
+            r_sub = ws.max_row
+            ws.merge_cells(start_row=r_sub, start_column=1, end_row=r_sub, end_column=N)
+            for c in range(1, N + 1):
+                ws.cell(r_sub, c).fill = PRES_FSC
+                ws.cell(r_sub, c).font = PRES_FCF
+                ws.cell(r_sub, c).border = PRES_BORDE_TABLA
+            ws.cell(r_sub, 1).alignment = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            ws.row_dimensions[r_sub].height = 18
+            registrar_altura_manual(ws, r_sub)
+            escribir_partidas(sub)
+            escribir_subcapitulo(sub, nivel + 1)
+
+    def escribir_partidas(nodo: Capitulo) -> None:
+        for partida in nodo.partidas:
+            ws.append([partida.codigo, partida.descripcion, partida.unidad, partida.cantidad])
+            r_p = ws.max_row
+            for c in range(1, N + 1):
+                ws.cell(r_p, c).fill = PRES_FD
+                ws.cell(r_p, c).font = PRES_FCF
+                ws.cell(r_p, c).border = PRES_BORDE_TABLA
+                ws.cell(r_p, c).alignment = Alignment(vertical="top", wrap_text=True)
+            cel_desc(ws, r_p, 2, partida.descripcion, font=PRES_FCF, width_chars=52, max_height=90.0)
+            ws.cell(r_p, 2).fill = PRES_FD
+            ws.cell(r_p, 3).alignment = PRES_AC
+            cel_cantidad(ws, r_p, 4, partida.cantidad, font=PRES_FCF)
+            ws.cell(r_p, 4).number_format = "#,##0.00###"
+            ws.cell(r_p, 4).fill = PRES_FD
+
+            descripcion_larga = normalizar_texto_largo(partida.descripcion_larga)
+            if descripcion_larga:
+                append_descripcion_fusionada_partida(
+                    ws,
+                    n_cols=N,
+                    start_col=2,
+                    end_col=N,
+                    texto=descripcion_larga,
+                    font=PRES_FN,
+                    fill=PRES_FB,
+                    max_height_points=300.0,
+                )
+            sep_vacia(ws, 5.0, N)
+
+    for cap in presupuesto.capitulos:
+        ws.append([f"CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}"] + [""] * (N - 1))
+        r = ws.max_row
+        aplicar_estilo_cabecera(ws, r, N, pal=pal)
+        cel_desc(ws, r, 1, f"CAPÍTULO {capitulo_limpio(cap.codigo)} — {cap.descripcion}", font=pal.font_header)
+        ws.cell(r, 1).fill = pal.fill_header
+        ws.row_dimensions[r].height = 20
+        registrar_altura_manual(ws, r)
+        escribir_partidas(cap)
+        escribir_subcapitulo(cap)
+
+    ajustar_columnas(ws, col_widths)
+    ajustar_alturas_filas_por_contenido(ws, max_col=N)
+    configurar_impresion(ws, "portrait", fila_cabecera, presupuesto.config)
+    inserir_peu(ws, pal, company, N)
+    wb.save(filepath)
 
 
 # ── PRES.02.04 — Resumen por Capítulos ───────────────────────────────────────
@@ -1471,7 +1571,6 @@ def generar_pres0204(
 
     cabecera_tabla(ws, ['Capítulo', 'Descripción', 'Importe (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     for i, cap in enumerate(presupuesto.capitulos):
         ws.append([capitulo_limpio(cap.codigo), cap.descripcion, cap.importe_total])
@@ -1564,7 +1663,6 @@ def generar_pres05(
 
     cabecera_tabla(ws, ['Concepto', '% aplicado', 'Importe (€)'], pal=pal)
     fila_cabecera = ws.max_row
-    ws.freeze_panes = f'A{fila_cabecera + 1}'
 
     filas_b1 = [
         ('PEM (sin residuos)',                       '—',  resumen.pem_sin_gr, False),
@@ -1689,7 +1787,6 @@ def generar_just_precios(
         N,
         pal=pal,
     )
-    ws.freeze_panes = f'A{ws.max_row + 1}'
     fila_cabecera_repetir = None
 
     # Acumular cantidades totales por recurso
@@ -1782,17 +1879,19 @@ def generar_todos(
     pal = palette or build_palette(None)
     output_dir.mkdir(parents=True, exist_ok=True)
     documentos = [
-        ('PRES.01_Cuadro_Oferta.xlsx',               generar_pres01),
-        ('PRES.02.01_Cuadro_Precios_1.xlsx',          generar_pres0201),
-        ('PRES.02.02_Cuadro_Precios_2.xlsx',          generar_pres0202),
-        ('PRES.02.03_Presupuesto_Descompuesto.xlsx',  generar_pres0203),
-        ('PRES.02.04_Resumen_Capitulos.xlsx',         generar_pres0204),
-        ('PRES.03_Mediciones_Ciegas.xlsx',            generar_pres03_mediciones),
-        ('PRES.05_VEC_Liquidacion.xlsx',              generar_pres05),
-        ('JUST_PRECIOS_Recursos.xlsx',                generar_just_precios),
+        (DocumentType.BUDGET_OFFER, generar_pres01),
+        (DocumentType.UNIT_PRICE_TABLE_1, generar_pres0201),
+        (DocumentType.UNIT_PRICE_TABLE_2, generar_pres0202),
+        (DocumentType.DECOMPOSED_BUDGET, generar_pres0203),
+        (DocumentType.CHAPTER_SUMMARY, generar_pres0204),
+        (DocumentType.MEASUREMENTS, generar_pres0301_mediciones),
+        (DocumentType.BLIND_MEASUREMENTS, generar_pres0302_mediciones_ciegas),
+        (DocumentType.VEC_SETTLEMENT, generar_pres05),
+        (DocumentType.RESOURCE_PRICE_JUSTIFICATION, generar_just_precios),
     ]
     rutas: list[Path] = []
-    for nombre, funcion in documentos:
+    for document_type, funcion in documentos:
+        nombre = filename_for_document(DocumentMetadata(document_type=document_type))
         ruta = output_dir / nombre
         funcion(presupuesto, ruta, palette=pal)
         rutas.append(ruta)

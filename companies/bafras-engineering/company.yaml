@@ -35,6 +35,7 @@ branding:
   fuente_principal: "Aptos"      # fuente corporativa
   fuente_fallback: "Calibri"     # fallback si Aptos no disponible
   logo: "logo.png"               # ruta relativa a esta carpeta
+  logo_asset_type: "lockup_horizontal"
 
 facturacio:
   serie_factura: "A"             # prefijo serie (A2025-001)

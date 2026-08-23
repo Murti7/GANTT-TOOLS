@@ -33,7 +33,7 @@ from gantt.reporting.styles import (
     GANTT_FONT_BOLD, GANTT_FONT_HEADER, GANTT_FONT_ITALIC,
     DocumentPalette, build_palette,
 )
-from gantt.reporting.documents import DocumentMetadata, DocumentType, PlanningMetadata
+from gantt.reporting.documents import DocumentMetadata, DocumentPurpose, DocumentType, PlanningMetadata
 from gantt.reporting.presentation import PresentationContext
 from gantt.reporting.rendering import (
     apply_document_footer,
@@ -41,6 +41,7 @@ from gantt.reporting.rendering import (
     metadata_from_project_config,
     presentation_from_palette_company,
     render_budget_header,
+    render_analysis_header,
     render_planning_header,
 )
 
@@ -99,6 +100,20 @@ def adjust_col_widths(ws) -> None:
             for cell in col
         )
         ws.column_dimensions[get_column_letter(col[0].column)].width = min(max_len + 3, 60)
+
+
+def first_filterable_row(ws, start_row: int) -> int:
+    """Primera fila usable como header de autofiltro, evitando merges."""
+    merged_rows = {row for merged in ws.merged_cells.ranges for row, _col in merged.cells}
+    for row in range(start_row, ws.max_row + 1):
+        non_empty = sum(
+            1
+            for col in range(1, ws.max_column + 1)
+            if ws.cell(row, col).value not in (None, "")
+        )
+        if row not in merged_rows and non_empty >= 2:
+            return row
+    return start_row
 
 
 
@@ -945,20 +960,27 @@ def exportar_analisis(
         # Dashboard como primera hoja (índice 0, se inserta delante de todo)
         write_dashboard(wb.create_sheet('Dashboard', 0), presupuesto, planificaciones, palette=pal)
 
+    header_rows = 5
+    first_content_row = header_rows + 1
+    first_scrollable_row = first_content_row + 1
     for ws in wb.worksheets:
-        ws.insert_rows(1, amount=9)
+        ws.insert_rows(1, amount=header_rows)
         n_cols = max(ws.max_column, 6)
         if planificaciones:
             render_planning_header(ws, metadata, presentation_context, n_cols)
         else:
-            render_budget_header(ws, metadata, presentation_context, n_cols)
-        if ws.max_row > 12:
-            ws.freeze_panes = "A11"
+            render_analysis_header(ws, metadata, presentation_context, n_cols)
+        data_last_row = ws.max_row
+        filter_row = first_filterable_row(ws, first_content_row)
+        if ws.max_row >= filter_row + 1:
+            ws.freeze_panes = f"A{filter_row + 1}"
+            ws.auto_filter.ref = f"A{filter_row}:{get_column_letter(n_cols)}{data_last_row}"
         apply_document_footer(ws, metadata, presentation_context, n_cols)
         configure_excel_printing(
             ws,
             orientation="landscape" if n_cols > 6 or planificaciones else "portrait",
-            repeat_row=11 if ws.max_row > 12 else None,
+            repeat_row=filter_row if ws.max_row > filter_row else None,
+            purpose=DocumentPurpose.ANALYSIS,
         )
 
     wb.save(output_path)

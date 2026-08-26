@@ -116,6 +116,28 @@ def test_presentation_context_expone_tema_idioma_y_paleta():
     assert context.palette.diagram.task_border == "#654321"
 
 
+def test_palette_semantic_foregrounds_contrastan_con_fondos_dinamicos():
+    dark = build_palette(
+        BrandingConfig(
+            color_primario="#102030",
+            color_secundario="#204020",
+            color_texto="#111111",
+        )
+    )
+    light = build_palette(
+        BrandingConfig(
+            color_primario="#F2F2F2",
+            color_secundario="#E8F5E9",
+            color_texto="#111111",
+        )
+    )
+
+    assert dark.font_header.color.rgb.endswith("FFFFFF")
+    assert dark.font_subhead.color.rgb.endswith("FFFFFF")
+    assert light.font_header.color.rgb.endswith("000000")
+    assert light.font_subhead.color.rgb.endswith("000000")
+
+
 def test_budget_header_lockup_no_duplica_issuer_en_brand_area(tmp_path: Path):
     ws = Workbook().active
     company = BrandingConfig(

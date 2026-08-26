@@ -73,13 +73,13 @@ Every document type has a functional purpose:
 
 Budget measurements are modeled as two distinct document identities:
 
-- `DocumentType.MEASUREMENTS`: `PRES.03.01`, filename
-  `PRES.03.01_Mediciones.xlsx`.
-- `DocumentType.BLIND_MEASUREMENTS`: `PRES.03.02`, filename
-  `PRES.03.02_Mediciones_Ciegas.xlsx`.
+- `DocumentType.BLIND_MEASUREMENTS`: `PRES.03.01`, filename
+  `PRES.03.01_Mediciones_Ciegas.xlsx`.
+- `DocumentType.MEASUREMENTS`: `PRES.03.02`, filename
+  `PRES.03.02_Mediciones.xlsx`.
 
 Both are Budget `DELIVERY` documents generated independently from the
-`Presupuesto` domain model. `PRES.03.02` is the commercially safe blind variant;
+`Presupuesto` domain model. `PRES.03.01` is the commercially safe blind variant;
 it must not be derived from another workbook by deleting or hiding columns.
 
 Freeze panes are owned by the layout policy. Budget `DELIVERY` documents do not

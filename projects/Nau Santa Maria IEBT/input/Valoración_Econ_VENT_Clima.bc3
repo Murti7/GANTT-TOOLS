@@ -1,0 +1,551 @@
+~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
+~K|-9\3\3\3\2\2\2\2\EUR\|5\0\0\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
+~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
+~C|VALORACIÓN_ECON_VENT_CLIMA##||Importado desde ficheros CSV|17141.44|260826|0|
+~D|VALORACIÓN_ECON_VENT_CLIMA##
+|01#\\1
+\02#\\1
+\03#\\1
+\04#\\1
+\05#\\1
+\06#\\1
+\|
+~C|01#||ACTUACIONES PREVIAS Y REPLANTEO|126.95||0|
+~D|01#
+|01.01\\1
+\|
+~C|01.01|ud|Replanteo técnico de la instalación de climatización y ventilación|120.9||0|
+~T|01.01|Replanteo técnico previo a la ejecución de las instalaciones de climatización y ventilación, mediante inspección conjunta de las zonas de actuación y definición sobre obra de la ubicación definitiva de equipos, trazados, pasos, soportaciones, terminales y conexiones, comprobando su compatibilidad con las condiciones reales del edificio y con el resto de instalaciones existentes.
+
+Incluye:
+
+Inspección y comprobación de las condiciones reales de las zonas de actuación en planta baja y planta primera.
+Definición de la ubicación definitiva de las unidades interiores y exteriores de climatización, incluyendo el nuevo sistema cassette y la nueva ubicación del split existente.
+Definición del trazado definitivo de las líneas frigoríficas, interconexiones eléctricas y evacuaciones de condensados.
+Replanteo de las redes de ventilación de impulsión y extracción de PB y PP, definiendo recorrido, cotas y posición de los conductos principales.
+Definición de la ubicación de los ventiladores, cajas de filtración, elementos de regulación y demás equipos auxiliares.
+Replanteo de la posición de las rejillas interiores de impulsión y extracción, considerando la distribución y uso previsto de los espacios.
+Definición de la ubicación de las tomas de aire exterior y expulsiones de aire viciado, garantizando una disposición adecuada entre ambas.
+Comprobación de interferencias con estructura, cerramientos, falsos techos, luminarias, instalaciones eléctricas y demás elementos existentes.
+Definición de los puntos de paso de conductos, tuberías y canalizaciones a través de cerramientos.
+Marcado físico sobre los cerramientos de los huecos y pasamuros necesarios, indicando posición y dimensiones requeridas para su posterior ejecución por el responsable de los trabajos de obra civil.
+Marcado específico en el cerramiento/fachada de la oficina de planta primera de los pasos correspondientes a los conductos Ø160 mm de toma y expulsión de aire.
+Definición de los pasos y huecos necesarios en planta baja para las redes de ventilación y climatización.
+Comprobación de espacios disponibles para montaje, desmontaje, registro, sustitución de filtros y mantenimiento posterior de los equipos.
+Definición de los criterios de soportación y puntos principales de fijación de equipos y conductos.
+
+Criterio de medida en proyecto: unidad (ud) de replanteo técnico completo de las instalaciones de climatización y ventilación.
+
+Criterio de medida en obra: unidad efectivamente realizada, incluyendo inspección, definición definitiva de trazados y equipos, comprobación de interferencias, marcado de huecos y coordinación de los trabajos previos necesarios.|
+~D|01.01
+|MO-CLIMA-OF\\2
+\MO-CLIMA-AY\\2
+\|
+~C|MO-CLIMA-OF|h|Oficial 1ª instalador climatización|33||1|
+~C|MO-CLIMA-AY|h|Ayudante instalador climatización|27.45||1|
+~C|02#||REFORMA DE CLIMATIZACIÓN EN PLANTA BAJA|6452.29||0|
+~T|02#|Reforma y ampliación de la instalación de climatización de las oficinas de planta baja mediante reubicación del sistema split existente e instalación de nuevo sistema de expansión directa tipo cassette.|
+~D|02#
+|02.01\\1
+\02.02\\1
+\02.03\\1
+\02.04\\1
+\|
+~C|02.01|ud|Desmontaje y reubicación de sistema split existente de 5 kW|144.11||0|
+~T|02.01|Desmontaje controlado de la unidad interior del sistema split existente de aproximadamente 5 kW de potencia frigorífica, actualmente situada en la oficina principal de planta baja, traslado dentro de la propia obra y reinstalación en la zona de terraza cerrada, conservando la unidad exterior existente y verificando previamente la viabilidad técnica de su reutilización.
+
+Incluye:
+
+Replanteo y comprobación previa del estado del equipo y de las condiciones necesarias para su reutilización.
+Operaciones frigoríficas necesarias para efectuar el desmontaje sin pérdida incontrolada de refrigerante, incluyendo recuperación o confinamiento cuando proceda.
+Desconexión de líneas frigoríficas, interconexión eléctrica, control y evacuación de condensados.
+Desmontaje, protección, traslado interior y fijación de la unidad en su nueva ubicación.
+Adaptación de conexiones, soportes, fijaciones y pequeño material necesario para la reinstalación.
+Conexionado final de las líneas asociadas, cuyas nuevas longitudes significativas se medirán en la partida correspondiente.
+Operaciones de estanqueidad, vacío y comprobación de carga de refrigerante cuando resulten necesarias.
+Comprobación de evacuación de condensados y funcionamiento del equipo en refrigeración y calefacción.
+
+Previamente a la intervención se verificará el estado funcional del equipo y la compatibilidad de la nueva ubicación con las condiciones de instalación existentes.
+
+Criterio de medida en proyecto: unidad (ud) de equipo split existente completamente desmontado, trasladado y reinstalado.
+
+Criterio de medida en obra: unidad (ud) efectivamente reubicada, conexionada, comprobada y en condiciones de funcionamiento, sin incluir las nuevas longitudes significativas de líneas medidas separadamente.|
+~D|02.01
+|MO-CLIMA-AY\\5
+\%MT-hidr\\0.05
+\|
+~C|%MT-hidr|%|Material hidráulico auxiliar|0|260326|%|
+~T|%MT-hidr|Material hdiráulico auxiliar|
+~C|02.02|ud|Suministro e instalación de sistema de climatización tipo cassette de 9,5 kW|4286.21||0|
+~T|02.02|Suministro e instalación de sistema de climatización de expansión directa aire-aire mediante bomba de calor inverter, Mitsubishi Electric Serie PRO MGPLZ-100VEA o equivalente, con potencia frigorífica nominal de 9,5 kW y calorífica de 11,2 kW, formado por unidad interior tipo cassette PLA-SM100EA, unidad exterior PUZ-SM100VKA, panel decorativo de cuatro vías PLP-6EALM2 y sistema de mando compatible. Equipo destinado a la climatización de la oficina principal de planta baja, con refrigerante R32.
+
+Incluye:
+
+Suministro del conjunto completo de unidad interior, unidad exterior, panel decorativo y elementos de control correspondientes.
+Instalación del cassette empotrado y nivelado en falso techo, incluyendo elementos específicos de suspensión y fijación.
+Instalación de la unidad exterior en posición replanteada, con soporte o bancada de capacidad adecuada, anclajes y elementos antivibratorios.
+Montaje del panel de cuatro vías y elementos propios del fabricante necesarios para completar el equipo.
+Refrigerante R32 correspondiente a la carga de fábrica del equipo, 2,0 kg
+Conexionado final a líneas frigoríficas, drenaje, interconexión y alimentación ejecutados mediante las partidas correspondientes.
+Configuración de parámetros de funcionamiento y mando del equipo.
+Comprobación de comunicaciones entre unidades, drenaje de condensados y funcionamiento en refrigeración y calefacción.
+Pequeño material, fijaciones y accesorios específicos necesarios para entregar el conjunto completamente montado.
+
+La ubicación del cassette se coordinará con falso techo y ventilación mecánica, manteniéndose ambos sistemas funcionalmente independientes. Se respetarán las distancias de servicio, mantenimiento y condiciones de instalación correspondientes a la combinación de unidades instalada.
+
+Criterio de medida en proyecto: unidad (ud) de sistema completo de climatización tipo cassette.
+
+Criterio de medida en obra: unidad (ud) completamente suministrada, instalada, fijada, conexionada, configurada y comprobada, incluyendo unidad interior, exterior, panel, mando y soportación, sin incluir líneas frigoríficas, drenajes ni alimentación eléctrica medidos separadamente.|
+~D|02.02
+|MT-CAS-10\\1
+\MT-CAS-SOP\\1
+\MT-CAS-SOPb\\1
+\MO-CLIMA-OF\\8
+\MO-CLIMA-AY\\8
+\%MT-hidr\\0.05
+\|
+~C|MT-CAS-10|ud|Sistema de climatización inverter tipo cassette Mitsubishi Electric MGPLZ-100VEA Serie PRO|3536||3|
+~C|MT-CAS-SOP|ud|Soporte para unidad exterior de climatización 900mm|40||3|
+~C|MT-CAS-SOPb|ud|Elementos antivibratorios para unidad exterior|22.5|260826|3|
+~C|02.03|ud|Líneas frigoríficas, interconexión y evacuación de condensados|1137.78||0|
+~T|02.03|Ejecución de las líneas frigoríficas, interconexiones funcionales y redes de evacuación de condensados necesarias para el nuevo sistema de climatización Mitsubishi Electric Serie PRO MGPLZ-100VEA, formado por unidad interior PLA-SM100EA y unidad exterior PUZ-SM100VKA, así como adaptación de los conductos correspondientes al sistema split existente de 5 kW objeto de reubicación. Para el nuevo sistema cassette se ejecutará línea frigorífica mediante tuberías de cobre deshidratado para refrigeración, aptas para refrigerante R32, de Ø9,52 mm (3/8") para la línea de líquido y Ø15,88 mm (5/8") para la línea de gas, con aislamiento térmico adecuado. La longitud prevista del trazado entre unidades será igual o inferior a aproximadamente 15 m, debiendo verificarse la longitud definitiva durante el replanteo.
+
+Incluye:
+Suministro e instalación de tuberías de cobre frigorífico deshidratado de Ø9,52 mm (3/8") en líquido y Ø15,88 mm (5/8") en gas, aptas para R32.
+Aislamiento térmico individual y continuo mediante elastómero flexible de célula cerrada, de espesor adecuado a las condiciones de servicio y exigencias reglamentarias.
+Uniones, conexiones y puntos singulares necesarios para la conexión entre las unidades PLA-SM100EA y PUZ-SM100VKA.
+Soportación mediante abrazaderas y fijaciones adecuadas, incluyendo protección mecánica de las líneas en los tramos expuestos a golpes o deterioro.
+Sellado y acabado de los pasos de instalaciones a través de cerramientos.
+Cableado de interconexión y comunicación funcional entre unidad interior y unidad exterior, de características y número de conductores conforme al esquema eléctrico de Mitsubishi Electric.
+Ejecución de la evacuación de condensados del cassette mediante tubería de PVC Ø32 mm, desde la unidad interior hasta arqueta exterior en terrassa.
+Tendido de la red de condensados con pendiente mínima del 1 % en los tramos por gravedad, evitando contrapendientes y puntos de acumulación.
+Utilización de la bomba de condensados incorporada en el cassette cuando resulte necesaria y compatible con el trazado, sin prever inicialmente bomba auxiliar externa.
+Soportación de la tubería de condensados y aislamiento térmico en aquellos tramos donde exista riesgo de condensación superficial.
+Adaptación de la evacuación de condensados correspondiente al split existente en su nueva ubicación.
+Adaptación de las líneas frigoríficas y de interconexión del split existente cuando resulte necesaria como consecuencia de su reubicación.
+Accesorios, manguitos, fijaciones, soportes, sellantes y pequeño material necesarios para la completa ejecución de las instalaciones.
+Presurización y prueba de estanqueidad de los circuitos frigoríficos intervenidos.
+Realización de vacío previo a la puesta en servicio conforme a las especificaciones del fabricante.
+Comprobación de conexiones frigoríficas, apertura de válvulas de servicio, verificación de ausencia de fugas y prueba de correcta evacuación de condensados.
+Refrigerante
+
+El nuevo conjunto MGPLZ-100VEA dispone de una carga de fábrica de 2,0 kg de refrigerante R32, incluida en el suministro del equipo.|
+~D|02.03
+|MT-LF\\15
+\MT-LFb\\15
+\MT-INTb\\30
+\MT-INT\\15
+\MT-COND\\15
+\MO-CLIMA-OF\\10
+\MO-CLIMA-AY\\10
+\%MT-hidr\\0.05
+\|
+~C|MT-LF|m|Tubería de cobre frigorífico deshidratado Ø9,52 mm (3/8") para línea de líquido|6.88||3|
+~C|MT-LFb|m|Tubería de cobre frigorífico deshidratado Ø15,88 mm (5/8") para línea de gas|12.76|260826|3|
+~C|MT-INTb|m|Aislamiento elastomérico para tubería frigorífica|4|260826|3|
+~C|MT-INT|m|Cable de interconexión y comunicación entre unidades interior y exterior|0.8||3|
+~C|MT-COND|m|Tubería de PVC Ø32 mm para evacuación de condensados|3.5||3|
+~C|02.04|ud|Alimentación eléctrica y control del nuevo sistema de climatización|576.93|260826|0|
+~T|02.04|Ejecución de instalación eléctrica específica para alimentación y control del nuevo sistema de climatización tipo cassette Mitsubishi Electric MGPLZ-100VEA o equivalente, desde el cuadro eléctrico interior Q02 mediante circuito dedicado C2.2-Clima 2, incluyendo canalización, conductores, conexiones, interconexiones propias del sistema y dispositivo de mando.
+
+Incluye:
+Despliegue de manguera de conductores de cobre 3G 4mm2 (F+T+N) desde cuadro Q02, cirucito C2.2 - Clima.
+Canalización mediante tubo, bandeja o sistema de conducción compatible con el trazado definitivo.
+Interconexión eléctrica y de comunicación necesaria entre unidad exterior e interior.
+Instalación del mando/control del cassette en ubicación accesible dentro de la oficina, incluyendo su línea de comunicación.
+Conexionado, identificación del circuito y comprobaciones eléctricas y funcionales finales.
+
+Criterio de medida en proyecto: unidad (ud) de instalación eléctrica completa asociada al nuevo sistema de climatización, desde cuadro Q02 hasta equipos y mando.
+
+Criterio de medida en obra: unidad (ud) completamente ejecutada, identificada, conexionada, comprobada y operativa.|
+~D|02.04
+|MT-3G4mm2\\20
+\MT-3G4mm2b\\20
+\MT-Mcontrol\\1
+\elec01\\5
+\MO-ELEC-AY\\4
+\%MT-Elec\\0.05
+\|
+~C|MT-3G4mm2|m|Manguera de alimentación RZ1-K(AS) 3G4 mm², cirucito C2.2-Clima 2|3.5|260826|3|
+~C|MT-3G4mm2b|m|Canalización para alimentación eléctrica del sistema de climatización|1.5|260826|3|
+~C|MT-Mcontrol|m|Mando cableado Mitsubishi PAR-41MAA|173|260826|3|
+~C|elec01|h|Oficial 1ª electricista.|33.3|260324|1|
+~C|MO-ELEC-AY|h|Ayudante electricista|27.49||1|
+~C|%MT-Elec|%|Material eléctrico auxiliar|0|260326|%|
+~T|%MT-Elec|Material eléctrico auxiliar|
+~C|03#||VENTILACIÓN MECÁNICA EN PLANTA BAJA|5350.5||0|
+~D|03#
+|03.01\\1
+\03.02\\1
+\03.03\\1
+\03.04\\1
+\03.05\\1
+\|
+~C|03.01|ud|Sistema de impulsión mecánica de aire exterior, caudal nominal 450 m3/h|1692.79||0|
+~T|03.01|Sistema de impulsión mecánica de aire exterior para ventilación de las oficinas de planta baja, dimensionado para un caudal nominal de 450 m³/h, mediante ventilador en línea con motor EC regulable, caja filtrante registrable de dos etapas y conexión a red circular de distribución Ø200 mm.
+
+Incluye:
+
+Ventilador EC en línea SODECA NEOLINEO/EW-250 o equivalente, para 450 m³/h y presión disponible aproximada de 220–250 Pa.
+Caja filtrante registrable SlimFilter EC 3/3 500/200 M6+F8 o equivalente, dimensionada para aproximadamente 500 m³/h.
+Filtración mediante primera etapa ISO ePM10 =60 % y segunda etapa ISO ePM1 =75 %.
+Transición Ø250/200 para conexión del ventilador a la red.
+Manguitos flexibles, elementos antivibratorios, soportación, fijaciones y accesorios de montaje.
+Montaje dejando accesibles ventilador y filtros para inspección, regulación y mantenimiento.
+Conexión mecánica completa con la toma exterior y la red de impulsión.
+
+Criterio de medida en proyecto: unidad (ud) de sistema de impulsión y filtración completamente instalado.
+
+Criterio de medida en obra: unidad realmente ejecutada, conectada mecánicamente y preparada para conexionado eléctrico, regulación y puesta en servicio.|
+~D|03.01
+|MT-VEN-PB-I\\1
+\MT-FILT-PB\\1
+\MT-VEN-AUX\\1
+\MO-CLIMA-OF\\3
+\MO-CLIMA-AY\\3
+\%MT-hidr\\0.05
+\|
+~C|MT-VEN-PB-I|ud|Ventilador en línea EC regulable SODECA NEOLINEO/EW-250 o equivalente, 450 m³/h|822.9||3|
+~C|MT-FILT-PB|ud|Caja filtrante registrable de dos etapas, caudal nominal =500 m³/h, con filtros ISO ePM10 =60 % + ISO ePM1 =75 %|542.93||3|
+~C|MT-VEN-AUX|ud|Manguitos flexibles antivibratorios, soportación, fijaciones y accesorios de conexión y montaje del ventilador Ø160|65||3|
+~C|03.02|ud|Sistema de extracción mecánica de aire viciado, caudal nominal 450 m3/h|859.49||0|
+~T|03.02|Sistema de extracción mecánica para evacuación del aire interior de las oficinas de planta baja, dimensionado para un caudal nominal de 450 m³/h, mediante ventilador helicocentrífugo en línea con motor EC regulable y conexión directa a la red de extracción Ø200 mm.
+
+Incluye:
+
+Ventilador Soler & Palau TD EVO-200 PF ECOWATT o equivalente, Ø200 mm.
+Dimensionado para 450 m³/h y presión disponible aproximada de 70–100 Pa.
+Manguitos flexibles y elementos antivibratorios.
+Soportes, fijaciones y accesorios necesarios para montaje.
+Conexión mecánica con la red de extracción y conducto de expulsión exterior.
+Montaje accesible para inspección, mantenimiento y regulación.
+
+Criterio de medida en proyecto: unidad (ud) de sistema de extracción mecánica completamente instalado.
+
+Criterio de medida en obra: unidad realmente ejecutada, conectada mecánicamente y preparada para conexionado eléctrico, regulación y puesta en servicio.|
+~D|03.02
+|MT-VEN-PB-E\\1
+\MT-VEN-AUX\\1
+\MO-CLIMA-OF\\2
+\MO-CLIMA-AY\\2
+\%MT-hidr\\0.05
+\|
+~C|MT-VEN-PB-E|ud|Ventilador helicocentrífugo en línea EC regulable S&P TD EVO-200 ECOWATT o equivalente, Ø200 mm, para extracción de aire, caudal de diseño 450 m³/h|632.66||3|
+~C|03.03|ud|Red de conductos y distribución de aire de ventilación en planta baja|1361.64||0|
+~T|03.03|Ejecución de las redes interiores de impulsión y extracción de ventilación mediante conducto circular helicoidal de chapa de acero galvanizado tipo Spiro Ø200 mm, dispuesto visto y longitudinalmente en el interior de las oficinas, manteniendo sección constante y sin ramales secundarios.
+
+Incluye:
+
+Conducto circular Spiro Ø200 mm para impulsión y extracción.
+Codos, manguitos, uniones, tapas y piezas especiales necesarias.
+Abrazaderas, varillas, soportes y elementos de fijación.
+Corte, ajuste, ensamblaje y alineación de los conductos.
+Sellado de juntas, uniones y pasos.
+Preparación de los puntos destinados al montaje directo de los terminales.
+Pequeño material y medios auxiliares necesarios para la ejecución completa.
+
+Los conductos se instalarán sin aislamiento térmico, al discurrir íntegramente por el interior del espacio acondicionado. No se empleará conducto flexible como red principal.
+
+Criterio de medida en proyecto: metro (m) de conducto Ø200 mm medido según longitud de eje del trazado proyectado.
+
+Criterio de medida en obra: metro (m) de conducto realmente instalado, soportado, unido, sellado y preparado para conexión a equipos y terminales.|
+~D|03.03
+|MT-CON-PB\\40
+\MT-CON-AUX\\1
+\MO-CLIMA-OF\\8
+\MO-CLIMA-AY\\8
+\%MT-hidr\\0.05
+\|
+~C|MT-CON-PB|m|Conducto circular helicoidal de chapa de acero galvanizado tipo Spiro Ø200 mm para red de ventilación|17.83||3|
+~C|MT-CON-AUX|ud|Manguitos, uniones, tapas, piezas especiales, abrazaderas, varillas, fijaciones y material de sellado para red Spiro Ø160|100||3|
+~C|03.04|ud|Elementos terminales, regulación y conexión con exterior en planta baja|626.6||0|
+~T|03.04|Suministro e instalación de los elementos terminales interiores y exteriores del sistema de ventilación de planta baja, incluyendo distribución mediante tres puntos de impulsión y tres de extracción, regulación individual y conexión de las redes con el exterior.
+
+Incluye:
+
+3 rejillas KOOLAIR 21-DVC 325×75 mm o equivalente, de doble deflexión y lamas orientables, para impulsión de aproximadamente 150 m³/h por unidad.
+3 rejillas KOOLAIR 21-SVC 325×75 mm o equivalente, de simple deflexión, para extracción de aproximadamente 150 m³/h por unidad.
+Montaje directo de los seis terminales sobre conducto circular Ø200 mm.
+6 compuertas KOOLAIR RFS-05/06 o equivalente, para regulación individual de caudal.
+2 rejillas exteriores, una para toma y otra para expulsión, con lamas antilluvia y malla de protección, dimensionadas para 450 m³/h.
+Apertura y preparación de huecos sobre conductos, fijaciones, conexiones y sellados.
+Orientación inicial de las rejillas de impulsión hacia la zona ocupada.
+
+La toma y expulsión exteriores se dispondrán evitando la recirculación entre ambas corrientes.
+
+Criterio de medida en proyecto: unidad (ud) de conjunto de terminales, regulación y conexiones exteriores.
+
+Criterio de medida en obra: unidad completamente instalada, incluyendo los seis terminales interiores, seis elementos de regulación y dos terminales exteriores, preparada para equilibrado.|
+~D|03.04
+|MT-TERM-PB-I\\3
+\MT-TERM-PB-E\\3
+\MT-REG-CON\\6
+\MT-REJ-EXT\\2
+\MO-CLIMA-OF\\4
+\MO-CLIMA-AY\\4
+\%MT-hidr\\0.05
+\|
+~C|MT-TERM-PB-I|ud|Rejilla de impulsión KOOLAIR 21-DVC 325×75 mm, doble deflexión, para montaje directo sobre conducto circular Ø200 mm|25.7||3|
+~C|MT-TERM-PB-E|ud|Rejilla de extracción KOOLAIR 21-SVC 325×75 mm, simple deflexión, para montaje directo sobre conducto circular Ø200 mm|25||3|
+~C|MT-REG-CON|ud|Compuerta de regulación KOOLAIR RFS-05/06, compatible con rejillas 21-DVC/21-SVC 225×75 mm|18.81||3|
+~C|MT-REJ-EXT|ud|Rejilla exterior para toma/expulsión de aire, con lamas antilluvia y malla de protección, adecuada para red Ø160 y 225 m³/h|45||3|
+~C|03.05|ud|Alimentación eléctrica, mando y control del sistema de ventilación mecánica PB|555.2|260826|0|
+~T|03.05|Ejecución de la instalación eléctrica y de control necesaria para la alimentación, mando y regulación de los ventiladores EC de impulsión y extracción de planta baja, desde circuito dedicado procedente del cuadro Q02, C2.3-Vent
+
+Incluye:
+
+Alimentación monofásica a 230 V mediante cable RZ1-K (AS) 3G1,5 mm² Cu.
+Canalización de protección correspondiente al trazado.
+Derivaciones y conexionado de los ventiladores de impulsión y extracción.
+Cableado de mando y regulación requerido por los motores EC.
+Sistema de mando con programación horaria semanal.
+Marcha y parada coordinada de impulsión y extracción.
+Regulación independiente de ambos ventiladores para ajuste de caudales.
+Cajas, bornes, conexiones, fijaciones y pequeño material eléctrico.
+Comprobación de continuidad, conexionado, funcionamiento del mando y respuesta de los ventiladores.
+
+Las protecciones magnetotérmicas y diferenciales del circuito se consideran incluidas en el capítulo correspondiente a la reforma de baja tensión.
+
+Criterio de medida en proyecto: unidad (ud) de instalación eléctrica y sistema de mando y control completamente ejecutados.
+
+Criterio de medida en obra: unidad instalada, conexionada y funcional, incluyendo alimentación de ambos ventiladores, mando, regulación y programación.|
+~D|03.05
+|MT-3G1_5mm2c\\40
+\MT-3G1.5mm2bb\\40
+\MT-Mcontrolb\\1
+\elec01\\4
+\MO-ELEC-AY\\4
+\%MT-Elec\\0.05
+\|
+~C|MT-3G1_5mm2c|m|Manguera de alimentación RZ1-K(AS) 3G1.5 mm², cirucito C3.3-Vent|1.19|260826|3|
+~C|MT-3G1.5mm2bb|m|Canalización para alimentación eléctrica del sistema de climatización|2.2|260826|3|
+~C|MT-Mcontrolb|m|Mando, programación horaria y regulación EC|150|260826|3|
+~C|04#||VENTILACIÓN MECÁNICA EN PLANTA PRIMERA|4362.63||0|
+~D|04#
+|04.01\\1
+\04.02\\1
+\04.03\\1
+\04.04\\1
+\04.05\\1
+\|
+~C|04.01|ud|Sistema de impulsión mecánica de aire exterior, caudal nominal 450 m3/h|1594.48|260826|0|
+~T|04.01|Sistema de impulsión mecánica de aire exterior para ventilación de las oficinas de planta baja, dimensionado para un caudal nominal de 450 m³/h, mediante ventilador en línea con motor EC regulable, caja filtrante registrable de dos etapas y conexión a red circular de distribución Ø200 mm.
+
+Incluye:
+
+Ventilador EC en línea SODECA NEOLINEO/EW-250 o equivalente, para 450 m³/h y presión disponible aproximada de 220–250 Pa.
+Caja filtrante registrable SlimFilter EC 3/3 500/200 M6+F8 o equivalente, dimensionada para aproximadamente 500 m³/h.
+Filtración mediante primera etapa ISO ePM10 =60 % y segunda etapa ISO ePM1 =75 %.
+Transición Ø250/200 para conexión del ventilador a la red.
+Manguitos flexibles, elementos antivibratorios, soportación, fijaciones y accesorios de montaje.
+Montaje dejando accesibles ventilador y filtros para inspección, regulación y mantenimiento.
+Conexión mecánica completa con la toma exterior y la red de impulsión.
+
+Criterio de medida en proyecto: unidad (ud) de sistema de impulsión y filtración completamente instalado.
+
+Criterio de medida en obra: unidad realmente ejecutada, conectada mecánicamente y preparada para conexionado eléctrico, regulación y puesta en servicio.|
+~D|04.01
+|MT-VEN-PB-Ib\\1
+\MT-FILT-PBb\\1
+\MT-VEN-AUXb\\1
+\MO-CLIMA-OF\\3
+\MO-CLIMA-AY\\3
+\%MT-hidr\\0.05
+\|
+~C|MT-VEN-PB-Ib|ud|Ventilador en línea EC regulable SODECA NEOLINEO/EW-160, Ø160 mm, para impulsión de 225 m³/h|572.2|260826|3|
+~C|MT-FILT-PBb|ud|Caja filtrante registrable pasiva SODECA CJFILTER Ø160 o equivalente, con filtración de dos etapas ISO ePM10 =60 % + ISO ePM1 =75 %|720|260826|3|
+~C|MT-VEN-AUXb|ud|Manguitos flexibles antivibratorios, soportación, fijaciones y accesorios de conexión y montaje del conjunto de impulsión Ø160|45|260826|3|
+~C|04.02|ud|Sistema de extracción mecánica de aire viciado, caudal nominal 225 m3/h|378.95||0|
+~T|04.02|Sistema de extracción mecánica para evacuación del aire interior de las oficinas de planta primera, dimensionado para un caudal nominal de 225 m³/h, mediante ventilador helicocentrífugo en línea con motor EC regulable.
+
+Incluye:
+
+Ventilador Soler & Palau TD EVO-160 PF ECOWATT o equivalente, con conexión Ø160 mm.
+Motor EC regulable, apto para ajuste del caudal durante el equilibrado de la instalación.
+Manguitos flexibles y elementos antivibratorios.
+Soportes, fijaciones y accesorios necesarios para montaje.
+Conexión mecánica a la red de extracción Ø160 mm.
+Conexión con el tramo de expulsión y terminal exterior.
+Montaje accesible para inspección, regulación y mantenimiento.
+
+Trabajos previos necesarios: replanteo de ubicación, comprobación de soportación, accesibilidad y coordinación con el punto definitivo de salida al exterior.
+
+Criterio de medida en proyecto: unidad (ud) de sistema de extracción mecánica completamente instalado.
+
+Criterio de medida en obra: unidad realmente ejecutada, conectada mecánicamente y preparada para conexionado eléctrico, regulación y puesta en servicio.|
+~D|04.02
+|MT-VEN-PP-E\\1
+\MT-VEN-AUX\\1
+\MO-CLIMA-OF\\2
+\MO-CLIMA-AY\\2
+\%MT-hidr\\0.05
+\|
+~C|MT-VEN-PP-E|ud|Ventilador helicocentrífugo EC S&P TD EVO-160 PF ECOWATT, Ø160 mm, para extracción de 225 m³/h|175||3|
+~C|04.03|ud|Red de conductos y distribución de aire de ventilación en planta primera|990.78||0|
+~T|04.03|Ejecución de las redes interiores de impulsión y extracción mediante conducto circular helicoidal de chapa de acero galvanizado tipo Spiro Ø160 mm, dispuesto longitudinalmente y manteniendo sección constante a lo largo de cada circuito.
+
+Las redes se diseñan para un caudal inicial máximo de 225 m³/h, correspondiente a una velocidad aproximada de 3,1 m/s en conducto Ø160 mm.
+
+Incluye:
+
+Conducto circular Spiro galvanizado Ø160 mm para las redes de impulsión y extracción.
+Codos, manguitos, uniones, tapas y piezas especiales necesarias.
+Abrazaderas, varillas, soportes y elementos de fijación.
+Corte, ajuste, ensamblaje y alineación de los conductos.
+Sellado de juntas, uniones y pasos.
+Preparación de los puntos destinados al montaje directo de las rejillas.
+Pequeño material y medios auxiliares necesarios para la completa ejecución.
+
+No se prevén ramales secundarios: los terminales se instalarán directamente sobre los dos conductos longitudinales.
+
+Los conductos discurrirán íntegramente por el interior y se ejecutarán sin aislamiento térmico. No se utilizará conducto flexible como red principal.
+
+Criterio de medida en proyecto: metro (m) de conducto Ø160 mm medido según longitud de eje del trazado proyectado.
+
+Criterio de medida en obra: metro (m) de conducto realmente instalado, soportado, unido y sellado, preparado para conexión a equipos y terminales.|
+~D|04.03
+|MT-CON-PP\\30
+\MT-CON-AUX\\1
+\MO-CLIMA-OF\\8
+\MO-CLIMA-AY\\8
+\%MT-hidr\\0.05
+\|
+~C|MT-CON-PP|m|Conducto circular helicoidal de chapa de acero galvanizado tipo Spiro Ø160 mm|12||3|
+~C|04.04|ud|Elementos terminales, regulación y conexión con exterior en planta primera|671.08||0|
+~T|04.04|Suministro e instalación de los elementos terminales interiores y exteriores correspondientes al sistema de ventilación de planta primera, mediante tres puntos de impulsión y tres puntos de extracción distribuidos longitudinalmente.
+
+Incluye:
+
+3 rejillas KOOLAIR 21-DVC 225×75 mm o equivalente, de doble deflexión y lamas orientables, para impulsión.
+Caudal de diseño aproximado de 75 m³/h por rejilla.
+3 rejillas KOOLAIR 21-SVC 225×75 mm o equivalente, de simple deflexión, para extracción.
+Caudal de diseño aproximado de 75 m³/h por rejilla.
+Montaje directo de los seis terminales sobre conducto circular Ø160 mm.
+6 compuertas de regulación KOOLAIR RFS-05/06 o equivalente, compatibles con los terminales seleccionados.
+2 rejillas exteriores, una destinada a toma de aire y otra a expulsión, con lamas antilluvia y malla de protección, adecuadas para conexión a la red Ø160 mm y para un caudal de 225 m³/h.
+Apertura y preparación de huecos en los conductos.
+Fijaciones, conexiones, juntas, sellado y pequeño material.
+Orientación inicial de las rejillas de impulsión hacia la zona ocupada.
+
+La toma y la expulsión exteriores se dispondrán con separación suficiente para evitar recirculación entre ambas corrientes.
+
+Criterio de medida en proyecto: unidad (ud) de conjunto de terminales, regulación y conexiones exteriores.
+
+Criterio de medida en obra: unidad completamente instalada, incluyendo seis terminales interiores, seis elementos de regulación y dos terminales exteriores, preparada para equilibrado y puesta en servicio.|
+~D|04.04
+|MT-TERM-PP-I\\3
+\MT-TERM-PP-E\\3
+\MT-REG-CON\\6
+\MT-REJ-EXT\\2
+\MO-CLIMA-OF\\5
+\MO-CLIMA-AY\\5
+\%MT-hidr\\0.05
+\|
+~C|MT-TERM-PP-I|ud|Rejilla de impulsión KOOLAIR 21-DVC 225×75 mm, doble deflexión, montaje directo sobre conducto circular Ø160|26.09||3|
+~C|MT-TERM-PP-E|ud|Rejilla de extracción KOOLAIR 21-SVC 225×75 mm, simple deflexión, montaje directo sobre conducto circular Ø160|18.58||3|
+~C|04.05|ud|Alimentación eléctrica, mando y control del sistema de ventilación mecánica PP|519.6|260826|0|
+~T|04.05|Ejecución de la instalación eléctrica y de control necesaria para la alimentación, mando y regulación de los ventiladores EC de impulsión y extracción de planta baja, desde circuito dedicado procedente del cuadro Q02, C2.3-Vent
+
+Incluye:
+
+Alimentación monofásica a 230 V mediante cable RZ1-K (AS) 3G1,5 mm² Cu.
+Canalización de protección correspondiente al trazado.
+Derivaciones y conexionado de los ventiladores de impulsión y extracción.
+Cableado de mando y regulación requerido por los motores EC.
+Sistema de mando con programación horaria semanal.
+Marcha y parada coordinada de impulsión y extracción.
+Regulación independiente de ambos ventiladores para ajuste de caudales.
+Cajas, bornes, conexiones, fijaciones y pequeño material eléctrico.
+Comprobación de continuidad, conexionado, funcionamiento del mando y respuesta de los ventiladores.
+
+Las protecciones magnetotérmicas y diferenciales del circuito se consideran incluidas en el capítulo correspondiente a la reforma de baja tensión.
+
+Criterio de medida en proyecto: unidad (ud) de instalación eléctrica y sistema de mando y control completamente ejecutados.
+
+Criterio de medida en obra: unidad instalada, conexionada y funcional, incluyendo alimentación de ambos ventiladores, mando, regulación y programación.|
+~D|04.05
+|MT-3G1_5mm2c\\30
+\MT-3G1.5mm2bb\\30
+\MT-Mcontrolb\\1
+\elec01\\4
+\MO-ELEC-AY\\4
+\%MT-Elec\\0.05
+\|
+~C|05#||REGULACIÓN, PRUEBAS Y PUESTA EN MARCHA|339.36||0|
+~D|05#
+|05.01\\1
+\05.02\\1
+\|
+~C|05.01|ud|Pruebas y puesta en marcha de los sistemas de climatización|161.6||0|
+~T|05.01|Realización de las operaciones finales de comprobación, ajuste y puesta en marcha de los sistemas de climatización objeto de reforma, incluyendo el nuevo sistema cassette Mitsubishi Electric Serie PRO MGPLZ-100VEA y el sistema split existente de aproximadamente 5 kW objeto de reubicación.
+
+Incluye:
+
+Comprobación de conexiones frigoríficas, eléctricas, de comunicación y evacuación de condensados.
+Verificación de estanqueidad y ausencia de fugas en los circuitos frigoríficos intervenidos.
+Comprobación de las condiciones previas a puesta en servicio y apertura de válvulas de servicio.
+Puesta en funcionamiento y comprobación en los modos de operación disponibles.
+Verificación de temperaturas de impulsión y retorno y correcto funcionamiento de unidades interiores y exteriores.
+Comprobación de la evacuación de condensados.
+Configuración de mandos, consignas y parámetros básicos de funcionamiento.
+Comprobación de ausencia de vibraciones, ruidos o anomalías de funcionamiento.
+Ajustes finales necesarios para dejar ambos sistemas completamente operativos.
+
+Criterio de medida: unidad (ud) de conjunto de sistemas de climatización comprobados, regulados y puestos en servicio.|
+~D|05.01
+|MO-CLIMA-OF\\3
+\MO-CLIMA-AY\\2
+\%MT-hidr\\0.05
+\|
+~C|05.02|ud|Pruebas y puesta en marcha de los sistemas de ventilación|161.6||0|
+~T|05.02|Realización de las operaciones finales de comprobación, medición y regulación de los sistemas de impulsión y extracción de aire, hasta alcanzar los caudales de diseño y garantizar su correcto funcionamiento.
+
+Incluye:
+
+Comprobación general de conductos, ventiladores, filtros, terminales, compuertas y conexiones.
+Puesta en funcionamiento de los ventiladores de impulsión y extracción.
+Medición de caudales mediante instrumentación adecuada.
+Regulación de velocidad de los ventiladores EC y ajuste de las compuertas de los terminales.
+Equilibrado de las redes de impulsión y extracción.
+Ajuste a los caudales nominales de 450 m³/h en PB y 225 m³/h en PP, tanto en impulsión como en extracción.
+Ajuste orientativo de 150 m³/h por terminal en PB y 75 m³/h por terminal en PP.
+Configuración y comprobación de marcha/parada, regulación y programación horaria.
+Verificación del sentido de circulación, funcionamiento de filtros y terminales y ausencia de vibraciones o ruidos anómalos.
+Registro de los principales parámetros de funcionamiento y realización de los ajustes finales necesarios.
+Puesta en servicio definitiva de ambos sistemas de ventilación.
+
+Criterio de medida: unidad (ud) de conjunto de sistemas de ventilación PB y PP completamente comprobados, equilibrados, regulados y puestos en servicio.|
+~D|05.02
+|MO-CLIMA-OF\\3
+\MO-CLIMA-AY\\2
+\%MT-hidr\\0.05
+\|
+~C|06#||CERTIFICACIÓN Y LEGALIZACIÓN DE LA INSTALAICÓN TÉRMICA|509.71||0|
+~D|06#
+|06.01\\1
+\|
+~C|06.01|ud|Certificación y legalización de la instalación térmica conforme al RITE|485.44||0|
+~T|06.01|Revisión técnica, documentación, certificación y tramitación para la legalización del conjunto de la instalación térmica del establecimiento, incluyendo tanto las instalaciones existentes (15 kW frío) en servicio como las nuevas instalaciones y modificaciones ejecutadas durante la reforma, de acuerdo con las exigencias del Reglamento de Instalaciones Térmicas en los Edificios (RITE) y el procedimiento administrativo aplicable.
+
+La actuación comprenderá la inspección y caracterización de la instalación existente, la comprobación de su adecuación para su incorporación a la instalación objeto de registro y la integración documental de los nuevos sistemas de climatización y ventilación ejecutados, considerando una potencia térmica instalada total aproximada de 25 kW.
+
+Incluye:
+
+Revisión técnica de los equipos e instalaciones térmicas existentes que deban permanecer en servicio.
+Identificación e inventario de los equipos de climatización existentes y nuevos, incluyendo sus características principales, potencias y datos necesarios para la documentación reglamentaria.
+Revisión de las modificaciones efectuadas sobre los sistemas existentes, incluyendo el sistema split de aproximadamente 5 kW objeto de reubicación.
+Incorporación documental del nuevo sistema de climatización Mitsubishi Electric Serie PRO MGPLZ-100VEA, formado por unidad interior PLA-SM100EA y unidad exterior PUZ-SM100VKA.
+Incorporación de los sistemas de ventilación mecánica ejecutados en las oficinas, con caudales nominales de 450 m³/h en planta baja y 225 m³/h en planta primera, incluyendo impulsión, extracción, filtración, regulación y control.
+Comprobación de las características generales de las instalaciones ejecutadas y de su correspondencia con la documentación a presentar.
+Determinación y justificación de la potencia térmica instalada total y de las características reglamentarias de la instalación resultante.
+Recopilación de fichas técnicas, características de equipos y demás documentación necesaria para la tramitación.
+Elaboración y firma de la Memoria Técnica de la instalación conforme al RITE, incluyendo los cálculos, justificaciones, relación de equipos, esquemas y documentación técnica reglamentariamente exigible.
+Elaboración, emisión y firma del Certificado de Instalación Térmica por empresa instaladora habilitada.
+Preparación de formularios y documentación administrativa necesaria.
+Presentación y tramitación ante la UDIT/órgano competente de la CAIB para el registro y puesta en servicio de la instalación.
+Atención y subsanación de posibles requerimientos documentales derivados de errores, omisiones o aclaraciones correspondientes a la documentación elaborada dentro de esta partida.
+Entrega al titular de copia de la memoria técnica, certificado, documentación presentada y justificante final de registro o puesta en servicio.
+
+Criterio de medida en proyecto: unidad (ud) de actuación completa de revisión, documentación, certificación y legalización de la instalación térmica.
+
+Criterio de medida en obra: unidad efectivamente ejecutada, incluyendo revisión de la instalación existente y reformada, elaboración y firma de la Memoria Técnica RITE y Certificado de Instalación Térmica, tramitación administrativa y entrega de la documentación acreditativa correspondiente.|

@@ -4,7 +4,14 @@ import zipfile
 
 from openpyxl import load_workbook
 
-from gantt.bc3.models import Capitulo, Partida, Presupuesto, ProjectConfig, RecursoMO
+from gantt.bc3.models import (
+    Capitulo,
+    Partida,
+    Presupuesto,
+    ProjectConfig,
+    RecursoElemental,
+    RecursoMO,
+)
 from gantt.reporting.presupuesto_exporter import (
     generar_pres0301_mediciones,
     generar_pres0302_mediciones_ciegas,
@@ -55,8 +62,24 @@ def _presupuesto_pres03() -> Presupuesto:
         descripcion="Presupuesto demo",
         importe_total=9876.54,
         capitulos=[capitulo],
-        recursos_mo={"MO-01": RecursoMO(codigo="MO-01", descripcion="Oficial especialista", precio_hora=88.88)},
-        descompuestos_raw={"01.01": [("MO-01", 2.0)]},
+        recursos_mo={
+            "MO-01": RecursoMO(
+                codigo="MO-01",
+                descripcion="Oficial especialista",
+                precio_hora=88.88,
+            )
+        },
+        recursos_mt={
+            "MT-01": RecursoElemental(
+                codigo="MT-01",
+                descripcion="Material medible",
+                unidad="ud",
+                precio_unidad=12.34,
+            )
+        },
+        descompuestos_raw={
+            "01.01": [("MO-01", 2.0), ("MT-01", 3.0), ("%MT", 0.05)],
+        },
         config=ProjectConfig(
             proyecto="Auditoria energetica integral",
             edificio="Viding Fitness Calvia",
@@ -77,59 +100,65 @@ def _values(path: Path) -> tuple[list, str]:
         wb.close()
 
 
-def test_pres0302_mediciones_ciegas_contenido_layout_integridad_y_confidencialidad(tmp_path: Path):
-    path = tmp_path / "PRES.03.02_Mediciones_Ciegas.xlsx"
+def _assert_delivery_printing_and_perimeter(path: Path) -> None:
+    wb = load_workbook(path, data_only=False)
+    try:
+        ws = wb.active
+        assert ws.freeze_panes is None
+        assert str(ws.page_setup.paperSize) == str(ws.PAPERSIZE_A4)
+        assert ws.page_setup.orientation == "portrait"
+        assert ws.page_setup.fitToWidth == 1
+        assert ws.page_margins.left >= 0.7
+        assert ws.print_title_rows
+        assert ws.print_area
 
-    generar_pres0302_mediciones_ciegas(_presupuesto_pres03(), path)
+        header_row = int(ws.print_title_rows.split(":")[0].replace("$", ""))
+        if ws["A7"].fill.fgColor.rgb.endswith("1B3A5C"):
+            assert ws["A7"].font.color.rgb.endswith("FFFFFF")
+        min_col = 1
+        max_col = ws.max_column
+        assert ws.cell(header_row, min_col).border.left.style
+        assert ws.cell(header_row, max_col).border.right.style
+        for col in range(min_col, max_col + 1):
+            assert ws.cell(header_row, col).border.top.style
+            assert ws.cell(header_row, col).border.bottom.style
+    finally:
+        wb.close()
+
+
+def test_pres0301_mediciones_ciegas_detalladas_layout_integridad_y_contenido(tmp_path: Path):
+    path = tmp_path / "PRES.03.01_Mediciones_Ciegas.xlsx"
+
+    generar_pres0301_mediciones(_presupuesto_pres03(), path)
 
     report = validate_xlsx_integrity(path)
     assert report.passed, report.issues
+    _assert_delivery_printing_and_perimeter(path)
 
     wb = load_workbook(path, data_only=False)
     try:
-        assert wb.sheetnames == ["MEDICIONES"]
-        ws = wb["MEDICIONES"]
+        assert wb.sheetnames == ["Mediciones Ciegas"]
+        ws = wb["Mediciones Ciegas"]
         values = [cell.value for row in ws.iter_rows() for cell in row if cell.value is not None]
         text = "\n".join(str(value) for value in values)
 
         assert "MEDICIONES CIEGAS" in values
-        assert "PRES.03.02" in values
-        assert "CAPÍTULO 01 — Informacion tecnica" in values
-        assert "01.1 — Subcapitulo tecnico" in values
+        assert "PRES.03.01" in values
         assert "01.01" in values
         assert "Levantamiento inicial" in values
         assert "Servicio de recopilacion" in text
-        assert "m2" in values
-        assert 0.125 in values
-        assert 1.5 in values
-
-        forbidden_terms = [
-            "P. unit.",
-            "Importe",
-            "Precio unitario",
-            "TOTAL CAPÍTULO",
-            "PEM",
-            "PEC",
-            "GG",
-            "BI",
-            "IVA",
-            "MO",
-            "MT",
-            "MQ",
-            "PA",
-        ]
-        for term in forbidden_terms:
-            assert not re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, flags=re.IGNORECASE)
-        assert "1234.56" not in text
-        assert "9876.54" not in text
-
-        assert ws.freeze_panes is None
-        assert str(ws.page_setup.paperSize) == str(ws.PAPERSIZE_A4)
-        assert ws.page_setup.orientation == "portrait"
-        assert ws.print_title_rows
-        assert not any(dim.hidden for dim in ws.column_dimensions.values())
-        assert not any(dim.hidden for dim in ws.row_dimensions.values())
-        assert not any(isinstance(value, str) and value.startswith("=") for value in values)
+        assert "MO" in values
+        assert "MT" in values
+        assert "MO-01" in text
+        assert "MT-01" in text
+        assert 2.0 in values
+        assert 3.0 in values
+        assert "P. unit." not in text
+        assert "Importe" not in text
+        assert "%" not in values
+        assert "%MT" not in text
+        assert "TOTAL CAP" not in text
+        assert "PEM" not in text
     finally:
         wb.close()
 
@@ -140,62 +169,78 @@ def test_pres0302_mediciones_ciegas_contenido_layout_integridad_y_confidencialid
     assert b"88.88" not in serialized
 
 
-def test_pres0301_mediciones_recupera_comportamiento_historico(tmp_path: Path):
-    path = tmp_path / "PRES.03.01_Mediciones.xlsx"
+def test_pres0302_mediciones_simples_no_escribe_recursos_ni_totales(tmp_path: Path):
+    path = tmp_path / "PRES.03.02_Mediciones.xlsx"
 
-    generar_pres0301_mediciones(_presupuesto_pres03(), path)
+    generar_pres0302_mediciones_ciegas(_presupuesto_pres03(), path)
 
     report = validate_xlsx_integrity(path)
     assert report.passed, report.issues
+    _assert_delivery_printing_and_perimeter(path)
 
     wb = load_workbook(path, data_only=False)
     try:
-        ws = wb["Mediciones"]
+        assert wb.sheetnames == ["MEDICIONES"]
+        ws = wb["MEDICIONES"]
         values = [cell.value for row in ws.iter_rows() for cell in row if cell.value is not None]
         text = "\n".join(str(value) for value in values)
 
         assert "MEDICIONES" in values
-        assert "PRES.03.01" in values
-        assert "CAPÍTULO 01 — Informacion tecnica" in values
+        assert "MEDICIONES CIEGAS" not in values
+        assert "PRES.03.02" in values
         assert "01.01" in values
-        assert "Levantamiento inicial" in values
+        assert "01.02" in values
+        assert "m2" in values
+        assert 0.125 in values
+        assert 1.5 in values
         assert "Servicio de recopilacion" in text
-        assert "MO" in values
-        assert "MO-01 — Oficial especialista" in values
-        assert "TOTAL CAPÍTULO 01: Informacion tecnica" in values
-        assert "P. unit." not in text
-        assert "Importe" not in text
-        assert ws.freeze_panes is None
-        assert str(ws.page_setup.paperSize) == str(ws.PAPERSIZE_A4)
-        assert ws.page_setup.orientation == "portrait"
-        assert ws.print_title_rows
+
+        forbidden_terms = [
+            "P. unit.",
+            "Importe",
+            "Precio unitario",
+            "TOTAL CAP",
+            "PEM",
+            "PEC",
+            "GG",
+            "BI",
+            "IVA",
+            "MO",
+            "MT",
+            "MQ",
+            "PA",
+            "%MT",
+        ]
+        for term in forbidden_terms:
+            assert not re.search(rf"(?<!\w){re.escape(term)}(?!\w)", text, flags=re.IGNORECASE)
     finally:
         wb.close()
 
 
 def test_pres0301_y_pres0302_son_documentos_distintos_desde_mismo_presupuesto(tmp_path: Path):
     presupuesto = _presupuesto_pres03()
-    mediciones = tmp_path / "PRES.03.01_Mediciones.xlsx"
-    ciegas = tmp_path / "PRES.03.02_Mediciones_Ciegas.xlsx"
+    ciegas = tmp_path / "PRES.03.01_Mediciones_Ciegas.xlsx"
+    mediciones = tmp_path / "PRES.03.02_Mediciones.xlsx"
 
-    generar_pres0301_mediciones(presupuesto, mediciones)
-    generar_pres0302_mediciones_ciegas(presupuesto, ciegas)
+    generar_pres0301_mediciones(presupuesto, ciegas)
+    generar_pres0302_mediciones_ciegas(presupuesto, mediciones)
 
-    valores_mediciones, texto_mediciones = _values(mediciones)
     valores_ciegas, texto_ciegas = _values(ciegas)
+    valores_mediciones, texto_mediciones = _values(mediciones)
 
-    assert mediciones.name != ciegas.name
-    assert "PRES.03.01" in valores_mediciones
-    assert "PRES.03.02" in valores_ciegas
-    assert "01.01" in valores_mediciones
+    assert ciegas.name != mediciones.name
+    assert "PRES.03.01" in valores_ciegas
+    assert "PRES.03.02" in valores_mediciones
     assert "01.01" in valores_ciegas
-    assert "m2" in valores_mediciones
+    assert "01.01" in valores_mediciones
     assert "m2" in valores_ciegas
-    assert 0.125 in valores_mediciones
+    assert "m2" in valores_mediciones
     assert 0.125 in valores_ciegas
-    assert texto_mediciones != texto_ciegas
-    assert "MO-01 — Oficial especialista" in valores_mediciones
-    assert "MO-01 — Oficial especialista" not in valores_ciegas
-    assert "TOTAL CAPÍTULO 01: Informacion tecnica" in valores_mediciones
-    assert "TOTAL CAPÍTULO 01: Informacion tecnica" not in valores_ciegas
-    assert "1234.56" not in texto_ciegas
+    assert 0.125 in valores_mediciones
+    assert texto_ciegas != texto_mediciones
+    assert "MO-01" in texto_ciegas
+    assert "MT-01" in texto_ciegas
+    assert "MO-01" not in texto_mediciones
+    assert "MT-01" not in texto_mediciones
+    assert "TOTAL CAP" not in texto_ciegas
+    assert "TOTAL CAP" not in texto_mediciones

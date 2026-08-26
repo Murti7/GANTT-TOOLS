@@ -21,19 +21,18 @@ PPT_Complex_V09_Un_Ref_Sin_Act_Vaso: base=108, optimizado=51
 PPT_Complex_VFinal: base=93, optimizado=46
 ```
 
-## ENG-3B.3 follow-up: PRES.03 split
+## ENG-3B.4 follow-up: PRES.03 identity correction
 
-La normalizacion inicial de `PRES.03_Mediciones.xlsx` se migra a dos documentos
-canonicos independientes:
+La normalizacion de `PRES.03` queda corregida en dos documentos canonicos
+independientes:
 
-- `PRES.03.01_Mediciones.xlsx`: recupera el documento historico de mediciones,
-  basado en el generador compartido de descompuesto con `mostrar_precios=False`.
-  Mantiene capitulos, subcapitulos, partidas, descripciones, unidades,
-  cantidades, detalle de recursos/descompuesto sin precios visibles y filas
-  marcador `TOTAL CAPITULO` no economicas.
-- `PRES.03.02_Mediciones_Ciegas.xlsx`: mantiene la variante ciega introducida en
-  ENG-3B.3, construida directamente desde capitulos/partidas y sin precios,
-  importes, recursos, descompuestos, totales economicos ni economia oculta.
+- `PRES.03.01_Mediciones_Ciegas.xlsx`: medicion ciega detallada para solicitud
+  de precios. Mantiene capitulos, subcapitulos, partidas, descripciones,
+  unidades, cantidades y recursos medibles no valorados. Excluye precios,
+  importes, porcentajes auxiliares y totales.
+- `PRES.03.02_Mediciones.xlsx`: medicion simple, construida directamente desde
+  capitulos/partidas y sin precios, importes, recursos, descompuestos, totales
+  economicos ni economia oculta.
 
 `PRES.03_Mediciones.xlsx` queda como nombre intermedio obsoleto; no se genera en
 la salida canonica.

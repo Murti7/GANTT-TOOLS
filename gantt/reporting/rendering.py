@@ -222,6 +222,7 @@ def render_budget_header(
             ws.cell(row, col).border = BOX_BORDER
             if row == 7:
                 ws.cell(row, col).fill = palette.fill_header
+                ws.cell(row, col).font = palette.font_header
             else:
                 ws.cell(row, col).fill = palette.fill_white
             ws.cell(row, col).alignment = Alignment(vertical="center", wrap_text=True)
@@ -375,7 +376,7 @@ def configure_excel_printing(
     ws.page_setup.fitToWidth = 1
     ws.page_setup.fitToHeight = fit_to_height
     ws.sheet_properties.pageSetUpPr.fitToPage = True
-    ws.page_margins.left = 0.5
+    ws.page_margins.left = 0.7
     ws.page_margins.right = 0.5
     ws.page_margins.top = 0.6
     ws.page_margins.bottom = 0.6

@@ -306,8 +306,8 @@ LITERALES: dict[str, dict[str, str]] = {
         'web':         'Web',
         'email':       'Email',
         'tel':         'Tel',
-        'pres_03_01':  'Mediciones',
-        'pres_03_02':  'Mediciones ciegas',
+        'pres_03_01':  'Mediciones ciegas',
+        'pres_03_02':  'Mediciones',
     },
     'ca': {
         'generado':    'Document generat el',
@@ -318,8 +318,8 @@ LITERALES: dict[str, dict[str, str]] = {
         'web':         'Web',
         'email':       'Email',
         'tel':         'Tel',
-        'pres_03_01':  'Amidaments',
-        'pres_03_02':  'Amidaments cecs',
+        'pres_03_01':  'Amidaments cecs',
+        'pres_03_02':  'Amidaments',
     },
     'en': {
         'generado':    'Document generated on',
@@ -330,8 +330,8 @@ LITERALES: dict[str, dict[str, str]] = {
         'web':         'Web',
         'email':       'Email',
         'tel':         'Tel',
-        'pres_03_01':  'Measurements',
-        'pres_03_02':  'Blind measurements',
+        'pres_03_01':  'Blind measurements',
+        'pres_03_02':  'Measurements',
     },
 }
 

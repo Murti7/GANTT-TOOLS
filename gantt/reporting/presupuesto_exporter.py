@@ -47,8 +47,8 @@ _ANEXO_DOCUMENT_TYPE = {
     "PRES.02.02": DocumentType.UNIT_PRICE_TABLE_2,
     "PRES.02.03": DocumentType.DECOMPOSED_BUDGET,
     "PRES.02.04": DocumentType.CHAPTER_SUMMARY,
-    "PRES.03.01": DocumentType.MEASUREMENTS,
-    "PRES.03.02": DocumentType.BLIND_MEASUREMENTS,
+    "PRES.03.01": DocumentType.BLIND_MEASUREMENTS,
+    "PRES.03.02": DocumentType.MEASUREMENTS,
     "PRES.05": DocumentType.VEC_SETTLEMENT,
     "JUST_PRECIOS": DocumentType.RESOURCE_PRICE_JUSTIFICATION,
 }
@@ -301,7 +301,8 @@ def configurar_impresion(
     """Configura impresion con politica documental normalizada."""
     for row in ws.iter_rows():
         for cell in row:
-            if cell.value is not None and cell.font.name in (None, "Calibri"):
+            has_explicit_color = cell.font.color is not None and cell.font.color.type == "rgb"
+            if cell.value is not None and cell.font.name in (None, "Calibri") and not has_explicit_color:
                 cell.font = PRES_FN
     configure_excel_printing(ws, orientation=orientacion, repeat_row=fila_cabecera)
 
@@ -1246,9 +1247,9 @@ def generar_descompuesto_doc(
     sheet_title: str | None = None,
 ) -> None:
     """
-    Generador compartido para PRES.02.03 (con precios) y PRES.03.01 (mediciones historicas).
+    Generador compartido para PRES.02.03 (con precios) y PRES.03.01 (mediciones ciegas).
     Con mostrar_precios=True: 6 columnas, precios, importes, horas MO visibles, PEM final.
-    Con mostrar_precios=False: 4 columnas, sin precios, sin importes, horas MO ocultas.
+    Con mostrar_precios=False: 4 columnas, sin precios, sin importes, recursos medibles visibles.
     """
     pal = palette or build_palette(None)
     company = presupuesto.company
@@ -1259,11 +1260,11 @@ def generar_descompuesto_doc(
     headers    = (['Código', 'Descripción', 'Ud.', 'Cantidad', 'P. unit. (€)', 'Importe (€)']
                   if mostrar_precios else ['Código', 'Descripción', 'Ud.', 'Cantidad'])
     anexo      = anexo or ('PRES.02.03' if mostrar_precios else 'PRES.03.01')
-    titulo     = titulo or ('PRESUPUESTO DESCOMPUESTO Y MEDICIONES' if mostrar_precios else 'MEDICIONES')
+    titulo     = titulo or ('PRESUPUESTO DESCOMPUESTO Y MEDICIONES' if mostrar_precios else 'MEDICIONES CIEGAS')
 
     wb = Workbook()
     ws = wb.active
-    ws.title = sheet_title or ('Presupuesto Descompuesto' if mostrar_precios else 'Mediciones')
+    ws.title = sheet_title or ('Presupuesto Descompuesto' if mostrar_precios else 'Mediciones Ciegas')
     ajustar_columnas(ws, col_widths)
     inserir_cabecera(
         ws, pal, company,
@@ -1299,10 +1300,10 @@ def generar_descompuesto_doc(
             ws.append(fila_p)
             r_p = ws.max_row
             aplicar_estilo_capitulo(ws, r_p, N)
-            cel_desc(ws, r_p, 2, partida.descripcion, font=PRES_FCF, width_chars=42, max_height=90.0)
-            ws.cell(r_p, 2).fill = PRES_FCP
-            cel_cantidad(ws, r_p, 4, partida.cantidad, font=PRES_FCF)
-            ws.cell(r_p, 4).fill = PRES_FCP
+            cel_desc(ws, r_p, 2, partida.descripcion, font=pal.font_subhead, width_chars=42, max_height=90.0)
+            ws.cell(r_p, 2).fill = pal.fill_subhead
+            cel_cantidad(ws, r_p, 4, partida.cantidad, font=pal.font_subhead)
+            ws.cell(r_p, 4).fill = pal.fill_subhead
             if mostrar_precios:
                 cel_eur(ws, r_p, 5, partida.precio_unitario, font=PRES_FCF)
                 ws.cell(r_p, 5).fill = PRES_FCP
@@ -1329,8 +1330,12 @@ def generar_descompuesto_doc(
                             suma_directos_local += round(cant_tmp * precio_tmp, 4)
                 base_aux_local = suma_directos_local  # base acumulada para % en cascada
 
-                for tipo, _ in [('MO', None), ('MQ', None), ('MT', None),
-                                 ('PA', None), ('%', None), ('?', None)]:
+                tipos_visibles = (
+                    [('MO', None), ('MQ', None), ('MT', None), ('PA', None), ('%', None), ('?', None)]
+                    if mostrar_precios
+                    else [('MO', None), ('MQ', None), ('MT', None)]
+                )
+                for tipo, _ in tipos_visibles:
                     if not grupos[tipo]:
                         continue
                     for cod_rec, cant in grupos[tipo]:
@@ -1350,7 +1355,7 @@ def generar_descompuesto_doc(
                             if tipo == '%':
                                 base_aux_local += coste
                         else:
-                            cant_visible = '' if tipo == 'MO' else cant
+                            cant_visible = cant
                             ws.append([col_tipo, f'{cod_rec} — {desc_r}', unidad_r, cant_visible])
 
                         r_r = ws.max_row
@@ -1370,7 +1375,7 @@ def generar_descompuesto_doc(
                             ws.cell(r_r, 6).number_format = PRES_FE
                             ws.cell(r_r, 6).alignment    = PRES_AN
                         else:
-                            cant_visible = '' if tipo == 'MO' else cant
+                            cant_visible = cant
                             if cant_visible != '':
                                 cel_cantidad(ws, r_r, 4, cant_visible, font=PRES_FDE,
                                               recurso=(tipo not in ('%', '?')))
@@ -1389,6 +1394,9 @@ def generar_descompuesto_doc(
         ws.row_dimensions[r].height = 18
         registrar_altura_manual(ws, r)
         escribir_partidas_de(cap)
+        if not mostrar_precios:
+            sep_vacia(ws, 6.0, N)
+            continue
 
         # Total capítulo
         if mostrar_precios:
@@ -1437,22 +1445,22 @@ def generar_pres0203(
 def generar_pres0301_mediciones(
     presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
 ) -> None:
-    """Genera PRES.03.01 Mediciones con el comportamiento historico recuperado."""
+    """Genera PRES.03.01 Mediciones ciegas detalladas sin economia."""
     generar_descompuesto_doc(
         presupuesto,
         filepath,
         mostrar_precios=False,
         palette=palette,
         anexo="PRES.03.01",
-        titulo="MEDICIONES",
-        sheet_title="Mediciones",
+        titulo="MEDICIONES CIEGAS",
+        sheet_title="Mediciones Ciegas",
     )
 
 
 def generar_pres0302_mediciones_ciegas(
     presupuesto: Presupuesto, filepath: Path, palette: DocumentPalette | None = None
 ) -> None:
-    """Genera PRES.03.02 Mediciones ciegas sin economia ni descompuestos."""
+    """Genera PRES.03.02 Mediciones simples sin economia ni descompuestos."""
     pal = palette or build_palette(None)
     company = presupuesto.company
 
@@ -1472,7 +1480,7 @@ def generar_pres0302_mediciones_ciegas(
         ref_projecte=presupuesto.config.numero_expediente,
         revisio=presupuesto.config.revision,
     )
-    aplicar_encabezado_documental(ws, presupuesto.config, "PRES.03.02", "MEDICIONES CIEGAS", N, pal=pal)
+    aplicar_encabezado_documental(ws, presupuesto.config, "PRES.03.02", "MEDICIONES", N, pal=pal)
     cabecera_tabla(ws, ["Código", "Descripción", "Ud.", "Cantidad"], pal=pal)
     fila_cabecera = ws.max_row
     ajustar_columnas(ws, col_widths)
@@ -1884,8 +1892,8 @@ def generar_todos(
         (DocumentType.UNIT_PRICE_TABLE_2, generar_pres0202),
         (DocumentType.DECOMPOSED_BUDGET, generar_pres0203),
         (DocumentType.CHAPTER_SUMMARY, generar_pres0204),
-        (DocumentType.MEASUREMENTS, generar_pres0301_mediciones),
-        (DocumentType.BLIND_MEASUREMENTS, generar_pres0302_mediciones_ciegas),
+        (DocumentType.BLIND_MEASUREMENTS, generar_pres0301_mediciones),
+        (DocumentType.MEASUREMENTS, generar_pres0302_mediciones_ciegas),
         (DocumentType.VEC_SETTLEMENT, generar_pres05),
         (DocumentType.RESOURCE_PRICE_JUSTIFICATION, generar_just_precios),
     ]

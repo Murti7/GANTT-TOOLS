@@ -60,6 +60,22 @@ def test_resolver_contexto_ejecucion_separa_output_por_bc3_si_hay_varios(tmp_pat
     assert not hasattr(context.project_config, 'empresa')
 
 
+def test_resolver_contexto_ejecucion_registra_fallback_visual_sin_issuer(tmp_path: Path):
+    input_dir = tmp_path / 'projects' / 'Proyecto' / 'input'
+    input_dir.mkdir(parents=True)
+    (input_dir / 'a.bc3').write_text('', encoding='latin-1')
+
+    context = resolver_contexto_ejecucion(
+        'Proyecto',
+        workspace_root=tmp_path,
+        run_id='RUN-1',
+    )
+
+    assert context.company_slug is None
+    assert context.company_config is None
+    assert "No issuer/company configured; default presentation theme used." in context.warnings
+
+
 def test_cargar_config_proyecto_rechaza_claves_desconocidas(tmp_path: Path):
     config_path = tmp_path / 'config.yaml'
     config_path.write_text('empresa: demo\ncampo_inventado: true\n', encoding='utf-8')

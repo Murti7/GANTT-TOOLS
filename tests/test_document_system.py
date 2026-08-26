@@ -62,8 +62,8 @@ def test_filename_policy_budget_y_invoice_draft_issued():
     )
 
     assert filename_for_document(budget) == "PRES.02.04_Resumen_Capitulos.xlsx"
-    assert filename_for_document(measurements) == "PRES.03.01_Mediciones.xlsx"
-    assert filename_for_document(blind_measurements) == "PRES.03.02_Mediciones_Ciegas.xlsx"
+    assert filename_for_document(blind_measurements) == "PRES.03.01_Mediciones_Ciegas.xlsx"
+    assert filename_for_document(measurements) == "PRES.03.02_Mediciones.xlsx"
     assert filename_for_document(draft) == "F01_DRAFT_invoice-123.xlsx"
     assert filename_for_document(issued) == "BAF-2026-001_F01.xlsx"
 

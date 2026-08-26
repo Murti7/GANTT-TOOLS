@@ -154,6 +154,10 @@ def resolver_contexto_ejecucion(
     company_config = None
     if company_slug:
         company_config = cargar_company(company_slug, workspace_root / 'companies')
+    else:
+        project_model_warnings.append(
+            "No issuer/company configured; default presentation theme used."
+        )
 
     planificacion_path = input_dir / 'planificacion.yaml'
     planificacion_path = planificacion_path if planificacion_path.exists() else None

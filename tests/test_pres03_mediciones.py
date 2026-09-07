@@ -147,11 +147,11 @@ def test_pres0301_mediciones_ciegas_detalladas_layout_integridad_y_contenido(tmp
         assert "01.01" in values
         assert "Levantamiento inicial" in values
         assert "Servicio de recopilacion" in text
-        assert "MO" in values
         assert "MT" in values
+        assert "MO" in values
         assert "MO-01" in text
         assert "MT-01" in text
-        assert 2.0 in values
+        assert 2.0 not in values
         assert 3.0 in values
         assert "P. unit." not in text
         assert "Importe" not in text

@@ -1,7 +1,7 @@
 ~V|CYPE INGENIEROS, S.A.|FIEBDC-3/2016|ARQUIMEDES||ANSI|Presupuesto|2|
 ~K|-9\3\3\3\2\2\2\2\EUR\|3\13\6\\21|3\2\\3\3\\2\2\2\-9\3\3\3\2\EUR\||
 ~X||ce\Coste energético\MJ\eCO2\Emisión de CO2\kg\ler\Código LER\\m\Masa del elemento\kg\v\Volumen\m3\|
-~C|REFORMA_IE_NAU_SANTA_MARIA##||Importado desde ficheros CSV|14259.58|030826|0|
+~C|REFORMA_IE_NAU_SANTA_MARIA##||Importado desde ficheros CSV|15131.13|030826|0|
 ~D|REFORMA_IE_NAU_SANTA_MARIA##
 |01#\\1
 \02#\\1
@@ -159,14 +159,14 @@ Criterio de medición en obra: ud ejecutada cuando se haya completado la retirada
 \MO-AY1\\1
 \|
 ~C|MT-RS1|ud|Gestión completa de residuos de instalación eléctrica|250||3|
-~C|02#||CUADROS ELÉCTRICOS|7637.75||0|
+~C|02#||CUADROS ELÉCTRICOS|8329.44||0|
 ~T|02#|Capítulo correspondiente al suministro, montaje y puesta en servicio de los cuadros eléctricos de baja tensión incluidos en la reforma de la instalación, comprendiendo el cuadro general y los subcuadros de distribución previstos en el proyecto. Incluye el suministro de envolventes y de la totalidad de la aparamenta de protección y maniobra definida en los esquemas unifilares, así como el montaje, cableado interior, identificación, comprobaciones funcionales y preparación para su posterior conexión a las líneas de alimentación y distribución definidas en el proyecto.|
 ~D|02#
 |02.01\\1
 \02.02\\1
 \02.03\\1
 \|
-~C|02.01|ud|Cuadro general Q01|3798.99||0|
+~C|02.01|ud|Cuadro general Q01|4036.84||0|
 ~T|02.01|Suministro, montaje y puesta en servicio del cuadro general de baja tensión Q01 destinado a la distribución principal de la instalación eléctrica objeto del proyecto, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, capacidad suficiente para alojar la totalidad de la aparamenta proyectada y reserva para futuras ampliaciones, completamente equipado con un interruptor general automático bipolar de 100 A, curva C y poder de corte mínimo de 10 kA, un protector contra sobretensiones transitorias bipolar tipo II, un interruptor diferencial bipolar tipo A de 40 A y sensibilidad de 30 mA, cinco interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 10 kA, dos interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 10 kA, dos interruptores automáticos magnetotérmicos bipolares de 25 A, curva C y poder de corte mínimo de 10 kA y un interruptor automático magnetotérmico bipolar de 50 A, curva C y poder de corte mínimo de 10 kA.
 
 Incluye:
@@ -190,6 +190,7 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 \MT-PR1\\1
 \MT-PR2\\1
 \MT-PR3\\1
+\MT-PR3b\\2
 \MT-PR4-10\\5
 \MT-PR5-10\\2
 \MT-PR6-10\\2
@@ -201,6 +202,7 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 ~C|MT-PR1|ud|Interruptor general automático 2P 100 A, curva C, PdC 10 kA|984.75||3|
 ~C|MT-PR2|ud|Protector contra sobretensiones transitorias tipo II, 2P|147.95||3|
 ~C|MT-PR3|ud|Interruptor diferencial 2P, tipo A, 40 A, 30 mA|384.24||3|
+~C|MT-PR3b|ud|Interruptor diferencial 2P, tipo A, 25 A, 30 mA|113.26|070926|3|
 ~C|MT-PR4-10|ud|Interruptor magnetotérmico 2P 10 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|128.84||3|
 ~C|MT-PR5-10|ud|Interruptor magnetotérmico 2P 16 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|131.17||3|
 ~C|MT-PR6-10|ud|Interruptor magnetotérmico 2P 25 A, curva C, PdC 10 kA según UNE-EN 60898-1, para instalación sobre carril DIN|137.8||3|
@@ -208,7 +210,7 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 ~C|MT-ET1|ud|Rótulos identificativos y esquema unifilar para cuadro eléctrico|25||3|
 ~C|%MT-Elec|%|Material eléctrico auxiliar|0|260326|%|
 ~T|%MT-Elec|Material eléctrico auxiliar|
-~C|02.02|ud|Subcuadro oficinas planta baja Q02|1960.83||0|
+~C|02.02|ud|Subcuadro oficinas planta baja Q02|2224.45||0|
 ~T|02.02|Suministro, montaje y puesta en servicio del subcuadro eléctrico de distribución Q02 destinado a la alimentación y protección de los circuitos eléctricos de las oficinas de planta baja, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, completamente equipado con un interruptor automático magnetotérmico general bipolar de 50 A, curva C y poder de corte mínimo de 6 kA, dos interruptores diferenciales bipolares tipo A de 40 A y sensibilidad de 30 mA, seis interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 6 kA y tres interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 6 kA.
 
 Incluye:
@@ -231,6 +233,8 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 \MT-CU2\\1
 \MT-PR7-6\\1
 \MT-PR3\\2
+\MT-PR3b\\1
+\MT-PR6-10\\1
 \MT-PR4-6\\5
 \MT-PR5-6\\3
 \MT-ET1\\1
@@ -240,7 +244,7 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 ~C|MT-PR7-6|ud|Interruptor magnetotérmico 2P 50 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|260.52||3|
 ~C|MT-PR4-6|ud|Interruptor magnetotérmico 2P 10 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|48.7||3|
 ~C|MT-PR5-6|ud|Interruptor magnetotérmico 2P 16 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|49.5||3|
-~C|02.03|ud|Subcuadro oficinas planta primera Q03|1655.48||0|
+~C|02.03|ud|Subcuadro oficinas planta primera Q03|1825.54||0|
 ~T|02.03|Suministro, montaje y puesta en servicio del subcuadro eléctrico de distribución Q03 destinado a la alimentación y protección de los circuitos eléctricos de las oficinas de planta primera, constituido por envolvente modular de superficie con grado de protección mínimo IP40 e índice de resistencia mecánica IK07, completamente equipado con un interruptor automático magnetotérmico general bipolar de 25 A, curva C y poder de corte mínimo de 6 kA, dos interruptores diferenciales bipolares tipo A de 40 A y sensibilidad de 30 mA, cinco interruptores automáticos magnetotérmicos bipolares de 10 A, curva C y poder de corte mínimo de 6 kA y tres interruptores automáticos magnetotérmicos bipolares de 16 A, curva C y poder de corte mínimo de 6 kA.
 
 Incluye:
@@ -263,13 +267,14 @@ Criterio de medición en obra: ud ejecutada cuando el cuadro haya sido completame
 \MT-CU2\\1
 \MT-PR6-6\\1
 \MT-PR3\\2
-\MT-PR4-6\\3
+\MT-PR3b\\1
+\MT-PR4-6\\4
 \MT-PR5-6\\4
 \MT-ET1\\1
 \%MT-Elec\\0.05
 \|
 ~C|MT-PR6-6|ud|Interruptor magnetotérmico 2P 25 A, curva C, PdC 6 kA según UNE-EN 60898-1, para instalación sobre carril DIN|48||3|
-~C|03#||INSTALACIÓN ELÉCTRICA|5181.88||0|
+~C|03#||INSTALACIÓN ELÉCTRICA|5361.74||0|
 ~T|03#|Capítulo correspondiente a la ejecución de las líneas eléctricas de alimentación y distribución previstas en la reforma de la instalación de baja tensión, comprendiendo la instalación de derivaciones individuales, líneas de alimentación entre cuadros, alimentación de equipos de climatización, ventilación mecánica, alumbrado de emergencia y demás circuitos definidos en el proyecto, incluyendo el suministro e instalación de canalizaciones, conductores, cajas de derivación, conexionado, identificación y comprobaciones necesarias para dejar la instalación completamente ejecutada y preparada para su puesta en servicio.|
 ~D|03#
 |03.01\\1
@@ -449,7 +454,7 @@ Criterio de medición en obra: ud realmente instalada, completamente conexionada,
 \|
 ~C|MT-LE2|ud|Luminaria de emergencia autónoma LED IP65, autonomía mínima 1 h|83.15||3|
 ~C|MT-CB2bb|m|Caja de empalmes IP 55, 150x150x180|15|030826|3|
-~C|03.08|ud|Instalación alumbrado de emergencia oficinas planta baja|641.95||0|
+~C|03.08|ud|Instalación alumbrado de emergencia oficinas planta baja|903.87||0|
 ~T|03.08|Suministro e instalación del sistema de alumbrado de emergencia correspondiente a las oficinas de planta baja, constituido por luminarias autónomas LED alimentadas a 230 V, con autonomía mínima de 1 hora, grado de protección IP42 y activación automática ante fallo del suministro del alumbrado normal, instaladas mediante circuito exclusivo de alumbrado de emergencia ejecutado con conductores de cobre tipo RZ1-K (AS) 0,6/1 kV de 1,5 mm² y protegidas mediante interruptor automático magnetotérmico bipolar de 10 A, curva C, conforme a la distribución definida en el proyecto.
 
 Incluye:
@@ -464,7 +469,7 @@ Criterio de medición en proyecto: ud por instalación completa de cada punto de a
 
 Criterio de medición en obra: ud realmente instalada, completamente conexionada, identificada, ensayada y en correcto funcionamiento.|
 ~D|03.08
-|MT-LE2\\4
+|MT-LE2\\7
 \MT-CB2b\\60
 \MT-TB2\\60
 \MT-CB2bb\\1
@@ -472,7 +477,7 @@ Criterio de medición en obra: ud realmente instalada, completamente conexionada,
 \MO-AY1\\2
 \%MT-Elec\\0.05
 \|
-~C|03.09|ud|Instalación alumbrado de emergencia oficinas planta primera|816.56||0|
+~C|03.09|ud|Instalación alumbrado de emergencia oficinas planta primera|729.26||0|
 ~T|03.09|Suministro e instalación del sistema de alumbrado de emergencia correspondiente a las oficinas de planta primera, constituido por luminarias autónomas LED alimentadas a 230 V, con autonomía mínima de 1 hora, grado de protección IP42 y activación automática ante fallo del suministro del alumbrado normal, instaladas mediante circuito exclusivo de alumbrado de emergencia ejecutado con conductores de cobre tipo RZ1-K (AS) 0,6/1 kV de 1,5 mm² y protegidas mediante interruptor automático magnetotérmico bipolar de 10 A, curva C, conforme a la distribución definida en el proyecto.
 
 Incluye:
@@ -487,7 +492,7 @@ Criterio de medición en proyecto: ud por instalación completa de cada punto de a
 
 Criterio de medición en obra: ud realmente instalada, completamente conexionada, identificada, ensayada y en correcto funcionamiento.|
 ~D|03.09
-|MT-LE2\\6
+|MT-LE2\\5
 \MT-TB2\\60
 \MT-CB2b\\60
 \MT-CB2bb\\1

@@ -1249,7 +1249,7 @@ def generar_descompuesto_doc(
     """
     Generador compartido para PRES.02.03 (con precios) y PRES.03.01 (mediciones ciegas).
     Con mostrar_precios=True: 6 columnas, precios, importes, horas MO visibles, PEM final.
-    Con mostrar_precios=False: 4 columnas, sin precios, sin importes, recursos medibles visibles.
+    Con mostrar_precios=False: 4 columnas, sin precios, sin importes, MO visible sin horas.
     """
     pal = palette or build_palette(None)
     company = presupuesto.company
@@ -1355,7 +1355,7 @@ def generar_descompuesto_doc(
                             if tipo == '%':
                                 base_aux_local += coste
                         else:
-                            cant_visible = cant
+                            cant_visible = '' if tipo == 'MO' else cant
                             ws.append([col_tipo, f'{cod_rec} — {desc_r}', unidad_r, cant_visible])
 
                         r_r = ws.max_row
@@ -1375,7 +1375,6 @@ def generar_descompuesto_doc(
                             ws.cell(r_r, 6).number_format = PRES_FE
                             ws.cell(r_r, 6).alignment    = PRES_AN
                         else:
-                            cant_visible = cant
                             if cant_visible != '':
                                 cel_cantidad(ws, r_r, 4, cant_visible, font=PRES_FDE,
                                               recurso=(tipo not in ('%', '?')))
